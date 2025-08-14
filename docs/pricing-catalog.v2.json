@@ -86,6 +86,63 @@
     "currency": "usd",
     "billing": "one_time"
   },
+  "reports": {
+    "standard": {
+      "variants": {
+        "a": { "price": 2900, "name": "Standard Report", "turnaround": "24-48 hours" },
+        "b": { "price": 4900, "name": "Standard Report", "turnaround": "24-48 hours" },
+        "c": { "price": 6900, "name": "Standard Report", "turnaround": "24-48 hours" }
+      },
+      "currency": "usd",
+      "billing": "one_time",
+      "features": ["10-15 pages", "GitHub-native analysis", "PDF + HTML delivery"],
+      "experiment": "multi_arm_bandit"
+    },
+    "custom": {
+      "base_price": 19900,
+      "rush_addon": 9900,
+      "currency": "usd",
+      "billing": "one_time",
+      "name": "Custom Report",
+      "turnaround": "12-24 hours",
+      "rush_turnaround": "6-12 hours",
+      "features": ["25-30 pages", "Custom analysis focus", "Priority support", "PDF + HTML delivery"]
+    },
+    "executive": {
+      "price": 99900,
+      "currency": "usd",
+      "billing": "one_time",
+      "name": "Executive Pack",
+      "turnaround": "6-12 hours",
+      "features": ["40+ pages", "Live readout session", "Slack/Teams delivery", "Confluence export", "Priority escalation"],
+      "requires_consultation": true,
+      "calendly_url": "https://calendly.com/mmtu-executive-consult"
+    },
+    "bundles": {
+      "driftguard_posture": {
+        "price": 9900,
+        "currency": "usd",
+        "billing": "one_time",
+        "name": "DriftGuard + Posture Report",
+        "components": ["driftguard_1mo_pro", "security_posture_standard"],
+        "discount_pct": 20
+      }
+    }
+  },
+  "overlay_studio": {
+    "pro": {
+      "variants": {
+        "a": { "price": 900, "name": "Pro Templates" },
+        "b": { "price": 1200, "name": "Pro Templates" },
+        "c": { "price": 1500, "name": "Pro Templates" },
+        "d": { "price": 1900, "name": "Pro Templates" }
+      },
+      "currency": "usd",
+      "billing": "one_time",
+      "features": ["SVG + 4K PNG exports", "Premium templates", "Priority support"],
+      "experiment": "multi_arm_bandit"
+    }
+  },
   "web_toys": {
     "meme_mixer": {
       "premium_pack": {
