@@ -1,0 +1,94 @@
+{
+  "bundle_upsells": {
+    "driftguard_posture": {
+      "id": "dg_posture_bundle_99",
+      "name": "DriftGuard Pro + Security Posture Report",
+      "price": 9900,
+      "currency": "usd",
+      "billing": "one_time",
+      "discount_percentage": 20,
+      "original_value": 12800,
+      "savings": 2900,
+      "components": [
+        {
+          "product": "driftguard_pro",
+          "duration": "1_month",
+          "value": 9900,
+          "description": "DriftGuard Pro (1 month access)"
+        },
+        {
+          "product": "security_posture_report", 
+          "tier": "standard",
+          "value": 2900,
+          "description": "Security Posture Analysis Report"
+        }
+      ],
+      "features": [
+        "Complete GitHub security analysis",
+        "Automated PR security reviews",
+        "Professional security posture report",
+        "Priority support for 30 days",
+        "Custom security recommendations",
+        "Compliance gap analysis"
+      ],
+      "display_config": {
+        "headline": "Complete Your Security Setup",
+        "subheadline": "Get DriftGuard Pro + Your Security Report for 20% off",
+        "cta_primary": "Add Security Bundle - $99",
+        "cta_secondary": "No thanks, just the report",
+        "urgency_text": "Limited time: Save $29 on this bundle",
+        "social_proof": "Used by 500+ development teams"
+      },
+      "targeting": {
+        "show_for_tiers": ["standard", "custom"],
+        "exclude_existing_dg_users": true,
+        "show_probability": 1.0,
+        "delay_seconds": 3
+      },
+      "analytics": {
+        "view_event": "bundle_upsell_view",
+        "accept_event": "bundle_upsell_accept", 
+        "decline_event": "bundle_upsell_decline",
+        "purchase_event": "bundle_upsell_purchase",
+        "track_props": [
+          "bundle_id",
+          "original_tier",
+          "original_price",
+          "bundle_price",
+          "savings_amount",
+          "utm_source",
+          "utm_medium",
+          "utm_campaign"
+        ]
+      }
+    },
+    "driftguard_org_discount": {
+      "id": "dg_org_20_off",
+      "name": "DriftGuard Organization Plan",
+      "discount_percentage": 20,
+      "promo_code": "POSTURE20",
+      "min_purchase": 19900,
+      "valid_days": 30,
+      "display_text": "Use code POSTURE20 for 20% off any DriftGuard plan",
+      "targeting": {
+        "show_for_company_size": "10+",
+        "show_for_executive_tier": true
+      }
+    }
+  },
+  "email_sequences": {
+    "thank_you_with_bundle": {
+      "subject": "Your {{report_name}} is being prepared + Special Offer",
+      "delay_minutes": 0,
+      "template": "thank_you_bundle_upsell",
+      "include_bundle_cta": true
+    },
+    "delivery_with_upsell": {
+      "subject": "Your {{report_name}} is ready + Secure your entire workflow",
+      "delay_minutes": 0,
+      "template": "report_delivery_bundle",
+      "include_bundle_cta": true,
+      "bundle_placement": "bottom"
+    }
+  }
+}

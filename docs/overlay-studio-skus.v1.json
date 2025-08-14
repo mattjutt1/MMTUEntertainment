@@ -1,0 +1,72 @@
+{
+  "overlay_studio": {
+    "pro": {
+      "experiment_config": {
+        "type": "multi_arm_bandit",
+        "active": true,
+        "variants": {
+          "a": {
+            "price": 900,
+            "display_price": "$9",
+            "billing": "one_time",
+            "name": "Studio Pro",
+            "weight": 0.25
+          },
+          "b": {
+            "price": 1200,
+            "display_price": "$12",
+            "billing": "one_time", 
+            "name": "Studio Pro",
+            "weight": 0.25
+          },
+          "c": {
+            "price": 1500,
+            "display_price": "$15",
+            "billing": "one_time",
+            "name": "Studio Pro", 
+            "weight": 0.25
+          },
+          "d": {
+            "price": 1900,
+            "display_price": "$19",
+            "billing": "one_time",
+            "name": "Studio Pro",
+            "weight": 0.25
+          }
+        },
+        "features": [
+          "SVG & 4K PNG exports",
+          "Premium template library (12+ templates)",
+          "Vector format support",
+          "PSD file exports",
+          "High-resolution (1440p & 4K)",
+          "Priority support",
+          "Commercial license"
+        ],
+        "analytics_events": {
+          "variant_assigned": "overlay_pro_variant_assigned",
+          "upgrade_view": "overlay_pro_upgrade_view",
+          "upgrade_click": "overlay_pro_upgrade_click",
+          "purchase_success": "overlay_pro_purchase_success"
+        }
+      }
+    },
+    "seasonal_packs": {
+      "valorant_pack": {
+        "price": 500,
+        "name": "Valorant Pro Pack",
+        "templates": ["valorant_classic", "valorant_neon", "valorant_tactical"]
+      },
+      "cozy_pack": {
+        "price": 500,
+        "name": "Cozy Streamer Pack", 
+        "templates": ["cozy_indie", "cozy_reading", "cozy_coffee"]
+      },
+      "retro_pack": {
+        "price": 500,
+        "name": "Retro Pixel Pack",
+        "templates": ["retro_pixel", "retro_arcade", "retro_8bit"]
+      }
+    }
+  }
+}
