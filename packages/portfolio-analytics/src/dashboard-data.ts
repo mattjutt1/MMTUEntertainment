@@ -126,7 +126,7 @@ export class PortfolioDashboardDataProvider {
           };
 
         } catch (error) {
-          console.error(`Error getting realtime status for ${product.name}:`, error);
+          console.error('Error getting realtime status for product:', product.name, error);
           return {
             productId: product.id,
             status: 'warning' as const,
@@ -234,7 +234,7 @@ export class PortfolioDashboardDataProvider {
         triggeredBy: 'github-actions'
       }));
     } catch (error) {
-      console.error(`Error getting recent deployments for ${product.name}:`, error);
+      console.error('Error getting recent deployments for product:', product.name, error);
       return [];
     }
   }
@@ -257,7 +257,7 @@ export class PortfolioDashboardDataProvider {
       }
       return [];
     } catch (error) {
-      console.error(`Error getting active incidents for ${product.name}:`, error);
+      console.error('Error getting active incidents for product:', product.name, error);
       return [];
     }
   }

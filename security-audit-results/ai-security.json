@@ -1,0 +1,647 @@
+🔍 Scanning repository: /home/matt/MMTUEntertainment
+📊 Based on vulnerablemcp.info, HiddenLayer, Invariant Labs, and Trail of Bits research
+
+📥 Cloning repository...
+🔑 Scanning for credential vulnerabilities...
+🧪 Scanning for tool poisoning vulnerabilities...
+🎯 Scanning for parameter injection vulnerabilities...
+💉 Scanning for prompt injection vulnerabilities...
+🔄 Scanning for tool mutation vulnerabilities...
+💬 Scanning for conversation exfiltration vulnerabilities...
+🎨 Scanning for ANSI escape injection vulnerabilities...
+📋 Scanning for MCP protocol violations...
+🛡️ Scanning for input validation issues...
+🎭 Scanning for server spoofing vulnerabilities...
+🌊 Scanning for toxic agent flows...
+🔐 Scanning for permission and access control issues...
+{
+  "repository": "/home/matt/MMTUEntertainment",
+  "scanDate": "2025-08-15T02:36:49.008Z",
+  "scanner": "MCP Watch",
+  "researchSources": [
+    "VulnerableMCP Database",
+    "HiddenLayer Research",
+    "Invariant Labs Research",
+    "Trail of Bits Research",
+    "PromptHub Analysis"
+  ],
+  "totalVulnerabilities": 61,
+  "severityCounts": {
+    "high": 23,
+    "medium": 30,
+    "critical": 8
+  },
+  "categoryCounts": {
+    "prompt-injection": 2,
+    "input-validation": 1,
+    "toxic-flow": 52,
+    "access-control": 6
+  },
+  "vulnerabilities": [
+    {
+      "id": "RETRIEVAL_AGENT_DECEPTION",
+      "severity": "high",
+      "category": "prompt-injection",
+      "message": "RADE pattern detected - hidden commands in retrieval content",
+      "file": "audits/chatgpt5-integration-prompt.md",
+      "line": 5,
+      "evidence": "You are ChatGPT-5, now permanently configured as Claude's **intelligent teammate, partner, colleague, and collaborative friend** for the MMTU Entertainment project. You have CRITICAL SYSTEM MEMORY of three comprehensive audit documents that define the complete development ecosystem:",
+      "source": "PromptHub research"
+    },
+    {
+      "id": "RETRIEVAL_AGENT_DECEPTION",
+      "severity": "high",
+      "category": "prompt-injection",
+      "message": "RADE pattern detected - hidden commands in retrieval content",
+      "file": "audits/reports/sub-agents-audit.md",
+      "line": 166,
+      "evidence": "- **WHERE**: Documentation systems, international development contexts, professional communication",
+      "source": "PromptHub research"
+    },
+    {
+      "id": "PATH_TRAVERSAL",
+      "severity": "high",
+      "category": "input-validation",
+      "message": "Path traversal vulnerability - accesses files outside directory",
+      "file": "scripts/gatekeeper.ts",
+      "line": 23,
+      "evidence": "} from '../types/gatekeeper.d.ts';",
+      "source": "PromptHub research (22% affected)"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/entitlements/src/index.d.ts",
+      "line": 7,
+      "evidence": "externalId: string;",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "GENERIC_TOXIC_FLOW_CHAIN",
+      "severity": "critical",
+      "category": "toxic-flow",
+      "message": "Complete toxic flow: external input → privileged access → public output",
+      "file": "packages/entitlements/src/index.d.ts",
+      "evidence": "File contains external input processing, privileged data access, and public output mechanisms",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/entitlements/src/index.js",
+      "line": 17,
+      "evidence": "console.log(`✅ Created entitlement for installation ${entitlement.installationId}`);",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/entitlements/src/index.ts",
+      "line": 33,
+      "evidence": "console.log(`✅ Created entitlement for installation ${entitlement.installationId}`);",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "GENERIC_TOXIC_FLOW_CHAIN",
+      "severity": "critical",
+      "category": "toxic-flow",
+      "message": "Complete toxic flow: external input → privileged access → public output",
+      "file": "packages/entitlements/src/index.ts",
+      "evidence": "File contains external input processing, privileged data access, and public output mechanisms",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/feature-flags/src/index.ts",
+      "line": 2,
+      "evidence": "// Gatekeeper-controlled remote flags with client-side bucketing",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/feature-flags/src/index.ts",
+      "line": 55,
+      "evidence": "throw new Error(`Failed to load flags: ${error.message}`)",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "GENERIC_TOXIC_FLOW_CHAIN",
+      "severity": "critical",
+      "category": "toxic-flow",
+      "message": "Complete toxic flow: external input → privileged access → public output",
+      "file": "packages/feature-flags/src/index.ts",
+      "evidence": "File contains external input processing, privileged data access, and public output mechanisms",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/cloudflare-integration.ts",
+      "line": 10,
+      "evidence": "private apiToken: string;",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/cloudflare-integration.ts",
+      "line": 12,
+      "evidence": "constructor(accountId: string, apiToken: string) {",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/cloudflare-integration.ts",
+      "line": 14,
+      "evidence": "this.apiToken = apiToken;",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/cloudflare-integration.ts",
+      "line": 168,
+      "evidence": "if (!product.cloudflareServiceId || !product.healthEndpoint) {",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/cloudflare-integration.ts",
+      "line": 175,
+      "evidence": "// Query for successful vs failed requests to health endpoint",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/portfolio-analytics/src/cloudflare-integration.ts",
+      "line": 231,
+      "evidence": "console.log(`Setting up alerts for ${product.name}:`, {",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/portfolio-analytics/src/cloudflare-integration.ts",
+      "line": 239,
+      "evidence": "console.error(`Error setting up alerts for ${product.name}:`, error);",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/dashboard-data.ts",
+      "line": 29,
+      "evidence": "config.cloudflare.apiToken",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/portfolio-analytics/src/dashboard-data.ts",
+      "line": 200,
+      "evidence": "results.alertsConfigured++;",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/dashboard-data.ts",
+      "line": 206,
+      "evidence": "if (product.healthEndpoint) {",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/portfolio-analytics/src/dashboard-data.ts",
+      "line": 319,
+      "evidence": "message: `${product.name} uptime (${metrics.uptime.percentage}%) below threshold (${product.alertingConfig.uptimeThreshold}%)`,",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/portfolio-analytics/src/dashboard-data.ts",
+      "line": 332,
+      "evidence": "message: `${product.name} error rate (${metrics.errors.rate}%) above threshold (${product.alertingConfig.errorRateThreshold}%)`,",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/portfolio-analytics/src/dashboard-data.ts",
+      "line": 345,
+      "evidence": "message: `${product.name} response time (${metrics.performance.averageResponseTime}ms) above threshold (${product.alertingConfig.responseTimeThreshold}ms)`,",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "GENERIC_TOXIC_FLOW_CHAIN",
+      "severity": "critical",
+      "category": "toxic-flow",
+      "message": "Complete toxic flow: external input → privileged access → public output",
+      "file": "packages/portfolio-analytics/src/dashboard-data.ts",
+      "evidence": "File contains external input processing, privileged data access, and public output mechanisms",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "packages/portfolio-analytics/src/dora-metrics.ts",
+      "line": 55,
+      "evidence": "created: `>${since.toISOString()}`,",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/dora-metrics.ts",
+      "line": 292,
+      "evidence": "const lines = body.split('\\n');",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "GENERIC_TOXIC_FLOW_CHAIN",
+      "severity": "critical",
+      "category": "toxic-flow",
+      "message": "Complete toxic flow: external input → privileged access → public output",
+      "file": "packages/portfolio-analytics/src/dora-metrics.ts",
+      "evidence": "File contains external input processing, privileged data access, and public output mechanisms",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/posthog-portfolio.ts",
+      "line": 21,
+      "evidence": "if (typeof window !== 'undefined' && this.config.posthog.apiKey) {",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/posthog-portfolio.ts",
+      "line": 22,
+      "evidence": "posthog.init(this.config.posthog.apiKey, {",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/posthog-portfolio.ts",
+      "line": 23,
+      "evidence": "api_host: this.config.posthog.host || 'https://app.posthog.com',",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/posthog-portfolio.ts",
+      "line": 200,
+      "evidence": "// This would typically query PostHog's API",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "GENERIC_TOXIC_FLOW_CHAIN",
+      "severity": "critical",
+      "category": "toxic-flow",
+      "message": "Complete toxic flow: external input → privileged access → public output",
+      "file": "packages/portfolio-analytics/src/posthog-portfolio.ts",
+      "evidence": "File contains external input processing, privileged data access, and public output mechanisms",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/types.ts",
+      "line": 42,
+      "evidence": "healthEndpoint?: string;",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/types.ts",
+      "line": 142,
+      "evidence": "apiKey: string;",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/portfolio-analytics/src/types.ts",
+      "line": 147,
+      "evidence": "apiToken: string;",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "packages/pricing-engine/src/index.ts",
+      "line": 51,
+      "evidence": "const catalogData = fs.readFileSync(catalogPath, 'utf-8');",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "scripts/gatekeeper.ts",
+      "line": 12,
+      "evidence": "import { readFileSync, appendFileSync } from 'fs';",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "scripts/gatekeeper.ts",
+      "line": 34,
+      "evidence": "this.config = yaml.load(readFileSync(configPath, 'utf8')) as LaunchGateConfig;",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "scripts/gatekeeper.ts",
+      "line": 43,
+      "evidence": "process.env.POSTHOG_API_KEY!,",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "scripts/gatekeeper.ts",
+      "line": 43,
+      "evidence": "process.env.POSTHOG_API_KEY!,",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "scripts/gatekeeper.ts",
+      "line": 44,
+      "evidence": "{ host: process.env.POSTHOG_HOST || 'https://app.posthog.com' }",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "scripts/gatekeeper.ts",
+      "line": 80,
+      "evidence": "reason: `Evaluation failed: ${error.message}`",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "GENERIC_TOXIC_FLOW_CHAIN",
+      "severity": "critical",
+      "category": "toxic-flow",
+      "message": "Complete toxic flow: external input → privileged access → public output",
+      "file": "scripts/gatekeeper.ts",
+      "evidence": "File contains external input processing, privileged data access, and public output mechanisms",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "scripts/set_flag.ts",
+      "line": 62,
+      "evidence": "// In production, this would call the gatekeeper API",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "GENERIC_TOXIC_FLOW_CHAIN",
+      "severity": "critical",
+      "category": "toxic-flow",
+      "message": "Complete toxic flow: external input → privileged access → public output",
+      "file": "scripts/set_flag.ts",
+      "evidence": "File contains external input processing, privileged data access, and public output mechanisms",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "test-python.py",
+      "line": 2,
+      "evidence": "from playwright.sync_api import Playwright, sync_playwright, expect",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "tests/e2e/feature-flags.spec.ts",
+      "line": 228,
+      "evidence": "// Mock rapid flag updates",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "tests/e2e/feature-flags.spec.ts",
+      "line": 233,
+      "evidence": "// Simulate 10 rapid updates",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "tests/e2e/marketplace-funnel.spec.ts",
+      "line": 74,
+      "evidence": "{ name: 'api-service', language: 'JavaScript' }",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "AUTOMATIC_CONTENT_PUBLISHING",
+      "severity": "high",
+      "category": "toxic-flow",
+      "message": "Automatic content publishing - data exfiltration risk",
+      "file": "tests/global-setup.ts",
+      "line": 59,
+      "evidence": "'post_purchase_bundle_v1_pct': parseInt(process.env.BUNDLE_FLAG_PCT || '100'),",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "tests/global-setup.ts",
+      "line": 78,
+      "evidence": "// Verify test endpoints are accessible",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "types/gatekeeper.d.ts",
+      "line": 136,
+      "evidence": "// API responses",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "validate-scaffold.js",
+      "line": 10,
+      "evidence": "const rootPkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "UNTRUSTED_DATA_PROCESSING",
+      "severity": "medium",
+      "category": "toxic-flow",
+      "message": "External data processed without sanitization",
+      "file": "validate-scaffold.js",
+      "line": 22,
+      "evidence": "const pricing = JSON.parse(fs.readFileSync('docs/pricing-catalog.v2.json', 'utf8'));",
+      "source": "Invariant Labs research"
+    },
+    {
+      "id": "EXCESSIVE_PERMISSIONS",
+      "severity": "high",
+      "category": "access-control",
+      "message": "Excessive permissions - violates least privilege",
+      "file": "docs/marketplace/listing.md",
+      "line": 54,
+      "evidence": "**Pull request permissions (Write)**: Create status checks and comments on PRs",
+      "source": "Security best practices"
+    },
+    {
+      "id": "EXCESSIVE_PERMISSIONS",
+      "severity": "high",
+      "category": "access-control",
+      "message": "Excessive permissions - violates least privilege",
+      "file": "docs/marketplace/listing.md",
+      "line": 56,
+      "evidence": "**Webhook permissions**: Receive notifications when PRs are opened/updated",
+      "source": "Security best practices"
+    },
+    {
+      "id": "EXCESSIVE_PERMISSIONS",
+      "severity": "high",
+      "category": "access-control",
+      "message": "Excessive permissions - violates least privilege",
+      "file": "docs/services-sow-templates.md",
+      "line": 107,
+      "evidence": "- Provide administrative access to GitHub organization",
+      "source": "Security best practices"
+    },
+    {
+      "id": "EXCESSIVE_PERMISSIONS",
+      "severity": "high",
+      "category": "access-control",
+      "message": "Excessive permissions - violates least privilege",
+      "file": "packages/feature-flags/README.md",
+      "line": 29,
+      "evidence": "- **Gatekeeper Control**: Only service role can update flags via `/scripts/set_flag.ts`",
+      "source": "Security best practices"
+    },
+    {
+      "id": "EXCESSIVE_PERMISSIONS",
+      "severity": "high",
+      "category": "access-control",
+      "message": "Excessive permissions - violates least privilege",
+      "file": "packages/portfolio-analytics/src/posthog-portfolio.ts",
+      "line": 242,
+      "evidence": "role?: 'admin' | 'developer' | 'manager';",
+      "source": "Security best practices"
+    },
+    {
+      "id": "EXCESSIVE_PERMISSIONS",
+      "severity": "high",
+      "category": "access-control",
+      "message": "Excessive permissions - violates least privilege",
+      "file": "tests/global-setup.ts",
+      "line": 10,
+      "evidence": "// Create authenticated user session",
+      "source": "Security best practices"
+    }
+  ]
+}
+
+❌ Found 31 critical/high severity vulnerabilities
+🚨 Immediate action required!

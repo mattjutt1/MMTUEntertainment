@@ -302,7 +302,7 @@ export class PostHogPortfolioAnalytics {
 
     // Also log in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Portfolio Analytics: ${eventName}`, properties);
+      console.log('Portfolio Analytics:', eventName, properties);
     }
   }
 

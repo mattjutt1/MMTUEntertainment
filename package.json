@@ -1,62 +1,20 @@
 {
-  "name": "@mmtu/entertainment",
+  "name": "mmtu-entertainment",
   "version": "1.0.0",
-  "description": "MMTU Entertainment - Multi-product portfolio with monetization engine",
   "private": true,
+  "scripts": {
+    "flags": "npx ts-node scripts/set_flag.ts",
+    "gatekeeper": "npx ts-node scripts/gatekeeper.ts"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-  "scripts": {
-    "build": "pnpm run -r build",
-    "dev": "pnpm run -r dev",
-    "test": "pnpm run -r test",
-    "e2e": "playwright test",
-    "e2e:headed": "playwright test --headed",
-    "e2e:debug": "playwright test --debug",
-    "lint": "pnpm run -r lint",
-    "typecheck": "pnpm run -r typecheck",
-    "clean": "pnpm run -r clean",
-    "portfolio:deploy": "./scripts/deploy-portfolio-analytics.sh full",
-    "portfolio:start": "./scripts/deploy-portfolio-analytics.sh start",
-    "portfolio:validate": "./scripts/deploy-portfolio-analytics.sh validate",
-    "portfolio:check": "./scripts/deploy-portfolio-analytics.sh check"
-  },
   "devDependencies": {
-    "@playwright/test": "^1.50.0",
-    "@types/node": "^20.0.0",
-    "ts-jest": "^29.1.0",
+    "@playwright/test": "^1.54.2",
+    "@types/js-yaml": "4.0.9",
+    "js-yaml": "4.1.0",
+    "ts-node": "10.9.2",
     "typescript": "^5.0.0"
-  },
-  "packageManager": "pnpm@8.15.0",
-  "main": "trace-test.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "dependencies": {
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^15.4.6",
-    "eslint-import-resolver-node": "^0.3.9",
-    "eslint-import-resolver-typescript": "^3.10.1",
-    "eslint-module-utils": "^2.12.1",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-security": "^2.1.1",
-    "eslint-scope": "^7.2.2",
-    "eslint-visitor-keys": "^3.4.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mattjutt1/MMTUEntertainment.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/mattjutt1/MMTUEntertainment/issues"
-  },
-  "homepage": "https://github.com/mattjutt1/MMTUEntertainment#readme"
+  }
 }

@@ -2,7 +2,8 @@
 
 import { execSync } from 'child_process';
 import { writeFileSync, existsSync, statSync, readdirSync } from 'fs';
-import { join, relative } from 'path';
+import { join, relative, resolve, normalize } from 'path';
+import process from 'process';
 
 const AUDIT_TIMESTAMP = new Date().toISOString();
 const REQUIRED_ARTIFACTS = [
@@ -24,8 +25,37 @@ const EXPECTED_APPS = [
   'apps/web-toy-mvp'
 ];
 
+// Safe path validation to prevent path traversal
+function validatePath(inputPath, baseDir = process.cwd()) {
+  const resolvedPath = resolve(normalize(inputPath));
+  const resolvedBase = resolve(baseDir);
+  
+  // Ensure the resolved path is within the base directory
+  if (!resolvedPath.startsWith(resolvedBase)) {
+    throw new Error(`Path traversal attempt detected: ${inputPath}`);
+  }
+  
+  return resolvedPath;
+}
+
 function executeCommand(command) {
   try {
+    // Sanitize command to prevent injection
+    const allowedCommands = [
+      'git log --oneline -n 50 --all --graph --decorate',
+      'git status --porcelain',
+      'git branch -a',
+      'git branch --show-current',
+      'git remote get-url origin',
+      'git log -1 --format="%H %s"',
+      'git rev-list --count HEAD'
+    ];
+    
+    const isAllowed = allowedCommands.some(allowed => command.startsWith(allowed));
+    if (!isAllowed) {
+      throw new Error(`Command not allowed: ${command}`);
+    }
+    
     return execSync(command, { encoding: 'utf8', cwd: process.cwd() }).trim();
   } catch (error) {
     return `ERROR: ${error.message}`;
@@ -37,15 +67,21 @@ function generateRepoTree() {
   
   function walkDirectory(dir, prefix = '', results = []) {
     try {
-      const items = readdirSync(dir).filter(item => 
+      // Validate the directory path to prevent traversal
+      const safeDir = validatePath(dir);
+      
+      const items = readdirSync(safeDir).filter(item => 
         !item.startsWith('.git') && 
         !item.startsWith('node_modules') &&
         !item.startsWith('dist') &&
-        !item.startsWith('build')
+        !item.startsWith('build') &&
+        // Additional security: filter out dangerous characters
+        !/[<>:"|?*]/.test(item)
       ).sort();
       
       items.forEach((item, index) => {
-        const fullPath = join(dir, item);
+        // Validate each item path
+        const fullPath = validatePath(join(safeDir, item));
         const isLast = index === items.length - 1;
         const currentPrefix = isLast ? '└── ' : '├── ';
         const nextPrefix = isLast ? '    ' : '│   ';
@@ -54,7 +90,7 @@ function generateRepoTree() {
           const stats = statSync(fullPath);
           if (stats.isDirectory()) {
             results.push(`${prefix}${currentPrefix}${item}/`);
-            walkDirectory(fullPath, prefix + nextPrefix, results);
+            walkDirectory(relative(process.cwd(), fullPath), prefix + nextPrefix, results);
           } else {
             const size = stats.size;
             const sizeStr = size > 1024 ? `(${Math.round(size/1024)}KB)` : `(${size}B)`;
@@ -71,7 +107,7 @@ function generateRepoTree() {
     return results;
   }
   
-  const tree = walkDirectory('.', '', ['Repository Structure:', '']);
+  const tree = walkDirectory(process.cwd(), '', ['Repository Structure:', '']);
   const treeContent = tree.join('\\n');
   writeFileSync('repo-tree.txt', treeContent);
   return tree.length;
@@ -127,13 +163,15 @@ function auditRequiredArtifacts() {
   
   // Check required artifacts
   REQUIRED_ARTIFACTS.forEach(artifact => {
-    const exists = existsSync(artifact);
+    // Validate artifact path to prevent traversal
+    const safePath = validatePath(artifact);
+    const exists = existsSync(safePath);
     let size = 0;
     let type = 'file';
     
     if (exists) {
       try {
-        const stats = statSync(artifact);
+        const stats = statSync(safePath);
         size = stats.size;
         type = stats.isDirectory() ? 'directory' : 'file';
         results.summary.artifacts_present++;
@@ -154,17 +192,19 @@ function auditRequiredArtifacts() {
   
   // Check expected apps
   EXPECTED_APPS.forEach(app => {
-    const exists = existsSync(app);
+    // Validate app path to prevent traversal
+    const safeAppPath = validatePath(app);
+    const exists = existsSync(safeAppPath);
     let packageJson = false;
     let hasSource = false;
     
     if (exists) {
       results.summary.apps_present++;
-      packageJson = existsSync(join(app, 'package.json'));
+      packageJson = existsSync(validatePath(join(safeAppPath, 'package.json')));
       
       // Check for source files
       try {
-        const srcPath = join(app, 'src');
+        const srcPath = validatePath(join(safeAppPath, 'src'));
         hasSource = existsSync(srcPath);
       } catch (err) {
         // Ignore

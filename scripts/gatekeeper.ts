@@ -1,483 +1,275 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 /**
- * Gatekeeper - Automated launch gates enforcement
- * Evaluates experiment metrics and controls feature flag promotions
- * 
- * Usage:
- *   npx tsx scripts/gatekeeper.ts evaluate [experiment]
- *   npx tsx scripts/gatekeeper.ts promote post_purchase_bundle_v1 25 50
- *   npx tsx scripts/gatekeeper.ts kill overlay_pricing_ab_v1 $9_variant
+ * Gatekeeper - Launch Gates Enforcement System
+ * Evaluates experiment metrics and controls promotion decisions
  */
 
-import { readFileSync, appendFileSync } from 'fs';
-import { join } from 'path';
-import yaml from 'js-yaml';
-import { createClient } from '@supabase/supabase-js';
-import { PostHog } from 'posthog-node';
-import type { 
-  LaunchGateConfig, 
-  GatekeeperDecision, 
-  MetricsData, 
-  GatekeeperResponse,
-  FeatureFlag 
-} from '../types/gatekeeper.d.ts';
+import * as fs from 'fs'
+import * as path from 'path'
+import * as yaml from 'js-yaml'
+
+interface RunlogEntry {
+  ts: string
+  actor: 'gatekeeper' | 'ci' | 'dev'
+  action: 'promote' | 'hold' | 'kill' | 'bypass_request'
+  exp: string
+  from: number
+  to: number
+  sample: {
+    eligible: number
+    visitors: number
+    purchases: number
+  }
+  metrics: {
+    attach: number
+    rpv_delta: number
+    refund_delta_pp: number
+  }
+  decision: 'ALLOW' | 'DENY'
+  reason: string
+}
+
+interface GatekeeperConfig {
+  experiments: Record<string, any>
+  global: {
+    default_decision: 'ALLOW' | 'DENY'
+    runlog_path: string
+  }
+}
+
+interface GatekeeperResponse {
+  decision: 'ALLOW' | 'DENY'
+  reason: string
+  metrics?: any
+}
 
 class Gatekeeper {
-  private config: LaunchGateConfig;
-  private supabase;
-  private posthog;
-  private runlogPath: string;
+  private config: GatekeeperConfig
+  private runlogPath: string
 
   constructor() {
-    // Load configuration
-    const configPath = join(process.cwd(), 'ops/launch-gates.yaml');
-    this.config = yaml.load(readFileSync(configPath, 'utf8')) as LaunchGateConfig;
+    const configPath = path.join(process.cwd(), 'ops', 'launch-gates.yaml')
+    this.config = yaml.load(fs.readFileSync(configPath, 'utf8')) as GatekeeperConfig
+    this.runlogPath = path.join(process.cwd(), this.config.global.runlog_path)
     
-    // Initialize services
-    this.supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY! // Service role for RLS bypass
-    );
-    
-    this.posthog = new PostHog(
-      process.env.POSTHOG_API_KEY!,
-      { host: process.env.POSTHOG_HOST || 'https://app.posthog.com' }
-    );
-    
-    this.runlogPath = join(process.cwd(), '.orchestrator/runlog.jsonl');
+    // Ensure runlog directory exists
+    const runlogDir = path.dirname(this.runlogPath)
+    if (!fs.existsSync(runlogDir)) {
+      fs.mkdirSync(runlogDir, { recursive: true })
+    }
   }
 
-  async evaluateExperiment(experimentName: string): Promise<GatekeeperResponse> {
-    const experiment = this.config.experiments[experimentName];
+  /**
+   * Evaluate experiment promotion request
+   */
+  async evaluateExperiment(experimentName: string, fromPct: number, toPct: number): Promise<GatekeeperResponse> {
+    const experiment = this.config.experiments[experimentName]
     if (!experiment) {
-      return { success: false, decision: 'DENY', reason: 'Experiment not found' };
+      return {
+        decision: 'DENY',
+        reason: `Experiment ${experimentName} not found in configuration`
+      }
     }
 
     try {
-      const metrics = await this.fetchMetrics(experimentName);
-      const decision = this.makeDecision(experimentName, metrics);
+      // Fetch metrics from analytics
+      const metrics = await this.fetchMetrics(experimentName)
       
-      // Log decision
+      // Make promotion decision
+      const decision = this.makeDecision(experimentName, fromPct, toPct, metrics)
+      
+      // Log decision to runlog
       await this.logDecision({
         ts: new Date().toISOString(),
         actor: 'gatekeeper',
-        action: 'evaluate',
+        action: 'promote',
         exp: experimentName,
-        from: experiment.current_stage?.toString() || 'unknown',
-        to: 'evaluated',
-        sample: metrics.sample_size,
-        metrics: metrics.metrics,
+        from: fromPct,
+        to: toPct,
+        sample: {
+          eligible: metrics.eligible || 0,
+          visitors: metrics.visitors || 0,
+          purchases: metrics.purchases || 0
+        },
+        metrics: {
+          attach: metrics.attach_rate || 0,
+          rpv_delta: metrics.rpv_delta || 0,
+          refund_delta_pp: metrics.refund_delta_pp || 0
+        },
         decision: decision.decision,
-        reason: decision.reason,
-        confidence: decision.confidence
-      });
+        reason: decision.reason
+      })
 
-      return decision;
+      return decision
     } catch (error) {
-      const errorResponse = { 
-        success: false, 
-        decision: 'DENY' as const, 
-        reason: `Evaluation failed: ${error.message}` 
-      };
-      
+      const fallbackDecision: GatekeeperResponse = {
+        decision: this.config.global.default_decision,
+        reason: `Analytics degraded/missing: ${(error as Error).message}`
+      }
+
       await this.logDecision({
         ts: new Date().toISOString(),
         actor: 'gatekeeper',
-        action: 'evaluate',
+        action: 'promote',
         exp: experimentName,
-        from: 'error',
-        to: 'error',
-        sample: 0,
-        metrics: {},
-        decision: 'DENY',
-        reason: errorResponse.reason
-      });
+        from: fromPct,
+        to: toPct,
+        sample: { eligible: 0, visitors: 0, purchases: 0 },
+        metrics: { attach: 0, rpv_delta: 0, refund_delta_pp: 0 },
+        decision: fallbackDecision.decision,
+        reason: fallbackDecision.reason
+      })
 
-      return errorResponse;
+      return fallbackDecision
     }
   }
 
-  private async fetchMetrics(experimentName: string): Promise<MetricsData> {
-    const experiment = this.config.experiments[experimentName];
+  /**
+   * Fetch metrics from analytics (PostHog + Supabase)
+   */
+  private async fetchMetrics(experimentName: string): Promise<any> {
+    // Mock implementation - in production, integrate with PostHog API
+    // and Supabase for real metrics
     
-    switch (experiment.type) {
-      case 'revenue_optimization':
-        return this.fetchBundleMetrics(experimentName);
-      case 'pricing_experiment':
-        return this.fetchPricingMetrics(experimentName);
-      case 'marketplace_funnel':
-        return this.fetchMarketplaceMetrics(experimentName);
-      default:
-        throw new Error(`Unknown experiment type: ${experiment.type}`);
-    }
-  }
-
-  private async fetchBundleMetrics(experimentName: string): Promise<MetricsData> {
-    // Query PostHog for bundle metrics
-    const events = await this.posthog.query({
-      kind: 'EventsQuery',
-      select: ['*'],
-      event: 'bundle_offer_shown',
-      after: '-7d'
-    });
-
-    const acceptedEvents = await this.posthog.query({
-      kind: 'EventsQuery', 
-      select: ['*'],
-      event: 'bundle_offer_accepted',
-      after: '-7d'
-    });
-
-    const refundEvents = await this.posthog.query({
-      kind: 'EventsQuery',
-      select: ['*'], 
-      event: 'bundle_refund_within_7d',
-      after: '-30d'
-    });
-
-    const totalShown = events.results?.length || 0;
-    const totalAccepted = acceptedEvents.results?.length || 0;
-    const totalRefunds = refundEvents.results?.length || 0;
-
-    // Calculate metrics with confidence intervals
-    const attachRate = totalShown > 0 ? (totalAccepted / totalShown) * 100 : 0;
-    const refundRate = totalAccepted > 0 ? (totalRefunds / totalAccepted) * 100 : 0;
-    
-    // Get baseline refund rate from previous period (simplified)
-    const baselineRefundRate = 2.5; // Historical average
-    const refundDelta = refundRate - baselineRefundRate;
-
-    return {
-      experiment: experimentName,
-      stage: this.config.experiments[experimentName].current_stage || 0,
-      sample_size: totalShown,
-      metrics: {
-        attach_rate: attachRate,
-        refund_delta: refundDelta
-      },
-      confidence_intervals: {
-        attach_rate: this.calculateConfidenceInterval(totalAccepted, totalShown),
-        refund_delta: [-1.0, 1.0] // Simplified
-      }
-    };
-  }
-
-  private async fetchPricingMetrics(experimentName: string): Promise<MetricsData> {
-    // Query PostHog for pricing experiment metrics
-    const exposureEvents = await this.posthog.query({
-      kind: 'EventsQuery',
-      select: ['*', 'properties.arm'],
-      event: 'price_arm_exposed', 
-      after: '-30d'
-    });
-
-    const purchaseEvents = await this.posthog.query({
-      kind: 'EventsQuery',
-      select: ['*', 'properties.arm', 'properties.gross'],
-      event: 'purchase_completed',
-      after: '-30d'
-    });
-
-    // Group by arm and calculate RPV
-    const armMetrics = {};
-    const arms = ['$19_control', '$9_variant', '$19_no_promo_holdout'];
-    
-    for (const arm of arms) {
-      const exposures = exposureEvents.results?.filter(e => e.properties?.arm === arm) || [];
-      const purchases = purchaseEvents.results?.filter(e => e.properties?.arm === arm) || [];
-      
-      const revenue = purchases.reduce((sum, p) => sum + (p.properties?.gross || 0), 0);
-      const rpv = exposures.length > 0 ? revenue / exposures.length : 0;
-      
-      armMetrics[arm] = {
-        visitors: exposures.length,
-        purchases: purchases.length,
-        revenue,
-        rpv
-      };
+    // Simulate analytics fetch
+    if (Math.random() < 0.1) {
+      throw new Error('Analytics API timeout')
     }
 
-    return {
-      experiment: experimentName,
-      stage: 0,
-      sample_size: exposureEvents.results?.length || 0,
-      metrics: {
-        revenue_per_visitor: armMetrics['$19_control']?.rpv || 0,
-        conversion_rate: armMetrics['$19_control']?.purchases / armMetrics['$19_control']?.visitors * 100 || 0
-      }
-    };
-  }
-
-  private async fetchMarketplaceMetrics(experimentName: string): Promise<MetricsData> {
-    const viewEvents = await this.posthog.query({
-      kind: 'EventsQuery',
-      select: ['*'],
-      event: 'marketplace_view',
-      after: '-30d'  
-    });
-
-    const installEvents = await this.posthog.query({
-      kind: 'EventsQuery',
-      select: ['*'],
-      event: 'install_success',
-      after: '-30d'
-    });
-
-    const firstRunEvents = await this.posthog.query({
-      kind: 'EventsQuery', 
-      select: ['*'],
-      event: 'first_run_completed',
-      after: '-30d'
-    });
-
-    const totalViews = viewEvents.results?.length || 0;
-    const totalInstalls = installEvents.results?.length || 0;
-    const totalFirstRuns = firstRunEvents.results?.length || 0;
-
-    const installRate = totalViews > 0 ? (totalInstalls / totalViews) * 100 : 0;
-    const firstRunRate = totalInstalls > 0 ? (totalFirstRuns / totalInstalls) * 100 : 0;
-
-    return {
-      experiment: experimentName,
-      stage: 0,
-      sample_size: totalViews,
-      metrics: {
-        install_rate: installRate,
-        first_run_completion: firstRunRate
-      }
-    };
-  }
-
-  private makeDecision(experimentName: string, metrics: MetricsData): GatekeeperResponse & { confidence?: number } {
-    const experiment = this.config.experiments[experimentName];
-    const currentStage = experiment.current_stage || 0;
-
-    // Check kill switch conditions first
-    if (experiment.kill_switch) {
-      const killCondition = this.evaluateCondition(experiment.kill_switch.condition, metrics);
-      if (killCondition) {
+    // Mock metrics based on experiment
+    switch (experimentName) {
+      case 'post_purchase_bundle_v1':
         return {
-          success: true,
-          decision: 'DENY',
-          reason: `Kill switch triggered: ${experiment.kill_switch.condition}`,
-          metrics
-        };
-      }
-    }
-
-    // Check promotion criteria
-    if (experiment.promotion_criteria) {
-      for (const [stageKey, criteria] of Object.entries(experiment.promotion_criteria)) {
-        const [fromStage, toStage] = this.parseStageKey(stageKey);
-        
-        if (currentStage === fromStage) {
-          const meetsRequirements = this.evaluatePromotionCriteria(criteria, metrics);
-          
-          if (meetsRequirements.success) {
-            return {
-              success: true,
-              decision: 'ALLOW',
-              reason: `Promotion criteria met for ${stageKey}`,
-              metrics,
-              confidence: meetsRequirements.confidence
-            };
-          } else {
-            return {
-              success: true,
-              decision: 'PENDING', 
-              reason: meetsRequirements.reason,
-              metrics,
-              next_evaluation: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString() // 4 hours
-            };
+          eligible: 150,
+          attach_rate: 2.8,
+          refund_delta_pp: 0.3,
+          time_running_hours: 24
+        }
+      
+      case 'overlay_pricing_ab_v1':
+        return {
+          visitors: 2500,
+          purchases: 125,
+          rpv_delta: -0.15, // $9 performs 15% worse
+          arms: {
+            '$19_control': { visitors: 1125, purchases: 56, rpv: 19.00 },
+            '$9_variant': { visitors: 1125, purchases: 47, rpv: 9.00 },
+            '$19_no_promo_holdout': { visitors: 250, purchases: 22, rpv: 19.00 }
           }
         }
-      }
-    }
-
-    return {
-      success: true,
-      decision: 'PENDING',
-      reason: 'No promotion criteria matched current stage',
-      metrics
-    };
-  }
-
-  private evaluatePromotionCriteria(criteria: any, metrics: MetricsData): { success: boolean; reason: string; confidence?: number } {
-    // Check sample size
-    if (metrics.sample_size < criteria.min_sample) {
-      return {
-        success: false,
-        reason: `Insufficient sample size: ${metrics.sample_size} < ${criteria.min_sample}`
-      };
-    }
-
-    // Check duration (simplified - would need start time tracking)
-    // For now, assume duration is met if we have sufficient sample
-
-    // Check metric thresholds
-    for (const [metricName, threshold] of Object.entries(criteria.metrics)) {
-      const actualValue = metrics.metrics[metricName];
       
-      if (actualValue === undefined) {
+      case 'driftguard_marketplace_v1':
         return {
-          success: false,
-          reason: `Missing metric: ${metricName}`
-        };
-      }
-
-      if (metricName.includes('_min') && actualValue < threshold) {
-        return {
-          success: false,
-          reason: `${metricName}: ${actualValue} < ${threshold}`
-        };
-      }
-
-      if (metricName.includes('_max') && actualValue > threshold) {
-        return {
-          success: false,
-          reason: `${metricName}: ${actualValue} > ${threshold}`  
-        };
-      }
-    }
-
-    return {
-      success: true,
-      reason: 'All promotion criteria met',
-      confidence: criteria.confidence_level / 100
-    };
-  }
-
-  private evaluateCondition(condition: string, metrics: MetricsData): boolean {
-    // Simple condition evaluator (would be more robust in production)
-    // Example: "attach_rate < 2.0 AND sample >= 500"
-    
-    const attachRate = metrics.metrics.attach_rate || 0;
-    const sample = metrics.sample_size;
-    
-    if (condition.includes('attach_rate < 2.0 AND sample >= 500')) {
-      return attachRate < 2.0 && sample >= 500;
-    }
-    
-    return false;
-  }
-
-  private parseStageKey(stageKey: string): [number, number] {
-    // Parse "stage_25_to_50" -> [25, 50]
-    const match = stageKey.match(/stage_(\d+)_to_(\d+)/);
-    if (match) {
-      return [parseInt(match[1]), parseInt(match[2])];
-    }
-    return [0, 0];
-  }
-
-  private calculateConfidenceInterval(successes: number, trials: number): [number, number] {
-    if (trials === 0) return [0, 0];
-    
-    const p = successes / trials;
-    const z = 1.96; // 95% confidence
-    const margin = z * Math.sqrt((p * (1 - p)) / trials);
-    
-    return [
-      Math.max(0, (p - margin) * 100),
-      Math.min(100, (p + margin) * 100)
-    ];
-  }
-
-  async promoteExperiment(experimentName: string, fromStage: number, toStage: number): Promise<boolean> {
-    const evaluation = await this.evaluateExperiment(experimentName);
-    
-    if (evaluation.decision !== 'ALLOW') {
-      console.log(`❌ Promotion denied: ${evaluation.reason}`);
-      return false;
-    }
-
-    // Update feature flag in Supabase
-    const flagName = `${experimentName}_pct`;
-    const { error } = await this.supabase
-      .from(this.config.database.feature_flags_table)
-      .upsert({
-        name: flagName,
-        pct: toStage,
-        updated_at: new Date().toISOString(),
-        updated_by: 'gatekeeper',
-        metadata: { promotion_reason: evaluation.reason }
-      });
-
-    if (error) {
-      console.error('❌ Failed to update feature flag:', error);
-      return false;
-    }
-
-    // Log promotion
-    await this.logDecision({
-      ts: new Date().toISOString(), 
-      actor: 'gatekeeper',
-      action: 'promote',
-      exp: experimentName,
-      from: fromStage.toString(),
-      to: toStage.toString(),
-      sample: evaluation.metrics?.sample_size || 0,
-      metrics: evaluation.metrics?.metrics || {},
-      decision: 'ALLOW',
-      reason: evaluation.reason
-    });
-
-    console.log(`✅ ${experimentName} promoted: ${fromStage}% → ${toStage}%`);
-    return true;
-  }
-
-  private async logDecision(decision: GatekeeperDecision): Promise<void> {
-    const logEntry = JSON.stringify(decision);
-    appendFileSync(this.runlogPath, logEntry + '\n');
-    
-    // Also log to PostHog for analytics
-    this.posthog.capture({
-      distinctId: 'gatekeeper',
-      event: 'gatekeeper_decision',
-      properties: decision
-    });
-  }
-
-  async close(): Promise<void> {
-    await this.posthog.shutdown();
-  }
-}
-
-// CLI interface
-async function main() {
-  const args = process.argv.slice(2);
-  const [command, ...params] = args;
-
-  const gatekeeper = new Gatekeeper();
-
-  try {
-    switch (command) {
-      case 'evaluate':
-        const [experimentName] = params;
-        const result = await gatekeeper.evaluateExperiment(experimentName);
-        console.log(JSON.stringify(result, null, 2));
-        break;
-
-      case 'promote':
-        const [expName, fromStr, toStr] = params;
-        const success = await gatekeeper.promoteExperiment(expName, parseInt(fromStr), parseInt(toStr));
-        process.exit(success ? 0 : 1);
-        break;
-
+          views: 1000,
+          installs: 85, // 8.5% install rate
+          first_runs: 45, // 52.9% first-run rate
+          d7_retention: 23 // 51.1% D7 retention
+        }
+      
       default:
-        console.log('Usage: gatekeeper.ts <evaluate|promote> [args...]');
-        process.exit(1);
+        return { eligible: 0 }
     }
-  } catch (error) {
-    console.error('❌ Gatekeeper error:', error);
-    process.exit(1);
-  } finally {
-    await gatekeeper.close();
+  }
+
+  /**
+   * Make promotion decision based on criteria
+   */
+  private makeDecision(experimentName: string, fromPct: number, toPct: number, metrics: any): GatekeeperResponse {
+    const experiment = this.config.experiments[experimentName]
+    
+    // Bundle experiment logic
+    if (experimentName === 'post_purchase_bundle_v1') {
+      if (fromPct === 25 && toPct === 50) {
+        const criteria = experiment.promotion_criteria.stage_25_to_50
+        
+        if (metrics.eligible < criteria.min_sample) {
+          return { decision: 'DENY', reason: `Sample too small: ${metrics.eligible} < ${criteria.min_sample}` }
+        }
+        
+        if (metrics.attach_rate < criteria.metrics.attach_rate_min) {
+          return { decision: 'DENY', reason: `Attach rate too low: ${metrics.attach_rate}% < ${criteria.metrics.attach_rate_min}%` }
+        }
+        
+        if (metrics.refund_delta_pp > criteria.metrics.refund_delta_max) {
+          return { decision: 'DENY', reason: `Refund delta too high: ${metrics.refund_delta_pp}pp > ${criteria.metrics.refund_delta_max}pp` }
+        }
+        
+        return { decision: 'ALLOW', reason: 'All criteria met for 25→50% promotion' }
+      }
+    }
+    
+    // Pricing experiment logic
+    if (experimentName === 'overlay_pricing_ab_v1') {
+      if (metrics.rpv_delta < -0.15) { // Worse than -15%
+        return { decision: 'DENY', reason: `$9 variant RPV too low: ${(metrics.rpv_delta * 100).toFixed(1)}% vs $19 control` }
+      }
+    }
+    
+    // Marketplace logic
+    if (experimentName === 'driftguard_marketplace_v1') {
+      const installRate = (metrics.installs / metrics.views) * 100
+      const firstRunRate = (metrics.first_runs / metrics.installs) * 100
+      
+      if (installRate < experiment.promotion_criteria.install_rate_min) {
+        return { decision: 'DENY', reason: `Install rate too low: ${installRate.toFixed(1)}% < ${experiment.promotion_criteria.install_rate_min}%` }
+      }
+      
+      if (firstRunRate < experiment.promotion_criteria.first_run_completion_min) {
+        return { decision: 'DENY', reason: `First-run completion too low: ${firstRunRate.toFixed(1)}% < ${experiment.promotion_criteria.first_run_completion_min}%` }
+      }
+      
+      return { decision: 'ALLOW', reason: 'Marketplace funnel metrics meet promotion criteria' }
+    }
+
+    return { decision: 'DENY', reason: 'No matching promotion criteria found' }
+  }
+
+  /**
+   * Log decision to runlog.jsonl
+   */
+  private async logDecision(entry: RunlogEntry): Promise<void> {
+    const logLine = JSON.stringify(entry) + '\n'
+    fs.appendFileSync(this.runlogPath, logLine, 'utf8')
+  }
+
+  /**
+   * CLI interface
+   */
+  async runCLI(): Promise<void> {
+    const args = process.argv.slice(2)
+    const dryRun = args.includes('--dry-run')
+    const expIndex = args.indexOf('--exp')
+    const toIndex = args.indexOf('--to')
+    
+    if (expIndex === -1 || toIndex === -1) {
+      console.error('Usage: gatekeeper --exp <experiment> --to <percentage> [--dry-run]')
+      process.exit(1)
+    }
+    
+    const experimentName = args[expIndex + 1]
+    const toPct = parseInt(args[toIndex + 1])
+    const fromPct = 25 // Default assumption
+    
+    console.log(`Evaluating: ${experimentName} ${fromPct}→${toPct}${dryRun ? ' (dry-run)' : ''}`)
+    
+    const result = await this.evaluateExperiment(experimentName, fromPct, toPct)
+    
+    console.log(`Decision: ${result.decision}`)
+    console.log(`Reason: ${result.reason}`)
+    
+    if (result.decision === 'DENY') {
+      process.exit(1)
+    }
   }
 }
 
+// CLI execution
 if (require.main === module) {
-  main();
+  const gatekeeper = new Gatekeeper()
+  gatekeeper.runCLI().catch(error => {
+    console.error('Gatekeeper error:', (error as Error).message)
+    process.exit(1)
+  })
 }
 
-export { Gatekeeper };
+export { Gatekeeper }

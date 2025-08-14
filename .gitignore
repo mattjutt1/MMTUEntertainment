@@ -3,3 +3,12 @@ node_modules/
 .env
 .DS_Store
 .orchestrator/*
+.next/
+node_modules/
+*.log
+.env*
+*.key
+*.pem
+coverage/
+dist/
+build/

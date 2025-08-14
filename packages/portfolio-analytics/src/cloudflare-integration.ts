@@ -139,7 +139,7 @@ export class CloudflareIntegration {
       return this.parseCloudflareMetrics(requestsData, performanceData, errorData, bandwidthData);
 
     } catch (error) {
-      console.error(`Error fetching Cloudflare metrics for ${product.name}:`, error);
+      console.error('Error fetching Cloudflare metrics for product:', product.name, error);
       return this.getEmptyMetrics();
     }
   }
@@ -216,7 +216,7 @@ export class CloudflareIntegration {
       };
 
     } catch (error) {
-      console.error(`Error fetching uptime metrics for ${product.name}:`, error);
+      console.error('Error fetching uptime metrics for product:', product.name, error);
       return { percentage: 100, downtime: 0 };
     }
   }
@@ -228,7 +228,7 @@ export class CloudflareIntegration {
     try {
       // This would integrate with Cloudflare's alerting system
       // For now, we'll return true to indicate alerts are conceptually set up
-      console.log(`Setting up alerts for ${product.name}:`, {
+      console.log('Setting up alerts for product:', product.name, {
         uptimeThreshold: product.alertingConfig.uptimeThreshold,
         errorRateThreshold: product.alertingConfig.errorRateThreshold,
         responseTimeThreshold: product.alertingConfig.responseTimeThreshold
@@ -236,7 +236,7 @@ export class CloudflareIntegration {
 
       return true;
     } catch (error) {
-      console.error(`Error setting up alerts for ${product.name}:`, error);
+      console.error('Error setting up alerts for product:', product.name, error);
       return false;
     }
   }

@@ -81,7 +81,7 @@ export class DORAMetricsCollector {
           deployments.push(deployment);
         }
       } catch (error) {
-        console.error(`Error fetching deployment data for ${product.name}:`, error);
+        console.error('Error fetching deployment data for product:', product.name, error);
       }
     }
 
@@ -126,7 +126,7 @@ export class DORAMetricsCollector {
           incidents.push(incident);
         }
       } catch (error) {
-        console.error(`Error fetching incident data for ${product.name}:`, error);
+        console.error('Error fetching incident data for product:', product.name, error);
       }
     }
 
