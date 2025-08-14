@@ -1,0 +1,67 @@
+name: Repository Self-Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, setup/*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  repo-audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git log analysis
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: |
+          npm install -g jq
+          
+      - name: Run repository audit
+        run: |
+          chmod +x scripts/repo_audit.mjs
+          node scripts/repo_audit.mjs
+          
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-audit-results
+          path: |
+            repo-tree.txt
+            last-commits.txt
+            audit-report.json
+          retention-days: 30
+          
+      - name: Display audit summary
+        run: |
+          echo "## Repository Audit Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Files:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          head -20 repo-tree.txt >> $GITHUB_STEP_SUMMARY
+          echo "..." >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Audit Results:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+          cat audit-report.json >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          
+      - name: Fail if critical issues found
+        run: |
+          CRITICAL_FAILURES=$(jq -r '.summary.critical_failures' audit-report.json)
+          if [ "$CRITICAL_FAILURES" != "0" ]; then
+            echo "❌ Critical audit failures detected: $CRITICAL_FAILURES"
+            exit 1
+          else
+            echo "✅ Repository audit passed"
+          fi
