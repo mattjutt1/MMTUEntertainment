@@ -1,0 +1,33 @@
+{
+  "cookies": [
+    {
+      "name": "mmtu_session",
+      "value": "test_authenticated_user_token",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 4105036800,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "user_id", 
+          "value": "test_user_12345"
+        },
+        {
+          "name": "user_tier",
+          "value": "pro"
+        },
+        {
+          "name": "auth_token",
+          "value": "test_jwt_token_authenticated"
+        }
+      ]
+    }
+  ]
+}

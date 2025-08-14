@@ -1,0 +1,106 @@
+# Launch Gates Configuration
+# Metrics-driven experiment promotion with automated enforcement
+# Updated: 2025-01-14
+
+experiments:
+  post_purchase_bundle_v1:
+    name: "Reports Security Bundle Upsell"
+    type: "revenue_optimization" 
+    status: "active"
+    current_stage: 25
+    ramp_stages: [25, 50, 100]
+    
+    promotion_criteria:
+      stage_25_to_50:
+        min_sample: 200  # eligible orders
+        min_duration_hours: 48
+        metrics:
+          attach_rate_min: 3.0  # percent
+          refund_delta_max: 0.5  # percentage points vs baseline
+        confidence_level: 90
+        
+      stage_50_to_100:
+        min_sample: 500
+        min_duration_hours: 168  # 7 days  
+        metrics:
+          attach_rate_min: 3.0
+          refund_delta_max: 0.5
+        confidence_level: 95
+        
+    kill_switch:
+      condition: "attach_rate < 2.0 AND sample >= 500"
+      action: "set_stage_0"
+      alert_channels: ["#revenue-alerts", "#engineering"]
+      
+    rollback_plan:
+      trigger: "manual_override OR kill_switch"
+      steps:
+        - "set feature_flags.post_purchase_bundle_v1_pct = 0"
+        - "alert team via Slack webhook"
+        - "create incident record in runlog"
+
+  overlay_pricing_ab_v1:
+    name: "Overlay Studio Pro Pricing A/B Test"
+    type: "pricing_experiment"
+    status: "active" 
+    arms: ["$19_control", "$9_variant", "$19_no_promo_holdout"]
+    traffic_split: [45, 45, 10]
+    
+    evaluation_criteria:
+      min_visitors_per_arm: 1000
+      min_purchases_per_arm: 50
+      evaluation_frequency_hours: 24
+      
+    decision_rules:
+      kill_variant:
+        condition: "$9_variant.rpv < 0.85 * $19_control.rpv"
+        confidence_level: 90
+        action: "redirect_traffic_to_control"
+        
+      follow_up:
+        condition: "$9_variant.rpv BETWEEN 0.95 AND 1.05 * $19_control.rpv AND downstream_attach_lift > 0"
+        action: "schedule_$14_mid_test"
+        
+    metrics:
+      primary: "revenue_per_visitor"
+      secondary: ["conversion_rate", "downstream_bundle_attach", "support_tickets"]
+
+  driftguard_marketplace_v1:
+    name: "DriftGuard GitHub Marketplace Launch"
+    type: "marketplace_funnel"
+    status: "pending_launch"
+    
+    promotion_criteria:
+      marketplace_ready:
+        metrics:
+          install_rate_min: 10.0  # percent of views
+          first_run_completion_min: 60.0  # percent of installs
+        retention_tracking: "D1, D7, D30"
+        
+    funnel_stages:
+      - "marketplace_view"
+      - "install_clicked"  
+      - "install_success"
+      - "first_run_completed"
+      - "config_saved"
+      
+    success_metrics:
+      primary: "install_to_first_run_rate"
+      secondary: ["d7_retention", "config_completion_rate"]
+
+# Global configuration
+gatekeeper:
+  evaluation_frequency_minutes: 15
+  decision_confidence_threshold: 0.85
+  max_auto_promotion_per_day: 1
+  emergency_contacts: ["matt@mmtu.dev"]
+  
+analytics:
+  provider: "posthog"
+  events_prefix: "gatekeeper_"
+  retention_days: 90
+  
+database:
+  feature_flags_table: "feature_flags"
+  audit_log_table: "experiment_decisions"
+  backup_frequency_hours: 6

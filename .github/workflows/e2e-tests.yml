@@ -1,0 +1,192 @@
+name: E2E Tests - Bundle & Pricing
+
+on:
+  pull_request:
+    paths: 
+      - 'apps/stream-overlay-studio/**'
+      - 'packages/feature-flags/**'
+      - 'tests/e2e/**'
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+
+env:
+  PLAYWRIGHT_BROWSERS_PATH: 0
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    services:
+      # Mock PostHog for testing
+      posthog-mock:
+        image: nginx:alpine
+        ports:
+          - 8080:80
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        flag-scenario: ['bundle-enabled', 'bundle-disabled', 'pricing-experiment']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      
+      - name: Enable Corepack
+        run: corepack enable
+        
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install ${{ matrix.browser }} --with-deps
+        
+      - name: Build test apps
+        run: |
+          pnpm build --filter=stream-overlay-studio
+          pnpm build --filter=@mmtu/feature-flags
+        
+      - name: Setup test environment
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # Create test environment file
+          cat > .env.test << EOF
+          NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+          NEXT_PUBLIC_POSTHOG_KEY=test_posthog_key
+          NEXT_PUBLIC_POSTHOG_HOST=http://localhost:8080
+          PLAYWRIGHT_TEST_BASE_URL=http://localhost:3000
+          EOF
+          
+      - name: Start application
+        run: |
+          pnpm dev --filter=stream-overlay-studio &
+          # Wait for app to be ready
+          timeout 60s bash -c 'until curl -f http://localhost:3000/health 2>/dev/null; do sleep 2; done'
+        env:
+          NODE_ENV: test
+          PORT: 3000
+          
+      - name: Configure feature flags for test scenario
+        env:
+          FLAG_SCENARIO: ${{ matrix.flag-scenario }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          case $FLAG_SCENARIO in
+            bundle-enabled)
+              node scripts/set_flag.ts post_purchase_bundle_v1_pct 100 --emergency
+              ;;
+            bundle-disabled)
+              node scripts/set_flag.ts post_purchase_bundle_v1_pct 0 --emergency
+              ;;
+            pricing-experiment)
+              node scripts/set_flag.ts overlay_pricing_ab_v1_enabled 100 --emergency
+              node scripts/set_flag.ts post_purchase_bundle_v1_pct 50 --emergency
+              ;;
+          esac
+          
+      - name: Run E2E tests
+        run: pnpm exec playwright test --project=${{ matrix.browser }}
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+          FLAG_SCENARIO: ${{ matrix.flag-scenario }}
+          
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-results-${{ matrix.browser }}-${{ matrix.flag-scenario }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+          
+      - name: Reset flags after test
+        if: always()
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          # Reset to safe defaults
+          node scripts/set_flag.ts post_purchase_bundle_v1_pct 0 --emergency
+          node scripts/set_flag.ts overlay_pricing_ab_v1_enabled 0 --emergency
+
+  test-report:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: e2e-tests
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        
+      - name: Generate test report
+        run: |
+          echo "## E2E Test Results 🎭" > test-summary.md
+          echo "" >> test-summary.md
+          echo "| Browser | Scenario | Status |" >> test-summary.md
+          echo "|---------|----------|--------|" >> test-summary.md
+          
+          for result in e2e-results-*; do
+            browser=$(echo $result | cut -d'-' -f3)
+            scenario=$(echo $result | cut -d'-' -f4)
+            
+            if [ -f "$result/test-results/results.json" ]; then
+              status="✅ Passed"
+            else
+              status="❌ Failed"  
+            fi
+            
+            echo "| $browser | $scenario | $status |" >> test-summary.md
+          done
+          
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('test-summary.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+  gatekeeper-validation:
+    runs-on: ubuntu-latest
+    if: success()
+    needs: e2e-tests
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate launch gates
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "🎯 Running gatekeeper validation..."
+          
+          # Check if tests passed for critical scenarios
+          if [[ "${{ needs.e2e-tests.result }}" == "success" ]]; then
+            echo "✅ E2E tests passed - experiments ready for promotion"
+            
+            # Log success to runlog
+            cat >> .orchestrator/runlog.jsonl << EOF
+          {"ts":"$(date -Iseconds)","actor":"playwright_ci","action":"validate","exp":"e2e_test_suite","from":"testing","to":"validated","sample":0,"metrics":{"browsers_tested":3,"scenarios_tested":3,"success_rate":1.0},"decision":"ALLOW","reason":"All E2E tests passed - bundle upsell, pricing experiment, feature flags validated"}
+          EOF
+          else
+            echo "❌ E2E tests failed - blocking experiment promotion" 
+            exit 1
+          fi

@@ -1,0 +1,285 @@
+name: Gatekeeper - Launch Gates Enforcement
+
+on:
+  pull_request:
+    paths:
+      - 'ops/launch-gates.yaml'
+      - 'scripts/gatekeeper.ts'
+      - '**/feature-flags/**'
+      - '**/pricing/**'
+      - '**/bundle/**'
+      - 'apps/stream-overlay-studio/src/lib/pricing.ts'
+      - 'apps/reports/src/components/BundleUpsell.tsx'
+      
+  schedule:
+    # Evaluate experiments every 4 hours
+    - cron: '0 */4 * * *'
+    
+  workflow_dispatch:
+    inputs:
+      experiment:
+        description: 'Experiment to evaluate'
+        required: false
+        default: 'all'
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'evaluate'
+        type: choice
+        options:
+          - evaluate
+          - promote
+          - kill
+
+jobs:
+  validate-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    name: Validate Experiment Changes
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+      
+      - name: Check PR template compliance
+        run: |
+          if ! grep -q "## Metrics snapshot" "$GITHUB_EVENT_PATH" 2>/dev/null; then
+            if [[ "${{ github.event.pull_request.body }}" != *"Metrics snapshot"* ]]; then
+              echo "❌ PR must include Metrics snapshot section"
+              exit 1
+            fi
+          fi
+          
+          if [[ "${{ github.event.pull_request.body }}" != *"Gatekeeper verdict"* ]]; then
+            echo "❌ PR must include Gatekeeper verdict section"  
+            exit 1
+          fi
+      
+      - name: Detect experiment changes
+        id: changes
+        run: |
+          # Check for ramp changes in code
+          if git diff --name-only ${{ github.event.before }}..${{ github.sha }} | grep -E "(pricing|bundle|feature.flags)" > /dev/null; then
+            echo "experiment_changed=true" >> $GITHUB_OUTPUT
+            
+            # Extract experiment names from changed files
+            experiments=""
+            if git diff --name-only ${{ github.event.before }}..${{ github.sha }} | grep pricing > /dev/null; then
+              experiments="$experiments overlay_pricing_ab_v1"
+            fi
+            if git diff --name-only ${{ github.event.before }}..${{ github.sha }} | grep bundle > /dev/null; then
+              experiments="$experiments post_purchase_bundle_v1"
+            fi
+            
+            echo "experiments=$experiments" >> $GITHUB_OUTPUT
+          else
+            echo "experiment_changed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Validate gatekeeper configuration
+        run: |
+          # Check YAML syntax
+          npx js-yaml ops/launch-gates.yaml > /dev/null
+          
+          # Validate TypeScript types
+          npx tsc --noEmit types/gatekeeper.d.ts
+          
+          # Test gatekeeper script compilation
+          npx tsc --noEmit scripts/gatekeeper.ts
+      
+      - name: Run gatekeeper evaluation
+        if: steps.changes.outputs.experiment_changed == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+        run: |
+          # Create runlog directory
+          mkdir -p .orchestrator
+          
+          # Evaluate each changed experiment
+          for exp in ${{ steps.changes.outputs.experiments }}; do
+            echo "Evaluating $exp..."
+            
+            if ! npx tsx scripts/gatekeeper.ts evaluate "$exp"; then
+              echo "❌ Gatekeeper evaluation failed for $exp"
+              echo "This PR cannot be merged until gates pass or emergency override is provided"
+              
+              # Create denial comment
+              cat > gatekeeper-verdict.md << EOF
+          ## 🚨 Gatekeeper Verdict: DENY
+          
+          **Experiment**: $exp  
+          **Reason**: Gate evaluation failed
+          **Action Required**: 
+          - Wait for sufficient sample size and metrics
+          - Or provide emergency override with \`GATEKEEPER_OVERRIDE=true\` label
+          
+          **Next Evaluation**: Every 4 hours via scheduled workflow
+          EOF
+              
+              # Post comment (simplified - would use GitHub API)
+              cat gatekeeper-verdict.md
+              exit 1
+            fi
+          done
+          
+          echo "✅ All experiment gates passed"
+      
+      - name: Check for emergency override
+        if: failure() && contains(github.event.pull_request.labels.*.name, 'GATEKEEPER_OVERRIDE')
+        run: |
+          echo "⚠️ Emergency override detected - allowing merge with audit trail"
+          
+          # Log override
+          cat >> .orchestrator/runlog.jsonl << EOF
+          {"ts":"$(date -Iseconds)","actor":"manual","action":"override","exp":"${{ steps.changes.outputs.experiments }}","from":"blocked","to":"override","sample":0,"metrics":{},"decision":"ALLOW","reason":"Emergency override via PR label"}
+          EOF
+      
+      - name: Upload gatekeeper logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gatekeeper-logs-${{ github.run_id }}
+          path: .orchestrator/runlog.jsonl
+          retention-days: 30
+
+  evaluate-experiments:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    name: Automated Experiment Evaluation
+    
+    strategy:
+      matrix:
+        experiment: 
+          - post_purchase_bundle_v1
+          - overlay_pricing_ab_v1
+          - driftguard_marketplace_v1
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+      
+      - name: Create runlog directory
+        run: mkdir -p .orchestrator
+      
+      - name: Evaluate experiment
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+        run: |
+          echo "🔍 Evaluating ${{ matrix.experiment }}..."
+          
+          result=$(npx tsx scripts/gatekeeper.ts evaluate "${{ matrix.experiment }}")
+          echo "$result"
+          
+          # Parse decision
+          decision=$(echo "$result" | jq -r '.decision // "UNKNOWN"')
+          reason=$(echo "$result" | jq -r '.reason // "No reason provided"')
+          
+          echo "Decision: $decision"
+          echo "Reason: $reason"
+          
+          # If promotion is allowed, attempt it
+          if [[ "$decision" == "ALLOW" ]]; then
+            echo "🚀 Attempting automatic promotion..."
+            
+            # Get current stage from config and determine next stage
+            current_stage=$(cat ops/launch-gates.yaml | yq ".experiments.${{ matrix.experiment }}.current_stage // 0")
+            
+            case $current_stage in
+              25) next_stage=50 ;;
+              50) next_stage=100 ;;
+              *) 
+                echo "No promotion path from stage $current_stage"
+                exit 0
+                ;;
+            esac
+            
+            if npx tsx scripts/gatekeeper.ts promote "${{ matrix.experiment }}" "$current_stage" "$next_stage"; then
+              echo "✅ Successfully promoted ${{ matrix.experiment }}: $current_stage% → $next_stage%"
+              
+              # Create success notification
+              cat > promotion-success.md << EOF
+          # 🎉 Experiment Promoted
+          
+          **Experiment**: ${{ matrix.experiment }}  
+          **Stage**: $current_stage% → $next_stage%  
+          **Reason**: $reason  
+          **Time**: $(date -Iseconds)
+          
+          Metrics will be monitored for next evaluation cycle.
+          EOF
+              
+              # In production, would send to Slack via webhook
+              cat promotion-success.md
+            fi
+          fi
+      
+      - name: Check kill switch conditions  
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+        run: |
+          # Check if kill switch should trigger
+          result=$(npx tsx scripts/gatekeeper.ts evaluate "${{ matrix.experiment }}")
+          decision=$(echo "$result" | jq -r '.decision // "UNKNOWN"')
+          
+          if [[ "$decision" == "DENY" ]] && echo "$result" | grep -q "Kill switch"; then
+            echo "🛑 Kill switch triggered for ${{ matrix.experiment }}"
+            
+            # Set flag to 0%
+            npx tsx scripts/gatekeeper.ts promote "${{ matrix.experiment }}" "$(cat ops/launch-gates.yaml | yq ".experiments.${{ matrix.experiment }}.current_stage // 0")" 0
+            
+            # Create incident alert
+            cat > kill-switch-alert.md << EOF
+          # 🚨 EXPERIMENT KILLED
+          
+          **Experiment**: ${{ matrix.experiment }}  
+          **Reason**: Kill switch triggered  
+          **Action**: Traffic set to 0%  
+          **Time**: $(date -Iseconds)
+          
+          **Required Actions**:  
+          1. Investigate root cause
+          2. Review metrics and user feedback  
+          3. Create post-mortem issue
+          EOF
+            
+            cat kill-switch-alert.md
+          fi
+      
+      - name: Upload evaluation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-${{ matrix.experiment }}-${{ github.run_id }}
+          path: |
+            .orchestrator/runlog.jsonl
+            promotion-success.md
+            kill-switch-alert.md
+          retention-days: 90
