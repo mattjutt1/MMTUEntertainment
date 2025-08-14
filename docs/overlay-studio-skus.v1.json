@@ -5,33 +5,27 @@
         "type": "multi_arm_bandit",
         "active": true,
         "variants": {
-          "a": {
+          "pro_9": {
             "price": 900,
             "display_price": "$9",
-            "billing": "one_time",
-            "name": "Studio Pro",
-            "weight": 0.25
+            "billing": "monthly",
+            "name": "Pro Pass",
+            "weight": 0.5,
+            "headline": "Go live in minutes. Look pro forever.",
+            "subheading": "Pro unlocks export-ready 4K/SVG overlays, one-click scenes, and new seasonal drops every week—so you ship more and fiddle less.",
+            "cta_text": "Start a 3-day Pro Pass — $1",
+            "cta_subtext": "auto-rolls to $9/mo"
           },
-          "b": {
-            "price": 1200,
-            "display_price": "$12",
-            "billing": "one_time", 
-            "name": "Studio Pro",
-            "weight": 0.25
-          },
-          "c": {
-            "price": 1500,
-            "display_price": "$15",
-            "billing": "one_time",
-            "name": "Studio Pro", 
-            "weight": 0.25
-          },
-          "d": {
+          "pro_19": {
             "price": 1900,
             "display_price": "$19",
-            "billing": "one_time",
+            "billing": "monthly",
             "name": "Studio Pro",
-            "weight": 0.25
+            "weight": 0.5,
+            "headline": "Creator-grade? Nah. Studio-grade.",
+            "subheading": "Designed for teams, agencies, and serious creators. SVG masters, 4K renders, and exclusive pro-only template packs.",
+            "cta_text": "Upgrade to Pro — $19/mo",
+            "cta_subtext": "Includes commercial license + pack-of-the-month"
           }
         },
         "features": [

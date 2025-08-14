@@ -1,0 +1,49 @@
+# Portfolio Observability Configuration
+# Copy this file to terraform.tfvars and fill in your values
+
+# Cloudflare Configuration
+cloudflare_api_token  = "your-cloudflare-api-token"
+cloudflare_account_id = "your-cloudflare-account-id"
+
+# GitHub Configuration  
+github_token        = "your-github-token"
+github_organization = "MMTUEntertainment"
+
+# Notification Channels
+notification_channels = {
+  slack_webhook_url = "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+  email_recipients  = ["alerts@mmtu.app", "devops@mmtu.app"]
+  pager_duty_key    = "your-pagerduty-integration-key"
+}
+
+# Portfolio Products Configuration
+# Customize this based on your actual products and requirements
+portfolio_products = [
+  {
+    id                      = "driftguard"
+    name                    = "DriftGuard"
+    repository              = "DriftGuard-Checks"
+    cloudflare_service_id   = "driftguard-service"
+    deployment_environments = ["production", "staging"]
+    health_endpoint         = "/health"
+    alerting_config = {
+      uptime_threshold       = 99.5
+      error_rate_threshold   = 1.0
+      response_time_threshold = 1000
+    }
+  },
+  {
+    id                      = "reports"
+    name                    = "Reports Platform"
+    repository              = "reports"
+    cloudflare_service_id   = "reports-service"
+    deployment_environments = ["production", "staging"]
+    health_endpoint         = "/api/health"
+    alerting_config = {
+      uptime_threshold       = 99.0
+      error_rate_threshold   = 2.0
+      response_time_threshold = 2000
+    }
+  }
+  # Add more products as needed
+]
