@@ -1,0 +1,31 @@
+name: ChatGPT PR Review
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  chatgpt-review:
+    if: contains(github.event.label.name, 'ai-review')
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: ChatGPT PR Review
+      uses: ./.github/actions/chatgpt-review
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+        pr-number: ${{ github.event.pull_request.number }}
+      env:
+        ENTITLEMENTS_API_URL: ${{ secrets.ENTITLEMENTS_API_URL }}
+        INSTALLATION_ID: ${{ github.event.installation.id }}

@@ -1,0 +1,7 @@
+name = "example-worker"
+main = "src/index.ts"
+compatibility_date = "2025-08-13"
+workers_dev = false
+routes = [
+  { pattern = "api.mmtuentertainment.com", custom_domain = true }
+]

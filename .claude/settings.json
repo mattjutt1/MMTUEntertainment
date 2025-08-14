@@ -1,0 +1,12 @@
+{
+  "projectRootHints": ["/home/matt/MMTUEntertainment"],
+  "preferredModels": { "planner": "opus-4.1", "executor": "sonnet-4" },
+  "toolPermissions": {
+    "default": "ask",
+    "mcp:cf-docs:*": "allow",
+    "mcp:cf-observability:*": "allow",
+    "mcp:cf-bindings:read*": "allow",
+    "mcp:cf-bindings:write*": "ask"
+  },
+  "ui": { "showArtifactsByDefault": true }
+}

@@ -1,0 +1,16 @@
+name: 'ChatGPT PR Review'
+description: 'AI-powered code review using ChatGPT with entitlement checking'
+inputs:
+  github-token:
+    description: 'GitHub token'
+    required: true
+  openai-api-key:
+    description: 'OpenAI API key'
+    required: true
+  pr-number:
+    description: 'Pull request number'
+    required: true
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

@@ -1,0 +1,12 @@
+{
+  "nodes": [
+    {"id":"MMTU"}, {"id":"Foundation"}, {"id":"Product"}, {"id":"Web Presence"},
+    {"id":"Lead & Deploy"}, {"id":"Growth"}, {"id":"Ops & Autonomy"},
+    {"id":"DriftGuard"}, {"id":"Site"}, {"id":"Marketplace"}
+  ],
+  "edges": [
+    ["MMTU","Foundation"],["MMTU","Product"],["MMTU","Web Presence"],
+    ["MMTU","Lead & Deploy"],["MMTU","Growth"],["MMTU","Ops & Autonomy"],
+    ["Product","DriftGuard"],["Web Presence","Site"],["Lead & Deploy","Marketplace"]
+  ]
+}

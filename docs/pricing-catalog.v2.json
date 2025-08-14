@@ -1,0 +1,98 @@
+{
+  "driftguard": {
+    "plans": {
+      "free": {
+        "name": "Free",
+        "price": 0,
+        "currency": "usd",
+        "billing": "monthly",
+        "features": [
+          "Basic security monitoring",
+          "5 PR reviews per month",
+          "1 repository",
+          "Community support"
+        ],
+        "limits": {
+          "repositories": 1,
+          "monthly_prs": 5,
+          "users": 1
+        }
+      },
+      "developer": {
+        "name": "Developer",
+        "price": 9900,
+        "currency": "usd", 
+        "billing": "monthly",
+        "features": [
+          "Advanced security monitoring",
+          "100 PR reviews per month",
+          "5 repositories",
+          "Email support",
+          "Custom security rules"
+        ],
+        "limits": {
+          "repositories": 5,
+          "monthly_prs": 100,
+          "users": 5
+        }
+      },
+      "team": {
+        "name": "Team",
+        "price": 29900,
+        "currency": "usd",
+        "billing": "monthly", 
+        "features": [
+          "Enterprise security monitoring",
+          "500 PR reviews per month",
+          "25 repositories",
+          "Priority support",
+          "Advanced analytics",
+          "Team management"
+        ],
+        "limits": {
+          "repositories": 25,
+          "monthly_prs": 500,
+          "users": 25
+        }
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": 99900,
+        "currency": "usd",
+        "billing": "monthly",
+        "features": [
+          "White-glove security monitoring",
+          "Unlimited PR reviews",
+          "Unlimited repositories", 
+          "24/7 support",
+          "Custom integrations",
+          "SLA guarantees",
+          "Dedicated success manager"
+        ],
+        "limits": {
+          "repositories": -1,
+          "monthly_prs": -1,
+          "users": -1
+        }
+      }
+    },
+    "overages": {
+      "additional_pr": 10,
+      "additional_repository": 2000
+    }
+  },
+  "comparison_matrix": {
+    "price": 2900,
+    "currency": "usd",
+    "billing": "one_time"
+  },
+  "web_toys": {
+    "meme_mixer": {
+      "premium_pack": {
+        "price": 500,
+        "currency": "usd",
+        "billing": "one_time"
+      }
+    }
+  }
+}

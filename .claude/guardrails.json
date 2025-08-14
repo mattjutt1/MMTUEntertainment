@@ -1,0 +1,15 @@
+{
+  "approvals": [
+    "Approve install: user-local Node via nvm, pnpm, wrangler, jq, rg.",
+    "Approve net download with SHA256 verification for <tool>.",
+    "Approve MCP: Filesystem/Git/Fetch/Language Server scoped to /home/matt/MMTUEntertainment."
+  ],
+  "denials": [
+    "Deny sudo unless explicitly allowed for apt (jq, ripgrep).",
+    "Deny secrets in plain text; use env files or dashboard bindings."
+  ],
+  "evidence": [
+    "Write .orchestrator/runlog.jsonl for machine events.",
+    "Write .orchestrator/tooling.log for human summary."
+  ]
+}
