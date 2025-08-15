@@ -12,7 +12,50 @@
     "diagnosticsSharing": true
   },
   "hooks": {
-    "enabled": true,
-    "configFile": ".claude/hooks.json"
-  }
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command", 
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/bash-allowlist-check.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/prettier-format.sh", 
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/load-repo-context.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "allowedTools": [
+    "Read", 
+    "Write", 
+    "Edit", 
+    "MultiEdit", 
+    "Bash(pnpm:*)", 
+    "Bash(npx:*)", 
+    "Bash(git:*)", 
+    "Bash(node:*)", 
+    "Bash(wrangler:*)"
+  ]
 }

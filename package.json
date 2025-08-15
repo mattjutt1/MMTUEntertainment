@@ -3,8 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "setup": "node scripts/setup.js",
     "flags": "npx ts-node scripts/set_flag.ts",
-    "gatekeeper": "npx ts-node scripts/gatekeeper.ts"
+    "gatekeeper": "npx ts-node scripts/gatekeeper.ts",
+    "deploy:soc2": "pnpm --filter=reports build && npx wrangler pages deploy apps/reports/.next --project-name=mmtu-reports",
+    "deploy:driftguard": "pnpm --filter=driftguard-checks build && npx wrangler deploy --name=mmtu-driftguard-checks",
+    "deploy:worker": "npx wrangler deploy apps/marketplace-webhook/src/index.ts --name=mmtu-marketplace-webhooks",
+    "test:e2e": "playwright test --project=chromium"
   },
   "workspaces": [
     "apps/*",

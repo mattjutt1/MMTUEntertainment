@@ -1,0 +1,21 @@
+# Set default behavior to automatically normalize line endings
+* text=auto eol=lf
+
+# Explicitly set specific file types
+*.md text eol=lf
+*.json text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary files should be left untouched
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.zip binary
