@@ -1,0 +1,153 @@
+name: Reports — HTML→PDF
+
+on:
+  workflow_dispatch:
+    inputs:
+      org:
+        description: "Organization name"
+        required: true
+        type: string
+      repo:
+        description: "Repository name (optional, defaults to all repos)"
+        required: false
+        type: string
+      report_type:
+        description: "Report type"
+        required: true
+        type: choice
+        options:
+          - security-audit
+          - dependency-risk
+          - ci-cd-hardening
+          - pr-quality
+          - secret-exposure
+        default: security-audit
+      date_range:
+        description: "Date range for analysis"
+        required: false
+        type: choice
+        options:
+          - last-30-days
+          - last-90-days
+          - last-6-months
+          - custom
+        default: last-30-days
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      security-events: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd apps/reports
+          npm ci
+          npm install puppeteer
+
+      - name: Install browsers for Puppeteer
+        run: |
+          cd apps/reports
+          npx puppeteer browsers install chrome
+
+      - name: Generate security data
+        run: |
+          # Create mock security findings for demonstration
+          mkdir -p /tmp/security-data
+          cat > /tmp/security-data/findings.json << 'EOF'
+          {
+            "org": "${{ github.event.inputs.org }}",
+            "repo": "${{ github.event.inputs.repo || 'all-repositories' }}",
+            "scan_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "report_type": "${{ github.event.inputs.report_type }}",
+            "findings": [
+              {
+                "severity": "HIGH",
+                "category": "Authentication",
+                "description": "Missing multi-factor authentication enforcement",
+                "file": "src/auth/config.ts",
+                "line": 42,
+                "remediation": "Enable MFA requirement in authentication configuration",
+                "cwe": "CWE-308"
+              },
+              {
+                "severity": "MEDIUM", 
+                "category": "Input Validation",
+                "description": "Insufficient input sanitization in user upload endpoint",
+                "file": "api/upload.js",
+                "line": 156,
+                "remediation": "Implement comprehensive input validation and sanitization",
+                "cwe": "CWE-20"
+              },
+              {
+                "severity": "LOW",
+                "category": "Logging",
+                "description": "Sensitive data potentially logged in error messages", 
+                "file": "utils/logger.ts",
+                "line": 89,
+                "remediation": "Implement log sanitization to remove sensitive information",
+                "cwe": "CWE-532"
+              }
+            ],
+            "summary": {
+              "total_findings": 3,
+              "high_severity": 1,
+              "medium_severity": 1,
+              "low_severity": 1,
+              "files_scanned": 247,
+              "scan_duration": "2m 34s"
+            }
+          }
+          EOF
+
+      - name: Generate PDF Report
+        run: |
+          node scripts/render-report-github.js
+        env:
+          ORG_NAME: ${{ github.event.inputs.org }}
+          REPO_NAME: ${{ github.event.inputs.repo }}
+          REPORT_TYPE: ${{ github.event.inputs.report_type }}
+          SCAN_DATE: ${{ github.run_started_at }}
+          FINDINGS_FILE: /tmp/security-data/findings.json
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report-${{ github.event.inputs.org }}-${{ github.run_number }}
+          path: apps/reports/output/*.pdf
+          retention-days: 30
+
+      - name: Generate report summary
+        run: |
+          echo "# 📊 Security Report Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Organization:** ${{ github.event.inputs.org }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${{ github.event.inputs.repo || 'All repositories' }}" >> $GITHUB_STEP_SUMMARY  
+          echo "**Report Type:** ${{ github.event.inputs.report_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Generated:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The PDF report has been generated and uploaded as an artifact." >> $GITHUB_STEP_SUMMARY
+          echo "Download it from the Actions tab to review the security findings." >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify completion
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Report generation completed successfully"
+            echo "📥 PDF available in workflow artifacts"
+          else
+            echo "❌ Report generation failed"
+            echo "🔍 Check workflow logs for details"
+          fi

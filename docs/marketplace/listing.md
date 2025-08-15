@@ -1,121 +1,81 @@
-# DriftGuard Checks - GitHub Marketplace Listing
+# DriftGuard — GitHub-first compliance checks & 1-click audit reports
 
-## Title
-DriftGuard Checks
+## App Information
 
-## Tagline (140 chars)
-PR quality gates without the platform tax. Policy-driven merge protection with instant setup and transparent pricing.
+**Title**: DriftGuard — GitHub-first compliance checks & 1-click audit reports
 
-## Long Description
+**Tagline**: Catch drift in PRs, prove compliance in minutes, not months.
 
-### What is DriftGuard Checks?
+**Category**: Security & Compliance
 
-DriftGuard Checks provides **policy-driven PR quality gates** that integrate natively with GitHub's merge protection system. Unlike heavyweight static analysis platforms that charge per seat or lines of code, DriftGuard focuses specifically on **PR workflow protection** with simple org-based pricing.
+**Description**: 
+DriftGuard runs lightweight security & policy checks on every PR and collects evidence automatically. Export SOC2/ISO-lite reports with a click. Works with existing scanners; no per-seat tax.
 
-### Key Features
+## Key Features
 
-**🛡️ Instant Policy Enforcement**
-- Pre-configured security policies for common vulnerabilities
-- Custom policy creation with YAML configuration
-- Automatic policy updates based on security advisories
+1. **Checks in PR** with remediation & line annotations (batched)
+   - Automated security scanning on every pull request
+   - Inline code annotations with specific remediation guidance
+   - Integration with GitHub Checks API for seamless workflow
 
-**⚡ Native GitHub Integration**
-- Works with existing branch protection rules
-- Integrates with GitHub status checks API
-- Supports GitHub Enterprise Server and GitHub.com
+2. **Evidence Store** that links findings ↔ commits ↔ fixes
+   - Automatic evidence collection and correlation
+   - Audit trail linking security findings to resolution commits
+   - Compliance-ready documentation generation
 
-**📊 Transparent Reporting**
-- Real-time policy violation reports
-- Historical compliance tracking
-- Slack/Teams notifications for policy events
+3. **1-click HTML→PDF report** with severity counts and timestamps
+   - Professional compliance reports (SOC2/ISO-lite format)
+   - Executive summaries with risk analysis
+   - Automated evidence compilation and formatting
 
-**🔧 Zero Configuration Setup**
-- Install and protect repos in under 5 minutes
-- Smart defaults for common security policies
-- No CI/CD pipeline changes required
+## Target Audience
 
-### How It Works
+**Who it's for**: Seed→Series-B teams, consultants, and dev-first orgs prepping for audits.
 
-1. **Install**: Add DriftGuard to your organization
-2. **Configure**: Select repos and enable policy packs
-3. **Protect**: PRs are automatically checked against policies
-4. **Merge**: Only compliant PRs can be merged
+- **Startups**: Preparing for Series A/B funding security requirements
+- **Consultants**: Providing compliance services to multiple clients
+- **Development Teams**: Maintaining security posture during rapid growth
+- **Audit-Prep Organizations**: Streamlining compliance documentation
 
-### Pricing
+## Pricing (per organization / month)
 
-- **Free**: 1 repo, 100 PRs/month, basic security policies
-- **Starter ($99/month)**: 5 repos, 500 PRs/month, Slack integration
-- **Team ($299/month)**: 25 repos, 2000 PRs/month, custom policies, SSO
-- **Enterprise**: Unlimited repos, priority support, audit logs, SLA
+- **Starter $99**: Up to 10 repositories, basic security checks, monthly reports
+- **Growth $299**: Up to 50 repositories, advanced scanning, weekly reports, API access
+- **Audit-Ready $799**: Unlimited repositories, custom compliance frameworks, real-time reporting, dedicated support
 
-### Permissions Rationale
+**Trial**: 14-day free trial (limited to 3 repositories and 5 PR checks)
 
-**Repository permissions (Read)**: Analyze file contents for policy violations
-**Pull request permissions (Write)**: Create status checks and comments on PRs
-**Organization permissions (Read)**: Access organization settings for team-based policies
-**Webhook permissions**: Receive notifications when PRs are opened/updated
+## Support & Contact
 
-### Support & Documentation
+**Support Email**: [support@mmtuentertainment.com](mailto:support@mmtuentertainment.com)
+**Documentation**: [docs.driftguard.app](https://docs.driftguard.app)
+**Status Page**: [status.driftguard.app](https://status.driftguard.app)
 
-- **Documentation**: https://docs.mmtuentertainment.com/driftguard
-- **Support Email**: support@mmtuentertainment.com
-- **Response Time**: 24 hours for paid plans, 48 hours for free tier
-- **Community**: GitHub Discussions in DriftGuard repository
+## Legal & Privacy
 
-### Legal
+**Privacy Policy**: [/docs/marketplace/privacy.md](privacy.md)
+**Terms of Service**: [/docs/marketplace/tos.md](tos.md)
 
-- **Privacy Policy**: https://www.mmtuentertainment.com/privacy
-- **Terms of Service**: https://www.mmtuentertainment.com/terms
-- **Security**: SOC 2 Type II compliant, data encrypted in transit and at rest
+## Required Screenshots
 
-## Screenshot Captions & Alt Text
+1. **PR with Checks annotations** (green pass and failing example)
+   - Screenshot showing DriftGuard check results in GitHub PR
+   - Example of inline code annotations with remediation suggestions
+   - Both passing and failing check states
 
-1. **Dashboard Overview**
-   - Caption: "Organization-wide policy compliance dashboard"
-   - Alt: "Screenshot showing DriftGuard dashboard with policy status across multiple repositories"
+2. **Evidence dashboard** (counts by severity)
+   - Main dashboard showing security findings overview
+   - Severity breakdown (Critical/High/Medium/Low)
+   - Trends and compliance metrics
 
-2. **Policy Configuration**
-   - Caption: "Configure security policies with YAML or visual editor"
-   - Alt: "Screenshot of policy configuration interface with YAML editor and policy options"
+3. **Report PDF preview page** with "Download" CTA
+   - SOC2-lite report preview interface
+   - Professional PDF output sample
+   - Download and sharing options
 
-3. **PR Status Check**
-   - Caption: "Native GitHub status checks show policy compliance"
-   - Alt: "GitHub pull request showing DriftGuard status check with policy results"
+## Integration Requirements
 
-4. **Violation Details**
-   - Caption: "Detailed policy violation reports with remediation guidance"
-   - Alt: "Screenshot showing detailed policy violation with file location and fix suggestions"
-
-5. **Team Notifications**
-   - Caption: "Slack/Teams integration for policy events and compliance updates"
-   - Alt: "Screenshot of Slack notification showing policy violation alert with details"
-
-6. **Historical Analytics**
-   - Caption: "Track compliance trends and policy effectiveness over time"
-   - Alt: "Analytics dashboard showing compliance metrics and trends across time periods"
-
-## FAQ
-
-**Q: How does DriftGuard compare to SonarCloud or CodeQL?**
-A: DriftGuard focuses specifically on PR merge protection rather than comprehensive code analysis. It's designed for teams that want policy enforcement without the complexity and cost of full static analysis platforms.
-
-**Q: What policies are included?**
-A: Built-in policies cover OWASP Top 10, dependency vulnerabilities, secrets detection, and common security misconfigurations. Custom policies can be created using our YAML DSL.
-
-**Q: Does this work with GitHub Enterprise Server?**
-A: Yes, DriftGuard supports both GitHub.com and GitHub Enterprise Server installations.
-
-**Q: Can I customize the policies?**
-A: Absolutely. Team and Enterprise plans include custom policy creation with our visual editor or YAML configuration.
-
-**Q: What happens if DriftGuard is down?**
-A: DriftGuard is designed with high availability. If our service is unavailable, PRs are allowed to merge to prevent blocking your workflow.
-
----
-
-## Competitive Positioning Notes
-
-<!-- SonarCloud: LOC-based pricing, comprehensive analysis platform -->
-<!-- DeepSource: $8-24/seat/month, broad security scope -->  
-<!-- Codacy: ~$15-18/user/month, traditional static analysis -->
-<!-- DriftGuard: Org-based, PR-focused, simple policy enforcement -->
+- **GitHub Permissions**: Contents (read), Checks (write), Pull requests (read)
+- **Webhook Events**: push, pull_request, marketplace_purchase
+- **API Dependencies**: GitHub REST API, GitHub Checks API
+- **Security**: All data encrypted in transit and at rest, GDPR compliant

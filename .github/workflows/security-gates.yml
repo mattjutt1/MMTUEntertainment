@@ -1,0 +1,269 @@
+name: Security Gates — Semgrep + Gitleaks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  checks: write
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Analysis
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install -g @semgrep/semgrep-action gitleaks
+
+      - name: Run Gitleaks scan
+        id: gitleaks
+        run: |
+          echo "🔍 Running Gitleaks secret detection..."
+          
+          # Create gitleaks report directory
+          mkdir -p security-reports
+          
+          # Run gitleaks scan
+          if gitleaks detect --source . --report-format json --report-path security-reports/gitleaks.json --verbose --no-git; then
+            echo "✅ No secrets detected by Gitleaks"
+            echo "gitleaks_status=pass" >> $GITHUB_OUTPUT
+            echo "gitleaks_findings=0" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Potential secrets detected by Gitleaks"
+            echo "gitleaks_status=fail" >> $GITHUB_OUTPUT
+            
+            # Count findings
+            FINDINGS_COUNT=$(jq length security-reports/gitleaks.json 2>/dev/null || echo "0")
+            echo "gitleaks_findings=$FINDINGS_COUNT" >> $GITHUB_OUTPUT
+            
+            # Show findings summary
+            echo "📊 Gitleaks found $FINDINGS_COUNT potential secrets"
+            if [ -f security-reports/gitleaks.json ]; then
+              echo "🔍 Secret types detected:"
+              jq -r '.[].RuleID' security-reports/gitleaks.json | sort | uniq -c | sort -nr
+            fi
+          fi
+
+      - name: Run Semgrep scan
+        id: semgrep
+        run: |
+          echo "🔍 Running Semgrep static analysis..."
+          
+          # Run semgrep with multiple rulesets
+          semgrep --config=auto \
+            --config=p/security-audit \
+            --config=p/owasp-top-ten \
+            --config=p/dockerfile \
+            --json \
+            --output security-reports/semgrep.json \
+            --verbose || true
+            
+          # Check if findings exist
+          if [ -f security-reports/semgrep.json ] && [ -s security-reports/semgrep.json ]; then
+            FINDINGS_COUNT=$(jq '.results | length' security-reports/semgrep.json)
+            echo "semgrep_findings=$FINDINGS_COUNT" >> $GITHUB_OUTPUT
+            
+            # Count by severity
+            HIGH_COUNT=$(jq '[.results[] | select(.extra.severity == "ERROR")] | length' security-reports/semgrep.json)
+            MEDIUM_COUNT=$(jq '[.results[] | select(.extra.severity == "WARNING")] | length' security-reports/semgrep.json)
+            LOW_COUNT=$(jq '[.results[] | select(.extra.severity == "INFO")] | length' security-reports/semgrep.json)
+            
+            echo "semgrep_high=$HIGH_COUNT" >> $GITHUB_OUTPUT
+            echo "semgrep_medium=$MEDIUM_COUNT" >> $GITHUB_OUTPUT
+            echo "semgrep_low=$LOW_COUNT" >> $GITHUB_OUTPUT
+            
+            echo "📊 Semgrep found $FINDINGS_COUNT findings ($HIGH_COUNT high, $MEDIUM_COUNT medium, $LOW_COUNT low)"
+            
+            # Set status based on findings
+            if [ "$HIGH_COUNT" -gt 0 ]; then
+              echo "semgrep_status=fail" >> $GITHUB_OUTPUT
+            elif [ "$MEDIUM_COUNT" -gt 5 ]; then
+              echo "semgrep_status=warn" >> $GITHUB_OUTPUT
+            else
+              echo "semgrep_status=pass" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "✅ No Semgrep findings detected"
+            echo "semgrep_status=pass" >> $GITHUB_OUTPUT
+            echo "semgrep_findings=0" >> $GITHUB_OUTPUT
+            echo "semgrep_high=0" >> $GITHUB_OUTPUT
+            echo "semgrep_medium=0" >> $GITHUB_OUTPUT
+            echo "semgrep_low=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload security findings to GitHub Checks
+        if: always()
+        run: |
+          echo "📤 Creating GitHub Checks with security findings..."
+          
+          # Create combined security report
+          node -e "
+          const fs = require('fs');
+          const gitleaks = fs.existsSync('security-reports/gitleaks.json') ? JSON.parse(fs.readFileSync('security-reports/gitleaks.json', 'utf8')) : [];
+          const semgrep = fs.existsSync('security-reports/semgrep.json') ? JSON.parse(fs.readFileSync('security-reports/semgrep.json', 'utf8')) : { results: [] };
+          
+          const findings = {
+            gitleaks: gitleaks.length || 0,
+            semgrep: semgrep.results?.length || 0,
+            total: (gitleaks.length || 0) + (semgrep.results?.length || 0),
+            high_severity: (semgrep.results || []).filter(r => r.extra?.severity === 'ERROR').length,
+            scan_date: new Date().toISOString(),
+            commit_sha: process.env.GITHUB_SHA,
+            ref: process.env.GITHUB_REF
+          };
+          
+          fs.writeFileSync('security-reports/summary.json', JSON.stringify(findings, null, 2));
+          console.log('Security scan summary:', findings);
+          "
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+
+      - name: Create GitHub Check Run
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read security findings
+            const gitleaksFindings = ${{ steps.gitleaks.outputs.gitleaks_findings || 0 }};
+            const semgrepFindings = ${{ steps.semgrep.outputs.semgrep_findings || 0 }};
+            const semgrepHigh = ${{ steps.semgrep.outputs.semgrep_high || 0 }};
+            const semgrepMedium = ${{ steps.semgrep.outputs.semgrep_medium || 0 }};
+            const semgrepLow = ${{ steps.semgrep.outputs.semgrep_low || 0 }};
+            
+            const totalFindings = gitleaksFindings + semgrepFindings;
+            
+            // Determine overall status
+            let conclusion = 'success';
+            let title = '✅ Security gates passed';
+            
+            if (gitleaksFindings > 0 || semgrepHigh > 0) {
+              conclusion = 'failure';
+              title = '❌ Security gates failed';
+            } else if (semgrepMedium > 5) {
+              conclusion = 'neutral';
+              title = '⚠️ Security gates passed with warnings';
+            }
+            
+            // Create summary
+            const summary = `
+            ## 🛡️ Security Analysis Results
+            
+            **Overall Status:** ${title}
+            
+            ### 📊 Findings Summary
+            - **Total Findings:** ${totalFindings}
+            - **Gitleaks (Secrets):** ${gitleaksFindings}
+            - **Semgrep (Static Analysis):** ${semgrepFindings}
+              - High Severity: ${semgrepHigh}
+              - Medium Severity: ${semgrepMedium}
+              - Low Severity: ${semgrepLow}
+            
+            ### 🎯 Quality Gates
+            - ✅ **No secrets detected:** ${gitleaksFindings === 0 ? 'PASS' : 'FAIL'}
+            - ✅ **No high-severity issues:** ${semgrepHigh === 0 ? 'PASS' : 'FAIL'}
+            - ✅ **Medium issues under control:** ${semgrepMedium <= 5 ? 'PASS' : 'WARN'}
+            
+            ${totalFindings > 0 ? '### ⚠️ Action Required\nPlease review and address the security findings before merging.' : '### ✅ All Clear\nNo security issues detected. Safe to proceed.'}
+            `;
+            
+            // Create check run
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Security Gates',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: conclusion,
+              output: {
+                title: title,
+                summary: summary
+              }
+            });
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const gitleaksFindings = ${{ steps.gitleaks.outputs.gitleaks_findings || 0 }};
+            const semgrepFindings = ${{ steps.semgrep.outputs.semgrep_findings || 0 }};
+            const semgrepHigh = ${{ steps.semgrep.outputs.semgrep_high || 0 }};
+            const totalFindings = gitleaksFindings + semgrepFindings;
+            
+            let status = '✅ Security gates passed';
+            let emoji = '🛡️';
+            
+            if (gitleaksFindings > 0 || semgrepHigh > 0) {
+              status = '❌ Security gates failed';
+              emoji = '🚨';
+            } else if (totalFindings > 0) {
+              status = '⚠️ Security gates passed with warnings';
+              emoji = '⚠️';
+            }
+            
+            const comment = `## ${emoji} Security Analysis Results
+            
+            **Status:** ${status}
+            
+            | Tool | Findings | Status |
+            |------|----------|--------|
+            | Gitleaks (Secrets) | ${gitleaksFindings} | ${gitleaksFindings === 0 ? '✅ Pass' : '❌ Fail'} |
+            | Semgrep (High Risk) | ${semgrepHigh} | ${semgrepHigh === 0 ? '✅ Pass' : '❌ Fail'} |
+            | Semgrep (Total) | ${semgrepFindings} | ${semgrepFindings <= 10 ? '✅ Pass' : '⚠️ Review'} |
+            
+            ${totalFindings > 0 ? 
+              '\n⚠️ **Action Required:** Please review and address security findings before merging.\n\nView detailed results in the Actions tab.' :
+              '\n✅ **All Clear:** No security issues detected. Safe to proceed with merge.'
+            }
+            `;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports-${{ github.run_number }}
+          path: security-reports/
+          retention-days: 30
+
+      - name: Fail if critical security issues
+        if: steps.gitleaks.outputs.gitleaks_status == 'fail' || steps.semgrep.outputs.semgrep_high > 0
+        run: |
+          echo "❌ Critical security issues detected!"
+          echo "🔍 Gitleaks status: ${{ steps.gitleaks.outputs.gitleaks_status }}"
+          echo "🔍 Semgrep high-severity issues: ${{ steps.semgrep.outputs.semgrep_high }}"
+          echo ""
+          echo "Please address these issues before proceeding:"
+          echo "1. Review secrets detected by Gitleaks"
+          echo "2. Fix high-severity vulnerabilities found by Semgrep"
+          echo "3. Download detailed reports from workflow artifacts"
+          exit 1
