@@ -39,11 +39,35 @@ DriftGuard runs lightweight security & policy checks on every PR and collects ev
 
 ## Pricing (per organization / month)
 
-- **Starter $99**: Up to 10 repositories, basic security checks, monthly reports
-- **Growth $299**: Up to 50 repositories, advanced scanning, weekly reports, API access
-- **Audit-Ready $799**: Unlimited repositories, custom compliance frameworks, real-time reporting, dedicated support
+**Free Trial**: 14 days, no credit card required
+- Up to 3 repositories
+- 25 PR security checks
+- Basic compliance reports
+- Community support
 
-**Trial**: 14-day free trial (limited to 3 repositories and 5 PR checks)
+**Starter**: $49/month
+- Up to 10 repositories
+- 200 PR security checks per month
+- PDF compliance reports
+- Email & Slack notifications
+- Community support
+
+**Professional**: $149/month
+- Up to 50 repositories
+- 1,000 PR security checks per month
+- SOC2-lite audit reports
+- Advanced evidence correlation
+- Priority support
+- Custom compliance rules
+
+**Enterprise**: $399/month
+- Unlimited repositories
+- Unlimited PR security checks
+- Multi-organization management
+- Dedicated customer success
+- Custom integrations
+- SSO/SAML authentication
+- White-label reporting
 
 ## Support & Contact
 
