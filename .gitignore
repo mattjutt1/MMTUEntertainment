@@ -12,3 +12,8 @@ node_modules/
 coverage/
 dist/
 build/
+
+# Claude Code personal settings
+.claude/settings.local.json
+.claude/memory/
+.claude/cache/

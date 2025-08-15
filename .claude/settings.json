@@ -1,15 +1,18 @@
 {
-  "projectRootHints": ["/home/matt/MMTUEntertainment"],
-  "preferredModels": { "planner": "opus-4.1", "executor": "sonnet-4" },
-  "toolPermissions": {
-    "default": "ask",
-    "mcp:cf-docs:*": "allow",
-    "mcp:cf-observability:*": "allow",
-    "mcp:cf-bindings:read*": "allow",
-    "mcp:cf-bindings:write*": "ask",
-    "mcp:semgrep-security:*": "allow"
+  "diffTool": "auto",
+  "statusLine": true,
+  "memory": {
+    "enabled": true,
+    "projectContext": true
   },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["semgrep-security"],
-  "ui": { "showArtifactsByDefault": true }
+  "defaultModel": "claude-opus-4-1",
+  "editorIntegration": {
+    "diffInEditor": true,
+    "selectionContext": true,
+    "diagnosticsSharing": true
+  },
+  "hooks": {
+    "enabled": true,
+    "configFile": ".claude/hooks.json"
+  }
 }

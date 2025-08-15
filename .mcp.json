@@ -1,8 +1,27 @@
 {
-  "mcpServers": {
+  "clients": {
+    "puppeteer": { 
+      "transport": "stdio", 
+      "command": "puppeteer-mcp",
+      "description": "Browser automation for screenshot generation and testing"
+    },
+    "sentry": { 
+      "transport": "http", 
+      "url": "https://mcp.sentry.io",
+      "description": "Error tracking and performance monitoring"
+    },
     "semgrep-security": {
+      "transport": "stdio",
       "command": "semgrep-mcp",
-      "args": []
+      "description": "Security scanning and vulnerability detection"
+    },
+    "github-api": {
+      "transport": "http",
+      "url": "https://api.github.com",
+      "description": "GitHub API integration for Checks API and marketplace"
     }
-  }
+  },
+  "debug": false,
+  "timeout": 30000,
+  "retries": 3
 }

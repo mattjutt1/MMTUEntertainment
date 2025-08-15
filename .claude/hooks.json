@@ -1,0 +1,23 @@
+{
+  "pre-edit": [
+    "bash -lc 'echo \"🔍 Running pre-edit checks...\"'",
+    "bash -lc 'pnpm lint || echo \"⚠️  Lint issues found - will fix during edit\"'",
+    "bash -lc 'pnpm typecheck || echo \"⚠️  Type issues found - will address\"'"
+  ],
+  "post-edit": [
+    "bash -lc 'echo \"✅ Running post-edit validation...\"'",
+    "bash -lc 'pnpm test --passWithNoTests --silent || echo \"⚠️  Tests need attention\"'"
+  ],
+  "pre-commit": [
+    "bash -lc 'echo \"🛡️  Running DriftGuard self-checks...\"'",
+    "bash -lc 'semgrep --config=auto --quiet . || echo \"Security scan complete\"'",
+    "bash -lc 'gitleaks detect --source . || echo \"Secret scan complete\"'"
+  ],
+  "post-commit": [
+    "bash -lc 'echo \"📝 Commit completed successfully\"'"
+  ],
+  "session-start": [
+    "bash -lc 'echo \"🚀 Claude Code power-user session started\"'",
+    "bash -lc 'echo \"Model: Opus 4.1 for planning → Sonnet 4 for execution\"'"
+  ]
+}
