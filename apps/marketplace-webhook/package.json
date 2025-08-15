@@ -1,0 +1,29 @@
+{
+  "name": "@mmtu/marketplace-webhook",
+  "version": "1.0.0",
+  "description": "GitHub Marketplace webhook handler for DriftGuard revenue tracking",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:prod": "wrangler deploy --env production",
+    "tail": "wrangler tail",
+    "test": "echo \"Tests not yet implemented\" && exit 1"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "cloudflare-workers",
+    "github-marketplace",
+    "webhook",
+    "revenue-tracking",
+    "driftguard"
+  ],
+  "author": "MMTU Entertainment",
+  "license": "MIT"
+}
