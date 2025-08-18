@@ -1,14 +1,27 @@
 name: Pivot Checks
+
 on:
   pull_request:
-  push:
     branches: [ main ]
+    paths:
+      - "pivot-checks/**"
+      - "data/metrics/**"
+      - ".github/workflows/pivot-checks.yml"
+      - "docs/pivot-rules.md"
+      - "docs/benchmarks_crosscheck.md"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pivot:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: false
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: "3.11"
       - run: python3 pivot-checks/check_pivot_rules.py --metrics data/metrics/current.json --config pivot-checks/config.json
