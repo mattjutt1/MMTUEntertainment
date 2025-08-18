@@ -1,0 +1,50 @@
+{
+  "ctrf": {
+    "name": "DriftGuard Test Suite",
+    "duration": 1500,
+    "status": "passed",
+    "results": {
+      "tool": {
+        "name": "jest",
+        "version": "29.0.0"
+      },
+      "summary": {
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "pending": 0,
+        "skipped": 0,
+        "start": 1692364800000,
+        "stop": 1692364801500
+      },
+      "tests": [
+        {
+          "name": "GitHub App authentication works",
+          "status": "passed",
+          "duration": 750,
+          "suite": "integration",
+          "message": null,
+          "trace": null
+        },
+        {
+          "name": "CTRF processing is functional",
+          "status": "passed",
+          "duration": 750,
+          "suite": "integration", 
+          "message": null,
+          "trace": null
+        }
+      ],
+      "environment": {
+        "repositoryName": "driftguard-test-repo",
+        "repositoryUrl": "https://github.com/mattjutt1/driftguard-test-repo",
+        "branchName": "main"
+      }
+    }
+  },
+  "repository": {
+    "owner": "mattjutt1",
+    "repo": "driftguard-test-repo",
+    "sha": "abc1234567890123456789012345678901234567"
+  }
+}

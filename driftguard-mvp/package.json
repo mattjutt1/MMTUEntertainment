@@ -1,0 +1,51 @@
+{
+  "name": "driftguard-checks",
+  "version": "1.0.0",
+  "description": "Universal GitHub check run aggregation service",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest",
+    "test:endpoints": "./test-endpoints.sh",
+    "test:ctrf": "./test-ctrf-flow.sh",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit",
+    "setup": "./quick-setup.sh",
+    "setup:validate": "node validate-setup.js",
+    "setup:secrets": "./configure-secrets.sh",
+    "setup:wizard": "open INTERACTIVE_SETUP_WIZARD.md",
+    "setup:checklist": "open SETUP_CHECKLIST.md",
+    "db:migrate": "wrangler d1 execute driftguard-prod --file=./schema.sql",
+    "build": "npm run lint && npm run type-check && npm run deploy"
+  },
+  "dependencies": {
+    "@octokit/auth-app": "^6.1.4",
+    "@octokit/rest": "^20.1.2",
+    "@supabase/supabase-js": "^2.55.0",
+    "jsonwebtoken": "^9.0.2",
+    "posthog-node": "^3.6.3",
+    "stripe": "^14.25.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "miniflare": "^3.20241218.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.0",
+    "wrangler": "^4.30.0"
+  },
+  "keywords": [
+    "github",
+    "checks",
+    "ctrf",
+    "testing",
+    "continuous-integration"
+  ],
+  "author": "MMTU Entertainment",
+  "license": "MIT"
+}

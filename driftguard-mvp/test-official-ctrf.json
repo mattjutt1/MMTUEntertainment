@@ -1,0 +1,79 @@
+{
+  "ctrf": {
+    "name": "DriftGuard Test Suite",
+    "duration": 2500,
+    "status": "passed",
+    "results": {
+      "tool": {
+        "name": "vitest",
+        "version": "1.6.0"
+      },
+      "summary": {
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "pending": 0,
+        "skipped": 0,
+        "start": 1692364800000,
+        "stop": 1692364802500
+      },
+      "tests": [
+        {
+          "name": "Authentication flow works correctly",
+          "status": "passed",
+          "duration": 1250,
+          "start": 1692364800000,
+          "stop": 1692364801250,
+          "suite": "auth",
+          "message": null,
+          "trace": null,
+          "rawStatus": "passed"
+        },
+        {
+          "name": "CTRF validation accepts all frameworks",
+          "status": "passed", 
+          "duration": 89,
+          "start": 1692364801250,
+          "stop": 1692364801339,
+          "suite": "validation",
+          "message": null,
+          "trace": null,
+          "rawStatus": "passed"
+        },
+        {
+          "name": "GitHub API integration handles rate limits",
+          "status": "passed",
+          "duration": 1161,
+          "start": 1692364801339,
+          "stop": 1692364802500,
+          "suite": "integration",
+          "message": null,
+          "trace": null,
+          "rawStatus": "passed"
+        }
+      ],
+      "environment": {
+        "appName": "driftguard-test-app",
+        "buildName": "Stress Test Build",
+        "buildNumber": "1",
+        "buildUrl": "https://github.com/mattjutt1/driftguard-test-repo/actions/runs/12345",
+        "repositoryName": "driftguard-test-repo",
+        "repositoryUrl": "https://github.com/mattjutt1/driftguard-test-repo",
+        "branchName": "main",
+        "testEnvironment": "production"
+      }
+    }
+  },
+  "repository": {
+    "owner": "mattjutt1",
+    "repo": "driftguard-test-repo", 
+    "sha": "abc1234567890123456789012345678901234567",
+    "installationId": 56792477
+  },
+  "metadata": {
+    "pullRequestNumber": 1,
+    "branchName": "main",
+    "buildUrl": "https://github.com/mattjutt1/driftguard-test-repo/actions/runs/12345",
+    "buildNumber": "1"
+  }
+}

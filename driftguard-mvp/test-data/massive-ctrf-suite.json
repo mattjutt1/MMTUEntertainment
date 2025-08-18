@@ -1,0 +1,152 @@
+{
+  "tool": "vitest",
+  "tool_version": "1.6.0",
+  "repository": "mattjutt1/driftguard-test-repo",
+  "commit_sha": "1234567890abcdef1234567890abcdef12345678",
+  "report": {
+    "name": "Comprehensive Test Suite - Stress Test Edition",
+    "status": "failed",
+    "tests": [
+      {
+        "name": "Authentication flow works correctly",
+        "status": "passed",
+        "duration": 1250,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "CTRF validation accepts all test frameworks",
+        "status": "passed",
+        "duration": 89,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "GitHub API integration handles rate limits",
+        "status": "passed",
+        "duration": 3400,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Stripe webhook signature validation",
+        "status": "passed",
+        "duration": 150,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "PostHog analytics event batching",
+        "status": "passed",
+        "duration": 780,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Supabase connection pool management",
+        "status": "failed",
+        "duration": 5000,
+        "message": "Connection timeout after 5000ms",
+        "trace": "Error: Connection timeout\\n    at Database.connect (db.ts:45)\\n    at CheckRunService.store (service.ts:123)",
+        "rawStatus": "failed"
+      },
+      {
+        "name": "KV cache invalidation strategy",
+        "status": "passed",
+        "duration": 95,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Error handling for malformed webhooks",
+        "status": "passed",
+        "duration": 200,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Rate limiting per installation ID",
+        "status": "passed",
+        "duration": 450,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Check run creation with large payloads",
+        "status": "skipped",
+        "duration": 0,
+        "message": "Skipped due to GitHub API limits",
+        "trace": null,
+        "rawStatus": "skipped"
+      },
+      {
+        "name": "Concurrent CTRF ingestion handling",
+        "status": "passed",
+        "duration": 2100,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Dashboard real-time data updates",
+        "status": "passed",
+        "duration": 890,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Cross-origin request handling",
+        "status": "passed",
+        "duration": 120,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Memory usage optimization",
+        "status": "passed",
+        "duration": 340,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Security headers validation",
+        "status": "passed",
+        "duration": 67,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      }
+    ],
+    "summary": {
+      "total": 15,
+      "passed": 13,
+      "failed": 1,
+      "skipped": 1,
+      "duration": 15781
+    }
+  },
+  "metadata": {
+    "pullRequestNumber": 42,
+    "branchName": "feat/stress-testing-suite",
+    "buildUrl": "https://github.com/mattjutt1/driftguard-test-repo/actions/runs/987654321",
+    "buildNumber": "999",
+    "environment": "production",
+    "ci_provider": "github-actions",
+    "coverage": {
+      "lines": 87.5,
+      "functions": 92.1,
+      "branches": 78.9
+    }
+  }
+}

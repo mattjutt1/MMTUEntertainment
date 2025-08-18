@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation "Main navigation":
+    - link "MMTU Entertainment home":
+      - /url: /
+      - text: MMTU Entertainment
+    - list:
+      - listitem:
+        - link "$97 Scan":
+          - /url: /offer/97
+      - listitem:
+        - link "$297 Audit":
+          - /url: /offer/297
+      - listitem:
+        - link "$997 Complete":
+          - /url: /offer/997
+      - listitem:
+        - link "Contact":
+          - /url: /contact
+- main:
+  - heading "Security Audit Pro" [level=1]
+  - paragraph: $297
+  - paragraph: Comprehensive security assessment with detailed remediation roadmap in 48 hours.
+  - button "Purchase security audit for $297": Get Security Audit - $297
+  - paragraph: ✅ 48-hour delivery guarantee
+  - heading "What's Included" [level=2]
+  - heading "🔍 Deep Security Analysis" [level=3]
+  - list:
+    - listitem: Multi-tool security scanning (Semgrep, Trivy, Gitleaks)
+    - listitem: Infrastructure vulnerability assessment
+    - listitem: Dependency security analysis
+    - listitem: CI/CD pipeline security review
+  - heading "📋 Detailed Remediation Plan" [level=3]
+  - list:
+    - listitem: Comprehensive vulnerability report
+    - listitem: Prioritized fix recommendations
+    - listitem: Security best practices guide
+    - listitem: Implementation timeline suggestions
+  - heading "⚡ Professional Delivery" [level=3]
+  - list:
+    - listitem: 48-hour delivery guaranteed
+    - listitem: Executive and technical reports
+    - listitem: Security gate configuration examples
+    - listitem: 30-minute consultation call included
+  - heading "Ideal for:" [level=3]
+  - list:
+    - listitem: Production system security review
+    - listitem: Compliance preparation (SOC 2, ISO 27001)
+    - listitem: Security program establishment
+    - listitem: Team security training foundation
+  - button "Start Security Audit - $297"
+- contentinfo:
+  - paragraph:
+    - text: © 2025 MMTU Entertainment.
+    - link "Terms":
+      - /url: /terms
+    - text: "|"
+    - link "Privacy":
+      - /url: /privacy
+```

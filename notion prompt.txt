@@ -1,0 +1,161 @@
+You are Claude Code operating in VS Code with Notion MCP configured.
+Your job is to make our Notion workspace match our “company-as-code” zero-to-one planner.
+Work in short Plan→Approve→Execute loops (≤10 minutes each). Be idempotent and explicit.
+
+────────────────────────────────────────────────────────────────────────
+GUARDRAILS
+- Scope: Only touch content under the parent page titled **“MMTU Company OS”**.
+- Idempotency: If a page/DB exists, update it; if missing, create it. No duplicates by title.
+- If a permission error occurs (403/insufficient access), STOP and print:
+  “Needs Add connections → <exact page or database title>”.
+- Respect Notion rate limits; backoff on 429.
+- Keep a detailed log of created/updated objects and counts.
+- Append a JSON line to **.orchestrator/runlog.jsonl** in this repo (create file if needed).
+────────────────────────────────────────────────────────────────────────
+REQUIRED NOTION TOOLS (verify first)
+List available Notion MCP tools. Ensure these exist (names are exact):
+  search, fetch, create-pages, update-page, move-pages, duplicate-page,
+  create-database, update-database, create-comment, get-comments,
+  get-users, get-user, get-self.
+
+If any are missing, STOP and print which tool is absent and the remediation
+(“Re-add Notion MCP server or reconnect OAuth, then /mcp → connect.”).
+
+For reference (keep handy during execution):
+- search: global search across Notion + connected tools when available.
+  e.g., “Search for pages mentioning ‘MMTU Company OS’”
+- fetch: retrieve content by URL.
+- create-pages / update-page / move-pages / duplicate-page: CRUD + move/copy pages.
+- create-database / update-database: create/update DBs and properties.
+- create-comment / get-comments: discussion trail on any page.
+- get-users / get-user / get-self: user/workspace metadata.
+
+────────────────────────────────────────────────────────────────────────
+OBJECTIVE (DEFINITION OF DONE)
+Under **“MMTU Company OS”**:
+1) Ensure the master page **“MMTU Zero-to-One Planner”** exists.
+2) Ensure the following databases exist with the exact properties below:
+   - Projects
+   - Experiments
+   - ICP_Interviews
+   - Content_Calendar
+   - Distribution_Partners
+   - Risks
+   - Metrics_Scorecard
+   - Backlog
+   - Weekly_Cadence
+3) On the master page, add linked views of all DBs.
+4) Seed initial rows (below) if titles not already present.
+5) Create relations:
+   - Weekly_Cadence.Experiments → Experiments (many↔many)
+   - Link “Week 1” to “svc-01 cold outreach” and “gk-01 landing price test”.
+6) Append a **Week 1 checklist** (items below) as bullets under the “Week 1” row.
+7) Post a **Verification Report** section at the top of the master page with:
+   - Timestamp
+   - Which DBs were created/updated + row counts after upsert
+   - Any permission gaps (pages/DBs needing “Add connections”)
+   - Next steps (bullets)
+8) Append a JSON line to **.orchestrator/runlog.jsonl**:
+   {"ts":"<ISO>", "actor":"Claude Code", "action":"notion_sync",
+    "created":{...}, "updated":{...}, "missing":[], "errors":[]}
+
+────────────────────────────────────────────────────────────────────────
+DATABASE SCHEMAS (create if missing; otherwise map names exactly)
+
+[Projects]
+- Project (title), Stream (select), Objective (rich_text)
+- Phase (select: Discovery|Build|Launch|Scale)
+- Status (status: Not started|In progress|Blocked|Done)
+- Owner (people or rich_text), Start (date), Due (date)
+- KPI (rich_text), KPI_Target (number), Evidence (url or rich_text)
+- Decision (rich_text), Next (rich_text)
+
+[Experiments]
+- Experiment (title), Stream (select), Hypothesis (rich_text)
+- Metric (rich_text), Success_Threshold (rich_text), Run_Length (rich_text)
+- Status (status), Owner (people or rich_text)
+- Start (date), Due (date), Result (rich_text), Decision (rich_text)
+- Evidence_Link (url)
+
+[ICP_Interviews]
+- Name (title), Role (rich_text), Company (rich_text), Segment (select)
+- Contact (rich_text), Scheduled_Date (date), Notes (rich_text)
+- Pain_Ranked_1_5 (number), Willing_to_Pay (checkbox), Followup_NextStep (rich_text)
+
+[Content_Calendar]
+- Title (title), Type (select), Target_Channel (select), Objective (rich_text)
+- Owner (people or rich_text), Status (status), Publish_Date (date), Link (url)
+
+[Distribution_Partners]
+- Partner (title), Type (select), Reach (number), Contact (rich_text)
+- Terms (rich_text), Status (status), Next_Step (rich_text)
+
+[Risks]
+- Risk (title), Category (select), Likelihood (select: Low|Med|High)
+- Impact (select: Low|Med|High), Mitigation (rich_text)
+- Owner (people or rich_text), Status (status), Review_Date (date)
+
+[Metrics_Scorecard]
+- Metric (title), Definition (rich_text), Source (select)
+- Cadence (select), Owner (people or rich_text), Target (number), Current (number)
+
+[Backlog]
+- Item (title), Stream (select), Type (select: Task|Doc|Experiment|Ops|Security)
+- Priority (select: P0|P1|P2), Status (status), Owner (people or rich_text), Due (date)
+
+[Weekly_Cadence]
+- Week (title), Theme (rich_text), Top_Outcome (rich_text)
+- Experiments (relation → Experiments), Ship_Artifacts (rich_text)
+- Risks_to_watch (rich_text), Retro_Notes (rich_text), Status (status)
+
+────────────────────────────────────────────────────────────────────────
+SEED ROWS (UPSERT BY TITLE)
+
+Projects
+- “Zero brand site live” | Stream: Core | Phase: Discovery | Status: Not started | KPI: meetings_booked | KPI_Target: 2
+- “Interview 15 ICPs” | Stream: Core | Phase: Discovery | Status: Not started | KPI: interviews_completed | KPI_Target: 15
+- “Gatekeeper Kit MVP” | Stream: Gatekeeper Kit | Phase: Build | Status: Not started | KPI: paid_users_30d | KPI_Target: 10
+- “Rapid Audit offer launch” | Stream: Services | Phase: Launch | Status: Not started | KPI: booked_audits | KPI_Target: 2
+- “Figma plugin MVP” | Stream: Figma DriftGuard | Phase: Build | Status: Not started | KPI: wau | KPI_Target: 20
+- “Edge Site Guard MVP” | Stream: Cloudflare Worker | Phase: Build | Status: Not started | KPI: paying_domains_30d | KPI_Target: 5
+
+Experiments
+- “svc-01 cold outreach” | Stream: Services | Hypothesis: 50 targeted emails → ≥4 calls | Metric: meetings_booked | Success_Threshold: >=4 | Run_Length: 7d | Status: Not started
+- “gk-01 landing price test” | Stream: Gatekeeper Kit | Hypothesis: $49 early converts ≥3% | Metric: paid_users | Success_Threshold: >=10 in 30d | Run_Length: 30d | Status: Not started
+- “fig-01 retention” | Stream: Figma DriftGuard | Hypothesis: alerts drive WAU | Metric: weekly_active | Success_Threshold: >=20% | Run_Length: 21d | Status: Not started
+- “cw-01 pricing” | Stream: Cloudflare Worker | Hypothesis: $5–10/10k checks viable | Metric: paying_domains | Success_Threshold: >=5 | Run_Length: 30d | Status: Not started
+
+Weekly_Cadence
+- “Week 1” | Theme: Foundations | Top_Outcome: Home page + 2 calls | Status: Not started
+  Checklist bullets to append under Week 1:
+  - Reserve domain + set up Cloudflare Pages
+  - Publish simple home page with 1 CTA (book call or buy audit)
+  - Create Stripe links (Audit $999, Kit $49 EA)
+  - Build 50-lead ICP list and send personalized outreach
+  - Schedule 2 demos in dev communities
+
+────────────────────────────────────────────────────────────────────────
+EXECUTION STEPS (do exactly this order)
+
+1) search → find “MMTU Company OS”; if missing, create-pages to create it.
+2) Under that parent, ensure the master page “MMTU Zero-to-One Planner” exists (create if missing).
+3) For each database schema above:
+   - search for a DB by title; if found, fetch to inspect properties.
+   - If properties differ, update-database to add missing properties (do not rename existing).
+   - If DB missing, create-database with all properties.
+4) create-pages or update-page to add linked database views on the master page (one view per DB).
+5) Upsert the Seed rows by title in Projects and Experiments.
+6) Create relation Weekly_Cadence.Experiments and link Week 1 ⇄ (svc-01, gk-01).
+7) update-page to append the Week 1 checklist bullets.
+8) create-comment on the master page with a concise sync summary.
+9) Insert a “Verification Report” section block at the top of the master page with:
+   - Timestamp
+   - DBs created/updated + row counts
+   - Any items requiring Add connections
+   - Next steps (bullets)
+10) Write/append a JSON line to .orchestrator/runlog.jsonl with the sync details.
+11) Print a short success summary to the console.
+
+If any step fails due to permissions, STOP and print:
+“Needs Add connections → <page or database title>”.
+Then wait for user confirmation before retrying.

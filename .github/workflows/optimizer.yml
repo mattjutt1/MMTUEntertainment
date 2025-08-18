@@ -1,0 +1,70 @@
+name: Metaprompt Optimizer CI
+
+on:
+  push:
+    paths:
+      - 'governance/MASTER_PROMPT*.md'
+      - 'MASTER_PROMPT*.md'
+      - 'scripts/policy/metaprompt_*.py'
+  pull_request:
+    paths:
+      - 'governance/MASTER_PROMPT*.md'
+      - 'MASTER_PROMPT*.md'
+      - 'scripts/policy/metaprompt_*.py'
+
+jobs:
+  validate-prompts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Validate Metaprompts
+        run: |
+          echo "::group::Checking for contradictions in prompt files"
+          
+          # Test both prompt files for contradictions
+          for file in governance/MASTER_PROMPT.md MASTER_PROMPT_FOR_GPT5.md; do
+            if [ -f "$file" ]; then
+              echo "Checking $file..."
+              content=$(cat "$file")
+              result=$(python scripts/policy/metaprompt_cli.py "$content")
+              echo "$result" | jq .
+              
+              # Extract status and issues count
+              status=$(echo "$result" | jq -r .status)
+              issues=$(echo "$result" | jq -r .issues_count)
+              
+              echo "File: $file - Status: $status - Issues: $issues"
+              
+              if [ "$issues" -gt 0 ]; then
+                echo "::warning::Found $issues contradiction(s) in $file"
+                echo "$result" | jq -r .diff
+              fi
+            fi
+          done
+          
+          # Check for META-PASS blocks
+          echo "::group::Verifying META-PASS blocks"
+          meta_pass_count=0
+          for file in governance/MASTER_PROMPT.md MASTER_PROMPT_FOR_GPT5.md; do
+            if [ -f "$file" ]; then
+              count=$(grep -c "META-PASS" "$file" || echo 0)
+              echo "$file: $count META-PASS blocks"
+              meta_pass_count=$((meta_pass_count + count))
+            fi
+          done
+          
+          echo "Total META-PASS blocks: $meta_pass_count"
+          
+          if [ "$meta_pass_count" -lt 4 ]; then
+            echo "::error::Expected at least 4 META-PASS blocks, found $meta_pass_count"
+            exit 1
+          fi
+          
+          echo "::notice::Metaprompt validation completed successfully"
+          echo "::endgroup::"

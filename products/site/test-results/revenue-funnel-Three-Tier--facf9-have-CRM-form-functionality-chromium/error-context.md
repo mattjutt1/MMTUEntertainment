@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation "Main navigation":
+    - link "MMTU Entertainment home":
+      - /url: /
+      - text: MMTU Entertainment
+    - list:
+      - listitem:
+        - link "$97 Scan":
+          - /url: /offer/97
+      - listitem:
+        - link "$297 Audit":
+          - /url: /offer/297
+      - listitem:
+        - link "$997 Complete":
+          - /url: /offer/997
+      - listitem:
+        - link "Contact":
+          - /url: /contact
+- main:
+  - heading "Security Scan Starter" [level=1]
+  - paragraph: $97
+  - paragraph: Essential security scan to catch critical vulnerabilities in 24 hours.
+  - button "Purchase security scan for $97": Get Security Scan - $97
+  - paragraph: ✅ 24-hour delivery guarantee
+  - heading "What's Included" [level=2]
+  - heading "🔍 Core Security Scan" [level=3]
+  - list:
+    - listitem: Automated Semgrep security analysis
+    - listitem: Critical vulnerability detection
+    - listitem: Secrets exposure check
+    - listitem: High/Critical findings report
+  - heading "📋 Priority Fixes" [level=3]
+  - list:
+    - listitem: Top 5 critical issues identified
+    - listitem: Quick-fix recommendations
+    - listitem: Risk assessment summary
+    - listitem: Next steps guidance
+  - heading "⚡ Fast Turnaround" [level=3]
+  - list:
+    - listitem: 24-hour delivery guaranteed
+    - listitem: Executive summary report
+    - listitem: Actionable remediation list
+    - listitem: Email support for questions
+  - heading "Perfect for:" [level=3]
+  - list:
+    - listitem: Pre-deployment security check
+    - listitem: Rapid vulnerability assessment
+    - listitem: Security compliance quick-start
+    - listitem: Developer security awareness
+  - button "Start Security Scan - $97"
+- contentinfo:
+  - paragraph:
+    - text: © 2025 MMTU Entertainment.
+    - link "Terms":
+      - /url: /terms
+    - text: "|"
+    - link "Privacy":
+      - /url: /privacy
+```

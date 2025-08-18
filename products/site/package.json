@@ -1,0 +1,22 @@
+{
+  "name": "mmtu-site",
+  "version": "1.0.0",
+  "description": "MMTU Entertainment minimal revenue site",
+  "scripts": {
+    "dev": "npx serve pages -l 3000",
+    "dev:dist": "npx serve dist -l 3000",
+    "build": "node build.js",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:live": "TEST_LIVE=1 npm run build && TEST_LIVE=1 npx serve dist -l 3000 & sleep 2 && TEST_LIVE=1 playwright test; kill %1",
+    "lint": "echo 'Static HTML - lint via workflows'",
+    "deploy": "wrangler pages deploy dist --project-name mmtu-site"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "serve": "^14.2.1"
+  },
+  "keywords": ["mmtu", "entertainment", "revenue", "offers"],
+  "author": "MMTU Entertainment",
+  "license": "MIT"
+}

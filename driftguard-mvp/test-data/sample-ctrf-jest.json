@@ -1,0 +1,89 @@
+{
+  "tool": "jest",
+  "tool_version": "29.7.0",
+  "repository": "mmtu-entertainment/driftguard-mvp",
+  "commit_sha": "def456789012345678901234567890123456789a",
+  "report": {
+    "name": "Unit Test Suite",
+    "status": "passed",
+    "tests": [
+      {
+        "name": "CTRF validator accepts valid format",
+        "status": "passed",
+        "duration": 150,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "GitHub check run factory creates correct payload",
+        "status": "passed",
+        "duration": 89,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Stripe webhook signature validation",
+        "status": "passed",
+        "duration": 45,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Environment variable validation",
+        "status": "passed",
+        "duration": 12,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Rate limiting functions correctly",
+        "status": "passed",
+        "duration": 230,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "PostHog analytics event formatting",
+        "status": "passed",
+        "duration": 67,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Supabase connection with proper credentials",
+        "status": "passed",
+        "duration": 180,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Error handling for malformed CTRF data",
+        "status": "passed",
+        "duration": 95,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      }
+    ],
+    "summary": {
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 868
+    }
+  },
+  "metadata": {
+    "pullRequestNumber": null,
+    "branchName": "main",
+    "buildUrl": "https://github.com/mmtu-entertainment/driftguard-mvp/actions/runs/123457",
+    "buildNumber": "124"
+  }
+}

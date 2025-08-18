@@ -20,3 +20,6 @@ build/
 
 # Windows Mark-of-the-Web metadata
 *:Zone.Identifier
+
+# Sensitive outreach data - contains real personal emails
+growth/

@@ -1,0 +1,56 @@
+{
+  "ctrf": {
+    "name": "DriftGuard Test Suite - Real Commit",
+    "duration": 1200,
+    "status": "passed",
+    "results": {
+      "tool": {
+        "name": "vitest",
+        "version": "1.6.0"
+      },
+      "summary": {
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "pending": 0,
+        "skipped": 0,
+        "start": 1692364800000,
+        "stop": 1692364801200
+      },
+      "tests": [
+        {
+          "name": "DriftGuard CTRF ingestion works",
+          "status": "passed",
+          "duration": 600,
+          "suite": "integration",
+          "message": null,
+          "trace": null
+        },
+        {
+          "name": "GitHub App authentication is successful",
+          "status": "passed",
+          "duration": 600,
+          "suite": "authentication", 
+          "message": null,
+          "trace": null
+        }
+      ],
+      "environment": {
+        "repositoryName": "driftguard-test-repo",
+        "repositoryUrl": "https://github.com/mattjutt1/driftguard-test-repo",
+        "branchName": "main",
+        "testEnvironment": "production"
+      }
+    }
+  },
+  "repository": {
+    "owner": "mattjutt1",
+    "repo": "driftguard-test-repo",
+    "sha": "dedcb1d68e53a710dfd3fdc08521d34e66b83ed0"
+  },
+  "metadata": {
+    "branchName": "main",
+    "buildUrl": "https://github.com/mattjutt1/driftguard-test-repo/actions/runs/12345",
+    "buildNumber": "1"
+  }
+}

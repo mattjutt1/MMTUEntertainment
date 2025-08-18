@@ -1,0 +1,65 @@
+{
+  "tool": "playwright",
+  "tool_version": "1.40.0",
+  "repository": "mmtu-entertainment/driftguard-mvp",
+  "commit_sha": "abc1234567890123456789012345678901234567a",
+  "report": {
+    "name": "E2E Test Suite",
+    "status": "passed",
+    "tests": [
+      {
+        "name": "Login flow works correctly",
+        "status": "passed",
+        "duration": 1500,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "Dashboard loads without errors",
+        "status": "passed", 
+        "duration": 800,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      },
+      {
+        "name": "CTRF ingestion endpoint accepts valid data",
+        "status": "failed",
+        "duration": 2100,
+        "message": "Expected status 200 but got 500",
+        "trace": "AssertionError: Expected status 200 but got 500\n    at test-ctrf-endpoint.spec.ts:45:12",
+        "rawStatus": "failed"
+      },
+      {
+        "name": "GitHub check run creation",
+        "status": "skipped",
+        "duration": 0,
+        "message": "Skipped due to missing GitHub App setup",
+        "trace": null,
+        "rawStatus": "skipped"
+      },
+      {
+        "name": "Stripe checkout flow",
+        "status": "passed",
+        "duration": 3200,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      }
+    ],
+    "summary": {
+      "total": 5,
+      "passed": 3,
+      "failed": 1,
+      "skipped": 1,
+      "duration": 7600
+    }
+  },
+  "metadata": {
+    "pullRequestNumber": 42,
+    "branchName": "feat/endpoint-testing",
+    "buildUrl": "https://github.com/mmtu-entertainment/driftguard-mvp/actions/runs/123456",
+    "buildNumber": "123"
+  }
+}

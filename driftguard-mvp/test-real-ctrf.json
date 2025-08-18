@@ -1,0 +1,27 @@
+{
+  "tool": "vitest",
+  "tool_version": "1.6.0", 
+  "repository": "mattjutt1/driftguard-test-repo",
+  "commit_sha": "abc1234567890123456789012345678901234567",
+  "report": {
+    "name": "Real CTRF Test",
+    "status": "passed",
+    "tests": [
+      {
+        "name": "Basic functionality test",
+        "status": "passed",
+        "duration": 150,
+        "message": null,
+        "trace": null,
+        "rawStatus": "passed"
+      }
+    ],
+    "summary": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "duration": 150
+    }
+  }
+}
