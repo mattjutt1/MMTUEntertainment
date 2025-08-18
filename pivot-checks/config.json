@@ -1,0 +1,11 @@
+{
+  "min_active_streams": 3,
+  "min_evidence_tier_to_scale": 2,
+  "thresholds": {
+    "retention_w4_scale": 0.20,
+    "retention_w4_kill": 0.10,
+    "gross_margin_scale": 0.60,
+    "ltv_cac_scale_min": 3.0,
+    "smoke_conv_min": 0.05
+  }
+}

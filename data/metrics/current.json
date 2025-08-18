@@ -1,0 +1,18 @@
+{
+  "active_streams": 3,
+  "evidence_level": 2,
+  "arpu_baseline": 15.0,
+  "experiments": [
+    {
+      "name": "DriftGuard Checks",
+      "adoption": 0.12,
+      "retention_w4": 0.22,
+      "gross_margin": 0.68,
+      "arpu": 17.5,
+      "ltv_cac": 0.95,
+      "smoke_conv": 0.06,
+      "cac_breakeven": true,
+      "cycles_failed": 0
+    }
+  ]
+}
