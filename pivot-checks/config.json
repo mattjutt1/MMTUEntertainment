@@ -6,6 +6,8 @@
     "retention_w4_kill": 0.10,
     "gross_margin_scale": 0.60,
     "ltv_cac_scale_min": 3.0,
-    "smoke_conv_min": 0.05
+    "smoke_conv_min": 0.05,
+    "adoption_kill_min": 0.10,
+    "cycles_kill_max": 2
   }
 }
