@@ -1,46 +1,36 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const PORT = Number(process.env.PORT ?? 4173);
+const BASE = `http://localhost:${PORT}`;
+
 export default defineConfig({
-  testDir: './e2e',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'test-results/results.json' }],
-    ['junit', { outputFile: 'test-results/results.xml' }]
-  ],
+  // Match only the site tests regardless of where they live
+  testMatch: ['products/site/**/*.spec.ts'],
+
+  timeout: 30_000,
+  fullyParallel: false,
+  reporter: [['github'], ['line']],
+
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    baseURL: BASE,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
 
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-    {
-      name: 'mobile-chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-  ],
-
-  webServer: process.env.CI ? undefined : {
-    command: process.env.TEST_LIVE === '1' ? 'npm run dev:dist' : 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+  webServer: {
+    // IMPORTANT: run from products/site so relative paths (./config/links.json) resolve
+    command: `bash -lc 'cd products/site && node build.js --port ${PORT}'`,
+    url: BASE,
+    reuseExistingServer: true,
+    timeout: 60_000
   },
+
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit',   use: { ...devices['Desktop Safari'] } },
+    { name: 'Mobile Chrome', use: { ...devices['Pixel 7'] } },
+    { name: 'Mobile Safari', use: { ...devices['iPhone 14'] } },
+  ],
 });
