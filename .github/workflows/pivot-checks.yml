@@ -9,6 +9,7 @@ on:
       - ".github/workflows/pivot-checks.yml"
       - "docs/pivot-rules.md"
       - "docs/benchmarks_crosscheck.md"
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
