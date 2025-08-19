@@ -20,8 +20,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: semgrep-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true  # keep only the latest run for a branch/PR
 
 jobs:
   semgrep:
@@ -35,19 +35,20 @@ jobs:
         with:
           fetch-depth: 0
           
+      # Use Semgrep CI (native) instead of the deprecated wrapper
+      # See: semgrep.dev docs → Sample CI configs
       - name: Run Semgrep SAST scan
-        uses: returntocorp/semgrep-action@v1
+        uses: returntocorp/semgrep@v1
+        id: semgrep
         with:
-          config: >-
-            p/security-audit
-            p/owasp-top-ten
-            p/javascript
-            p/typescript
+          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}   # optional if using Semgrep App
+          config: p/owasp-top-ten
           generateSarif: true
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
           
-      - name: Upload SARIF results
+      # Upload SARIF to GitHub Code scanning
+      - name: Upload SARIF to GitHub
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
@@ -57,9 +58,9 @@ jobs:
         if: always()
         run: |
           echo "## 🛡️ SAST Security Scan Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tool**: Semgrep with OWASP Top 10 + Security Audit rules" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tool**: Semgrep (native CI) with OWASP Top 10 rules" >> $GITHUB_STEP_SUMMARY
           echo "- **Scope**: Products, packages, apps (JavaScript/TypeScript)" >> $GITHUB_STEP_SUMMARY
-          echo "- **SARIF**: Results uploaded to GitHub Security tab" >> $GITHUB_STEP_SUMMARY
+          echo "- **SARIF**: Results uploaded to GitHub Security → Code scanning" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" == "success" ]; then
             echo "- **Status**: ✅ No critical security issues detected" >> $GITHUB_STEP_SUMMARY
           else
