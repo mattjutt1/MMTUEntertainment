@@ -36,7 +36,7 @@ jobs:
         run: pnpm exec playwright install chromium --with-deps
 
       - name: Run Site E2E Smoke Tests
-        run: pnpm test:e2e:site
+        run: pnpm test:e2e:site --project=chromium --reporter=line
         env:
           CI: true
 
