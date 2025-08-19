@@ -84,8 +84,8 @@ gh run view --json jobs -q '.jobs[].name'
 ```
 
 2. **Add to branch protection**:
-   - Settings → Rules → main ruleset → Require status checks
-   - Add: `Site E2E Smoke / smoke` (exact job name)
+   - Settings → Rules → main ruleset → Require status checks  
+   - Add: `Site E2E Smoke Tests (≤3min)` (exact job name)
 
 ## Troubleshooting
 
