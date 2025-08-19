@@ -1,0 +1,105 @@
+{
+  "timestamp": "2025-08-19T21:38:50.014Z",
+  "summary": {
+    "total_files": 993,
+    "total_commits": 1,
+    "required_artifacts": 8,
+    "artifacts_present": 8,
+    "apps_expected": 5,
+    "apps_present": 5,
+    "critical_failures": 0,
+    "warnings": 0
+  },
+  "artifacts": {
+    "package.json": {
+      "exists": true,
+      "size": 713,
+      "type": "file",
+      "critical": true
+    },
+    "pnpm-workspace.yaml": {
+      "exists": true,
+      "size": 36,
+      "type": "file",
+      "critical": true
+    },
+    "docs/pricing-catalog.v2.json": {
+      "exists": true,
+      "size": 4262,
+      "type": "file",
+      "critical": true
+    },
+    "apps/reports/src/components/PricingTiers.tsx": {
+      "exists": true,
+      "size": 8774,
+      "type": "file",
+      "critical": true
+    },
+    "apps/stream-overlay-studio/package.json": {
+      "exists": true,
+      "size": 1405,
+      "type": "file",
+      "critical": true
+    },
+    "packages/entitlements/src/index.ts": {
+      "exists": true,
+      "size": 1821,
+      "type": "file",
+      "critical": true
+    },
+    "packages/pricing-engine/src/index.ts": {
+      "exists": true,
+      "size": 2367,
+      "type": "file",
+      "critical": true
+    },
+    ".github/workflows/repo-audit.yml": {
+      "exists": true,
+      "size": 2010,
+      "type": "file",
+      "critical": true
+    }
+  },
+  "apps": {
+    "apps/comparison-matrix": {
+      "exists": true,
+      "has_package_json": true,
+      "has_source": true
+    },
+    "apps/probot-app": {
+      "exists": true,
+      "has_package_json": true,
+      "has_source": true
+    },
+    "apps/reports": {
+      "exists": true,
+      "has_package_json": true,
+      "has_source": true
+    },
+    "apps/stream-overlay-studio": {
+      "exists": true,
+      "has_package_json": true,
+      "has_source": true
+    },
+    "apps/web-toy-mvp": {
+      "exists": true,
+      "has_package_json": true,
+      "has_source": false
+    }
+  },
+  "structure_checks": {
+    "monorepo_workspace": true,
+    "pricing_catalog": true,
+    "entitlements_package": true,
+    "pricing_engine": true,
+    "github_workflows": true,
+    "security_workflows": true
+  },
+  "git_info": {
+    "current_branch": "triage/archive-moves-20250819",
+    "total_branches": 1,
+    "remote_url": "https://github.com/mattjutt1/MMTUEntertainment.git",
+    "latest_commit": "a3b60e7591f7c435528ede3e97e37ba26c053ed4 docs: dashboard archive analysis - skip due to script references",
+    "commit_count": 8
+  }
+}

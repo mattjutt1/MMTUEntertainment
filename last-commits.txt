@@ -1,0 +1,69 @@
+Last 50 Commits:\n==================================================\n* a3b60e7 (HEAD -> triage/archive-moves-20250819, origin/triage/archive-moves-20250819) docs: dashboard archive analysis - skip due to script references
+* 0836087 (triage/archive-dashboards-20250819) feat(security): add path filters + security baseline workflows
+* 5aeb207 triage(archive): move approved items to archive/2025-08-19/
+* aa0a548 (origin/triage/archive-20250819, triage/archive-20250819) chore(archive): propose candidates (no changes yet)
+* 7fc57f3 (origin/main, main) docs: Repository triage documentation and inventory (#5)
+| * 4567667 (origin/triage/repo-slim-20250819) fix(docs): correct exact job name in ops-runbook
+| * a515a0f docs: Add triage success criteria and phase completion status
+| * 95998ff docs: Complete repo triage documentation phase
+| * 9d29f50 (tag: rollback-pre-triage-20250819, origin/docs/working-notes-20250819, docs/working-notes-20250819) docs: add working-notes vault to capture raw ideas
+| | * b3d5e91 (refs/stash) On ci/site-e2e-hardening: temp: kit.html duplicate script fix
+| |/| 
+| | * 3d364fe index on ci/site-e2e-hardening: e38a6b7 fix(ci): limit Site E2E Smoke tests to chromium browser only
+| |/  
+| * e38a6b7 (origin/ci/site-e2e-hardening, ci/site-e2e-hardening) fix(ci): limit Site E2E Smoke tests to chromium browser only
+| * 0b8b922 fix(ci): resolve Site E2E webServer directory and serving issues
+| * b0aa3f8 fix: harden Site E2E CI pipeline
+| * 47ab0a9 chore(site): isolate Playwright & add smoke + full CI (site-only)
+| * 52a2e95 chore(site): isolate Playwright & add smoke + full CI (site-only)
+| * 0452d25 ci(site): isolate and harden E2E tests for revenue funnel
+|/  
+| * 5d313b4 (origin/pivot/cleanup-20250818, pivot/cleanup-20250818) test: Playwright config with webServer from products/site
+| * f2e9cb6 ci(pivot): restore complete workflow (concurrency + dispatch + submodules=false)
+| * 1af4103 chore: remove stale submodule gitlink; ignore _archive/
+| * 19227c3 ci(pivot): finalize workflow (concurrency + submodules=false + dispatch)
+| * a54356b ci(pivot): complete job section; add workflow_dispatch, concurrency, explicit submodules=false
+| * 5bc5aea ci(pivot): add concurrency + narrow triggers; explicit submodules=false
+| * 5c2e1ce pivot-checks: update thresholds & gates
+| * fcda770 chore: drop stale submodule; ignore _archive/
+| * 1989523 ci: trigger Pivot Checks
+| * 3809041 chore: bootstrap missing pivot governance files
+| * 78209d1 (feat/overlay-pro-blitz) feat(power-user): implement production-ready Claude Code setup with critical fixes
+| * 628983d feat(power-user): implement production-ready Claude Code setup with critical fixes
+| * 89dfe4d docs(reality-check): honest assessment for ChatGPT-5 strategic partner
+| * 9f5f8c4 feat(week1): implement ChatGPT-5 strategic priorities
+| * f4db67f feat(strategic): ship pack complete → ChatGPT-5 strategic decision required
+| * a39fa49 feat(marketplace): add Cloudflare Workers webhook handler
+| * 37b0448 feat(ship-pack): complete DriftGuard production deployment pipeline
+| * c488b1c feat(claude-code): complete power-user configuration for DriftGuard sprint
+| * 48660cd (origin/feat/overlay-pro-blitz) feat(research): add comprehensive strategic business analysis documents
+| * 10c9772 feat(ultra-think): complete strategic analysis framework with ChatGPT-5 integration
+| * a3542ac feat(strategic-collaboration): create optimized ChatGPT-5 partnership prompts
+| * 2b8bbe3 chore: update archived site submodule reference
+| * 451e0dc docs: update ChatGPT-5 collaboration status with security audit completion
+| * 333d48b feat(security): complete comprehensive security audit and remediation
+| * 92c4c16 feat(launch-gates): complete enforcement-first revenue optimization system
+| * 8371943 feat: complete 48-hour parallel execution (B+A+C paths)
+| * 4d972c0 (setup/scaffold) feat(gtm): complete 3 micro-steps for revenue optimization
+|/  
+* 3bccc72 (origin/setup/scaffold) feat(audit): add self-serve repository audit workflow
+* 323cafd feat(reports): implement pricing experiments and rush delivery
+* e90f668 chore(scaffold): monorepo, probot stub, overlay studio, reports landers, workflows\n\nCurrent Status:\n====================\nM test-repos/driftguard-test-repo
+?? repo-tree.txt\n\nBranches:\n====================\nci/site-e2e-hardening
+  docs/working-notes-20250819
+  feat/overlay-pro-blitz
+  main
+  pivot/cleanup-20250818
+  setup/scaffold
+  triage/archive-20250819
+  triage/archive-dashboards-20250819
+* triage/archive-moves-20250819
+  remotes/origin/ci/site-e2e-hardening
+  remotes/origin/docs/working-notes-20250819
+  remotes/origin/feat/overlay-pro-blitz
+  remotes/origin/main
+  remotes/origin/pivot/cleanup-20250818
+  remotes/origin/setup/scaffold
+  remotes/origin/triage/archive-20250819
+  remotes/origin/triage/archive-moves-20250819
+  remotes/origin/triage/repo-slim-20250819\n\nGenerated: 2025-08-19T21:38:50.014Z
