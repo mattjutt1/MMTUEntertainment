@@ -1,13 +1,24 @@
 name: 'SAST Security Scan'
+#
+# CI NOTE — job-level gating + code scanning:
+# - Avoid WORKFLOW-level skipping; it can leave checks "Pending" (merge blocked).               (GitHub)
+#   https://docs.github.com/actions/managing-workflow-runs/skipping-workflow-runs
+# - JOB-level `if:` skips report "Success/neutral" and won't block.                             (GitHub)
+#   https://docs.github.com/actions/using-jobs/using-conditions-to-control-job-execution
+# - Per-job file detection with dorny/paths-filter keeps scans relevant in a monorepo.          (GitHub Action)
+#   https://github.com/dorny/paths-filter
+# - SARIF must be v2.1.0 to populate the Security » Code scanning tab.                          (GitHub)
+#   https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/uploading-a-sarif-file-to-github
+#   https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning
+# - Branch protection accepts successful/skipped/neutral for required checks.                   (GitHub)
+#   https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+# - Concurrency prevents duplicate scans on the same ref.                                       (GitHub)
+#   https://docs.github.com/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs
 
 on:
   pull_request:
-    paths:
-      - 'products/**'
-      - 'packages/**'
-      - 'apps/**'
-      - '.github/workflows/semgrep.yml'
-      - '!archive/**'
+    types: [opened, synchronize, reopened]
+    # No workflow-level path filters. Gate at the job level to avoid Pending checks.
   push:
     branches: [main]
     paths:
@@ -22,98 +33,102 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  semgrep:
-    name: 'Semgrep SAST Analysis'
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      code_changed: ${{ steps.filter.outputs.code }}
+      workflows_changed: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - 'apps/**'
+              - 'products/**'
+              - 'packages/**'
+              - 'infra/**'
+              - 'scripts/**'
+              - '**/*.js'
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.py'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'yarn.lock'
+              - '!archive/**'
+              - '!docs/**'
+            workflows:
+              - '.github/workflows/**'
+
+  semgrep-sarif:
+    needs: detect
+    if: needs.detect.outputs.code_changed == 'true' || needs.detect.outputs.workflows_changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install Semgrep
-        run: python3 -m pip install semgrep
-
-      # Pass 1: Full SARIF upload (non-blocking)
-      - name: Run comprehensive Semgrep scan
+      - name: Install Semgrep (CLI)
+        run: python3 -m pip install --upgrade pip semgrep
+      
+      - name: Compute baseline (merge-base with base ref)
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
-          semgrep \
-            --config=p/owasp-top-ten \
-            --config=p/nodejs \
-            --config=p/typescript \
-            --config=p/react \
-            --sarif \
-            --output=semgrep-full.sarif \
-            .
+          git fetch --depth=1 origin "$BASE_REF":"refs/remotes/origin/$BASE_REF"
+          echo "SEMGREP_BASELINE_COMMIT=$(git merge-base HEAD origin/$BASE_REF)" >> $GITHUB_ENV
+          git rev-parse --abbrev-ref HEAD; git rev-parse --short HEAD; echo "$SEMGREP_BASELINE_COMMIT"
+      
+      - name: Run Semgrep full scan (non-blocking) → SARIF
+        run: semgrep scan --config=p/owasp-top-ten --sarif --output=semgrep.sarif .
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-
-      - name: Upload full SARIF to GitHub Code scanning
-        if: always()
+      
+      - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: semgrep-full.sarif
+          sarif_file: semgrep.sarif
 
-      # Pass 2: High/Critical gate (blocking)
-      - name: Compute baseline commit
+  # Gate only High/Critical NEW findings vs baseline
+  semgrep-gate:
+    needs: [detect, semgrep-sarif]
+    if: needs.detect.outputs.code_changed == 'true' || needs.detect.outputs.workflows_changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Install Semgrep (CLI)
+        run: python3 -m pip install --upgrade pip semgrep
+      
+      - name: Compute baseline (merge-base with base ref)
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
-          BASE_REF="${{ github.base_ref || 'main' }}"
-          BASELINE=$(git merge-base HEAD "origin/${BASE_REF}")
-          echo "BASELINE=$BASELINE" >> $GITHUB_ENV
-          echo "Using baseline: $BASELINE (merge-base with origin/${BASE_REF})"
-
-      - name: Run High/Critical security gate
+          git fetch --depth=1 origin "$BASE_REF":"refs/remotes/origin/$BASE_REF"
+          echo "BASELINE=$(git merge-base HEAD origin/$BASE_REF)" >> $GITHUB_ENV
+          echo "Baseline is $BASELINE"
+      
+      - name: Run Semgrep blocking gate (High/Critical delta)
         run: |
-          semgrep \
-            --config=p/owasp-top-ten \
-            --config=p/nodejs \
-            --config=p/typescript \
-            --config=p/react \
-            --severity=HIGH \
-            --severity=CRITICAL \
-            --baseline-commit="$BASELINE" \
-            --json \
-            --output=semgrep-gate.json \
-            .
+          semgrep scan \
+            --config=p/owasp-top-ten --config=p/nodejs --config=p/typescript --config=p/react \
+            --severity=high --severity=critical \
+            --baseline-commit "$BASELINE" \
+            --error .
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
-      - name: Evaluate security gate
-        run: |
-          FINDINGS=$(jq '.results | length' semgrep-gate.json)
-          echo "High/Critical findings in delta: $FINDINGS"
-          
-          if [ "$FINDINGS" -gt 0 ]; then
-            echo "❌ Security gate FAILED: $FINDINGS High/Critical issues detected"
-            echo "Review findings and remediate before merging"
-            jq -r '.results[] | "- \(.check_id): \(.path):\(.start.line) - \(.extra.message)"' semgrep-gate.json
-            exit 1
-          else
-            echo "✅ Security gate PASSED: No new High/Critical issues"
-          fi
-
-      - name: Report scan summary
-        if: always()
-        run: |
-          echo "## 🛡️ SAST Security Scan Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tool**: Semgrep CLI with curated rule packs" >> $GITHUB_STEP_SUMMARY
-          echo "- **Rules**: OWASP Top 10, Node.js, TypeScript, React" >> $GITHUB_STEP_SUMMARY
-          echo "- **Strategy**: Two-pass (full SARIF + High/Critical gate)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Scope**: Products, packages, apps" >> $GITHUB_STEP_SUMMARY
-          
-          if [ -f semgrep-gate.json ]; then
-            GATE_FINDINGS=$(jq '.results | length' semgrep-gate.json 2>/dev/null || echo "0")
-            if [ "$GATE_FINDINGS" -gt 0 ]; then
-              echo "- **Gate Status**: ❌ FAILED ($GATE_FINDINGS High/Critical)" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "- **Gate Status**: ✅ PASSED (no new High/Critical)" >> $GITHUB_STEP_SUMMARY
-            fi
-          fi
-          
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "- **Overall**: ✅ Security scan completed successfully" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- **Overall**: ❌ Security issues require attention" >> $GITHUB_STEP_SUMMARY
-          fi
+  semgrep-noop:
+    needs: detect
+    if: needs.detect.outputs.code_changed != 'true' && needs.detect.outputs.workflows_changed != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Docs-only changes; skipping Semgrep."
