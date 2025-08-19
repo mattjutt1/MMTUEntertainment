@@ -36,26 +36,77 @@ jobs:
       - name: Install Semgrep
         run: python3 -m pip install semgrep
 
-      - name: Run Semgrep scan
+      # Pass 1: Full SARIF upload (non-blocking)
+      - name: Run comprehensive Semgrep scan
         run: |
-          semgrep --config=p/owasp-top-ten --sarif --output=semgrep.sarif .
+          semgrep \
+            --config=p/owasp-top-ten \
+            --config=p/nodejs \
+            --config=p/typescript \
+            --config=p/react \
+            --sarif \
+            --output=semgrep-full.sarif \
+            .
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
-      - name: Upload SARIF to GitHub
+      - name: Upload full SARIF to GitHub Code scanning
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: semgrep.sarif
+          sarif_file: semgrep-full.sarif
+
+      # Pass 2: High/Critical gate (blocking)
+      - name: Run High/Critical security gate
+        run: |
+          semgrep \
+            --config=p/owasp-top-ten \
+            --config=p/nodejs \
+            --config=p/typescript \
+            --config=p/react \
+            --severity=HIGH \
+            --severity=CRITICAL \
+            --baseline-commit=origin/main \
+            --json \
+            --output=semgrep-gate.json \
+            .
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Evaluate security gate
+        run: |
+          FINDINGS=$(jq '.results | length' semgrep-gate.json)
+          echo "High/Critical findings in delta: $FINDINGS"
+          
+          if [ "$FINDINGS" -gt 0 ]; then
+            echo "❌ Security gate FAILED: $FINDINGS High/Critical issues detected"
+            echo "Review findings and remediate before merging"
+            jq -r '.results[] | "- \(.check_id): \(.path):\(.start.line) - \(.extra.message)"' semgrep-gate.json
+            exit 1
+          else
+            echo "✅ Security gate PASSED: No new High/Critical issues"
+          fi
 
       - name: Report scan summary
         if: always()
         run: |
           echo "## 🛡️ SAST Security Scan Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tool**: Semgrep CLI with OWASP Top 10 rules" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tool**: Semgrep CLI with curated rule packs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Rules**: OWASP Top 10, Node.js, TypeScript, React" >> $GITHUB_STEP_SUMMARY
+          echo "- **Strategy**: Two-pass (full SARIF + High/Critical gate)" >> $GITHUB_STEP_SUMMARY
           echo "- **Scope**: Products, packages, apps" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f semgrep-gate.json ]; then
+            GATE_FINDINGS=$(jq '.results | length' semgrep-gate.json 2>/dev/null || echo "0")
+            if [ "$GATE_FINDINGS" -gt 0 ]; then
+              echo "- **Gate Status**: ❌ FAILED ($GATE_FINDINGS High/Critical)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **Gate Status**: ✅ PASSED (no new High/Critical)" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
           if [ "${{ job.status }}" == "success" ]; then
-            echo "- **Status**: ✅ No critical security issues detected" >> $GITHUB_STEP_SUMMARY
+            echo "- **Overall**: ✅ Security scan completed successfully" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Status**: ⚠️ Security findings detected" >> $GITHUB_STEP_SUMMARY
+            echo "- **Overall**: ❌ Security issues require attention" >> $GITHUB_STEP_SUMMARY
           fi

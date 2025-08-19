@@ -1,0 +1,49 @@
+# Semgrep ignore patterns for MMTU Entertainment
+# Generated: 2025-08-19
+
+# Build artifacts & dependencies
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+coverage/
+*.min.js
+*.bundle.js
+
+# Archive & legacy
+archive/
+_archive/
+legacy/
+deprecated/
+
+# Test fixtures & examples
+tests/fixtures/
+examples/
+samples/
+demo/
+*.test.js
+*.spec.js
+__tests__/
+
+# Documentation
+docs/
+*.md
+README*
+CHANGELOG*
+
+# Development configs
+.env*
+.vscode/
+.idea/
+*.config.js
+webpack.config.js
+vite.config.js
+
+# Third-party vendored code
+vendor/
+lib/third-party/
+external/
+
+# Known false positives
+playwright.config.ts
