@@ -3,10 +3,7 @@ name: 'Site E2E Smoke'
 on:
   pull_request:
     branches: [ main ]
-    paths:
-      - "products/site/**"
-      - ".github/workflows/site-e2e-smoke.yml"
-      - "!archive/**"   # exclude archive moves from triggering smoke
+    # No workflow-level path filters. Gate at the job level to avoid Pending checks.
   workflow_dispatch:
 
 concurrency:
@@ -14,8 +11,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      site_changed: ${{ steps.filter.outputs.site }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            site:
+              - 'products/site/**'
+              - '.github/workflows/site-e2e-smoke.yml'
+              - '!archive/**'
+
   smoke:
     name: 'Site E2E Smoke Tests (≤3min)'
+    needs: detect
+    if: needs.detect.outputs.site_changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -72,3 +86,12 @@ jobs:
           else
             echo "- **Status**: ❌ Smoke tests failed - investigate immediately" >> $GITHUB_STEP_SUMMARY
           fi
+
+  # Optional: explicit no-op job for observability on non-site PRs
+  smoke-noop:
+    name: 'Site E2E Smoke Tests (≤3min)'
+    needs: detect
+    if: needs.detect.outputs.site_changed != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No site changes detected; skipping smoke tests."
