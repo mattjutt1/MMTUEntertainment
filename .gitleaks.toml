@@ -1,26 +1,13 @@
-# Gitleaks configuration for MMTU Entertainment
-# Allowlist for known safe files
+title = "MMTU Gitleaks Config"
 
 [allowlist]
-  description = "Safe files and test data"
-  
-  # Private key files - these are likely test keys or already public
-  files = [
-    '''driftguard-checks-matt\.2025-08-14\.private-key\.pem''',
-    '''driftguard-mmtu\.2025-08-15\.private-key\.pem'''
-  ]
-  
-  # Windows Zone.Identifier files contain download metadata, not real secrets
-  paths = [
-    '''.*\.Zone\.Identifier$'''
-  ]
-  
-  # False positives in temporary download URLs
-  regexes = [
-    '''AWSAccessKeyId=.*&Signature='''
-  ]
-
-[allowlist.commits]
-  description = "Commits with allowlisted content"
-  # Allow current commit that introduced these files
-  stopwords = []
+description = "Test keys & known false positives"
+paths = [
+  "tests/.*",
+  ".*fixtures.*", 
+  ".*example.*"
+]
+regexes = [
+  '''(?i)test(_|-)?(key|token|secret)[a-z0-9_\-]{8,}''',
+  '''(?i)dummy(pass(word)?|token|secret)'''
+]
