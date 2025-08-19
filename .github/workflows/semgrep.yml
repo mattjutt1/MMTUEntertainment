@@ -57,6 +57,13 @@ jobs:
           sarif_file: semgrep-full.sarif
 
       # Pass 2: High/Critical gate (blocking)
+      - name: Compute baseline commit
+        run: |
+          BASE_REF="${{ github.base_ref || 'main' }}"
+          BASELINE=$(git merge-base HEAD "origin/${BASE_REF}")
+          echo "BASELINE=$BASELINE" >> $GITHUB_ENV
+          echo "Using baseline: $BASELINE (merge-base with origin/${BASE_REF})"
+
       - name: Run High/Critical security gate
         run: |
           semgrep \
@@ -66,7 +73,7 @@ jobs:
             --config=p/react \
             --severity=HIGH \
             --severity=CRITICAL \
-            --baseline-commit=origin/main \
+            --baseline-commit="$BASELINE" \
             --json \
             --output=semgrep-gate.json \
             .
