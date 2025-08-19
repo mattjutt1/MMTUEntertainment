@@ -14,3 +14,9 @@ Nothing here needs to be polished. Raw thoughts are valid.
 - Three-doc structure: working-notes (ideas) + pivot-rules (constraints) + repo-map (structure)
 - No deletes yet - documentation first, action later
 - Success criteria: clear view of what we have vs what we need
+
+### Phase 1 Complete ✅
+- Branch: triage/repo-slim-20250819
+- PR: https://github.com/mattjutt1/MMTUEntertainment/pull/5
+- Rollback tag: v1.1.0-before-triage-20250819
+- Next: Review inventory data → create migration plan → controlled cleanup
