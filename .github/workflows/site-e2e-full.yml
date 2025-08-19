@@ -87,14 +87,19 @@ jobs:
 
     steps:
       - name: Report test summary
+        env:
+          TRIGGER: ${{ github.event_name }}
+          BROWSERS: ${{ github.event.inputs.browsers || 'all (chromium, firefox, webkit)' }}
+          TEST_ENV: ${{ github.event.inputs.test_env || 'default (placeholder mode)' }}
+          RESULT_STATUS: ${{ needs.full-e2e.result }}
         run: |
           echo "## 🧪 Site E2E Full Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Browsers**: ${{ github.event.inputs.browsers || 'all (chromium, firefox, webkit)' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment**: ${{ github.event.inputs.test_env || 'default (placeholder mode)' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status**: ${{ needs.full-e2e.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: $TRIGGER" >> $GITHUB_STEP_SUMMARY
+          echo "- **Browsers**: $BROWSERS" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: $TEST_ENV" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: $RESULT_STATUS" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.full-e2e.result }}" != "success" ]; then
+          if [ "$RESULT_STATUS" != "success" ]; then
             echo "⚠️ **Action Required**: Check test artifacts and fix failing tests" >> $GITHUB_STEP_SUMMARY
             echo "📊 **Debug**: Download test artifacts from the Actions run" >> $GITHUB_STEP_SUMMARY
           else
