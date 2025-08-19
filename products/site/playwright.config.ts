@@ -1,30 +1,36 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = Number(process.env.PORT ?? 4173);
-const HOST = '127.0.0.1';
-const BASE = `http://${HOST}:${PORT}`;
+const BASE = `http://localhost:${PORT}`;
 
 export default defineConfig({
-  testDir: 'e2e',                    // relative to products/site/
-  fullyParallel: false,              // keep CI simple & consistent
+  // Match only the site tests regardless of where they live
+  testMatch: ['products/site/**/*.spec.ts'],
+
+  timeout: 30_000,
+  fullyParallel: false,
   reporter: [['github'], ['line']],
 
   use: {
-    baseURL: BASE,                   // enables page.goto('/') 
+    baseURL: BASE,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
 
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } }
-  ],
-
-  // Build + serve the marketing site just for the tests
   webServer: {
-    command: `node build.js && npx http-server dist -p ${PORT} -a ${HOST} --ext html --silent -c-1`,
+    // IMPORTANT: run from products/site so relative paths (./config/links.json) resolve
+    command: `bash -lc 'cd products/site && node build.js --port ${PORT}'`,
     url: BASE,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 60_000
-  }
+  },
+
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit',   use: { ...devices['Desktop Safari'] } },
+    { name: 'Mobile Chrome', use: { ...devices['Pixel 7'] } },
+    { name: 'Mobile Safari', use: { ...devices['iPhone 14'] } },
+  ],
 });

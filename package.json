@@ -14,7 +14,7 @@
     "lint": "pnpm run -r lint",
     "typecheck": "pnpm run -r typecheck",
     "clean": "pnpm run -r clean",
-    "test:e2e:site": "pnpm exec playwright test -c products/site/playwright.config.ts --reporter=github"
+    "test:e2e:site": "pnpm exec playwright test -c products/site/playwright.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.54.2",
