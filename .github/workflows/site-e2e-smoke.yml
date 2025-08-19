@@ -1,0 +1,64 @@
+name: 'Site E2E Smoke'
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "products/site/**"
+      - ".github/workflows/site-e2e-smoke.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: site-e2e-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: 'Site E2E Smoke Tests (≤3min)'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Setup PNPM
+        run: |
+          corepack enable
+          corepack use pnpm@10
+
+      - name: Install workspace deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers (chromium only)
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Run Site E2E Smoke Tests
+        run: pnpm test:e2e:site
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-e2e-smoke-results-${{ github.run_id }}
+          path: |
+            products/site/test-results/
+            products/site/playwright-report/
+          retention-days: 7
+
+      - name: Report test summary
+        if: always()
+        run: |
+          echo "## 🧪 Site E2E Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runtime Target**: ≤3 minutes" >> $GITHUB_STEP_SUMMARY
+          echo "- **Browser**: Chromium only" >> $GITHUB_STEP_SUMMARY
+          echo "- **Scope**: Critical revenue funnel paths" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "- **Status**: ✅ All smoke tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status**: ❌ Smoke tests failed - investigate immediately" >> $GITHUB_STEP_SUMMARY
+          fi

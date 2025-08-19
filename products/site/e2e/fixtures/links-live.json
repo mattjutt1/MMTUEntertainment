@@ -1,0 +1,9 @@
+{
+  "stripe": {
+    "audit": "https://buy.stripe.com/example-audit-payment",
+    "kit": "https://buy.stripe.com/example-kit-payment"
+  },
+  "scheduler": {
+    "calendly": "https://calendly.com/example-user/30min"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "ga4_measurement_id": "TODO_GA4_MEASUREMENT_ID",
+  "events": {
+    "page_view": true,
+    "cta_click": true,
+    "purchase_success": true
+  }
+}

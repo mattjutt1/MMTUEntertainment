@@ -13,10 +13,13 @@
     "test": "pnpm run -r test",
     "lint": "pnpm run -r lint",
     "typecheck": "pnpm run -r typecheck",
-    "clean": "pnpm run -r clean"
+    "clean": "pnpm run -r clean",
+    "test:e2e:site": "pnpm exec playwright test -c products/site/playwright.config.ts --reporter=github"
   },
   "devDependencies": {
+    "@playwright/test": "1.54.2",
     "@types/node": "^20.0.0",
+    "playwright": "1.54.2",
     "typescript": "^5.0.0"
   },
   "packageManager": "pnpm@8.15.0"
