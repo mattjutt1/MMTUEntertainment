@@ -1,7 +1,9 @@
 name: actionlint
 on:
   pull_request:
-    paths: ['.github/workflows/**']
+    types: [opened, synchronize, reopened]
+    # No workflow-level paths filter here.
+    # We gate at the job level to avoid "skipped == pending" on required checks.
   push:
     branches: [main]
     paths: ['.github/workflows/**']
@@ -11,7 +13,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      workflows_changed: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            workflows:
+              - ".github/workflows/**"
+
   lint:
+    needs: detect
+    if: needs.detect.outputs.workflows_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
