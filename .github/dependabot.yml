@@ -1,0 +1,104 @@
+version: 2
+updates:
+  # Root workspace (pnpm monorepo)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule: 
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    target-branch: "main"
+    reviewers:
+      - "mattjutt1"
+    assignees:
+      - "mattjutt1"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    ignore:
+      # Major version updates require manual review
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Core revenue products
+  - package-ecosystem: "npm" 
+    directory: "/products/site"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "10:00"
+    open-pull-requests-limit: 2
+    target-branch: "main"
+    reviewers:
+      - "mattjutt1"
+    commit-message:
+      prefix: "deps(site)"
+
+  - package-ecosystem: "npm"
+    directory: "/apps/DriftGuard-Checks"
+    schedule:
+      interval: "weekly" 
+      day: "tuesday"
+      time: "09:00"
+    open-pull-requests-limit: 2
+    target-branch: "main"
+    reviewers:
+      - "mattjutt1"
+    commit-message:
+      prefix: "deps(driftguard)"
+
+  - package-ecosystem: "npm"
+    directory: "/apps/marketing"
+    schedule:
+      interval: "weekly"
+      day: "tuesday" 
+      time: "10:00"
+    open-pull-requests-limit: 2
+    target-branch: "main"
+    reviewers:
+      - "mattjutt1"
+    commit-message:
+      prefix: "deps(marketing)"
+
+  # Business packages
+  - package-ecosystem: "npm"
+    directory: "/packages/entitlements"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+    open-pull-requests-limit: 1
+    target-branch: "main"
+    reviewers:
+      - "mattjutt1"
+    commit-message:
+      prefix: "deps(entitlements)"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/pricing-engine"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "10:00" 
+    open-pull-requests-limit: 1
+    target-branch: "main"
+    reviewers:
+      - "mattjutt1"
+    commit-message:
+      prefix: "deps(pricing)"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "1"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    target-branch: "main"
+    reviewers:
+      - "mattjutt1"
+    commit-message:
+      prefix: "ci"
+      include: "scope"

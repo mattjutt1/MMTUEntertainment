@@ -1,10 +1,68 @@
-name: semgrep
-on: [push, pull_request]
+name: 'SAST Security Scan'
+
+on:
+  pull_request:
+    paths: 
+      - 'products/**'
+      - 'packages/**'
+      - 'apps/**'
+      - '.github/workflows/semgrep.yml'
+    paths-ignore:
+      - 'archive/**'
+  push:
+    branches: [ main ]
+    paths:
+      - 'products/**'
+      - 'packages/**'
+      - 'apps/**'
+    paths-ignore:
+      - 'archive/**'
+  workflow_dispatch:
+
+concurrency:
+  group: semgrep-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  scan:
+  semgrep:
+    name: 'Semgrep SAST Analysis'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
     steps:
-      - uses: actions/checkout@v4
-      - uses: returntocorp/semgrep-action@v1
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          config: p/ci
+          fetch-depth: 0
+          
+      - name: Run Semgrep SAST scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
+            p/javascript
+            p/typescript
+          generateSarif: true
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+          
+      - name: Upload SARIF results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+          
+      - name: Report scan summary
+        if: always()
+        run: |
+          echo "## 🛡️ SAST Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tool**: Semgrep with OWASP Top 10 + Security Audit rules" >> $GITHUB_STEP_SUMMARY
+          echo "- **Scope**: Products, packages, apps (JavaScript/TypeScript)" >> $GITHUB_STEP_SUMMARY
+          echo "- **SARIF**: Results uploaded to GitHub Security tab" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "- **Status**: ✅ No critical security issues detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status**: ⚠️ Security findings detected - review Security tab" >> $GITHUB_STEP_SUMMARY
+            echo "- **Action**: Review SARIF results and address high/critical findings" >> $GITHUB_STEP_SUMMARY
+          fi

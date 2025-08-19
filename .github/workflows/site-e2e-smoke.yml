@@ -6,6 +6,7 @@ on:
     paths:
       - "products/site/**"
       - ".github/workflows/site-e2e-smoke.yml"
+      - "!archive/**"   # exclude archive moves from triggering smoke
   workflow_dispatch:
 
 concurrency:
