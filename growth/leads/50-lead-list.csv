@@ -1,0 +1,52 @@
+first_name,last_name,role,company,website,contact_email_or_profile,source_url,personalization_snippet,segment
+Dan,Abramov,Principal Engineer,Meta,https://meta.com,dan_abramov,https://github.com/gaearon,"Redux creator, React team lead at Meta, focus on DX",principal/staff_eng
+Kent,Dodds,Founder/CTO,Epic Web Dev,https://epicweb.dev,kent@kentcdodds.com,https://kentcdodds.com,"Teaching-focused engineer, Epic Web platform, testing advocate",startup_cto
+Jason,Miller,Engineering Manager,Google,https://google.com,_developit,https://github.com/developit,"Preact creator, Google Chrome team, performance expert",eng_manager
+Evan,You,Creator/Maintainer,Vue.js,https://vuejs.org,yyx990803,https://github.com/yyx990803,"Vue.js creator, independent OSS maintainer, framework design",oss_maintainer
+Ryan,Florence,Co-founder,Remix,https://remix.run,ryanflorence,https://github.com/ryanflorence,"Remix co-founder, React Router creator, web standards advocate",startup_cto
+Michael,Jackson,Co-founder,Remix,https://remix.run,mjackson,https://github.com/mjackson,"Remix co-founder, React Router co-creator, web platform expert",startup_cto
+Sebastien,Lorber,Maintainer,Docusaurus,https://docusaurus.io,sebastienlorber,https://github.com/slorber,"Docusaurus maintainer, This Week in React newsletter",oss_maintainer
+Josh,Comeau,Educator/Engineer,The Joy of React,https://joshwcomeau.com,joshwcomeau,https://www.joshwcomeau.com,"CSS expert, React educator, interactive learning advocate",principal/staff_eng
+Cassidy,Williams,CTO,Contenda,https://contenda.co,cassidoo,https://cassidoo.co,"CTO at Contenda, dev advocate, newsletter creator",startup_cto
+Guillermo,Rauch,CEO,Vercel,https://vercel.com,rauchg,https://github.com/rauchg,"Vercel CEO, Next.js ecosystem, serverless advocate",startup_cto
+Rich,Harris,Principal Engineer,Vercel,https://vercel.com,Rich_Harris,https://github.com/Rich-Harris,"Svelte creator, Rollup creator, build tools expert",principal/staff_eng
+Anthony,Fu,Core Team,Vue.js/Vite,https://antfu.me,antfu7,https://github.com/antfu,"Vue/Vite core team, Nuxt team, prolific OSS contributor",oss_maintainer
+Sindre,Sorhus,Independent,Sindre Sorhus,https://sindresorhus.com,sindresorhus,https://github.com/sindresorhus,"Most prolific npm publisher, 1000+ packages, tooling expert",oss_maintainer
+Addy,Osmani,Engineering Manager,Google,https://google.com,addyosmani,https://github.com/addyosmani,"Chrome team, web performance expert, tooling advocate",eng_manager
+Sarah,Drasner,VP Engineering,Netlify,https://netlify.com,sdras,https://github.com/sdras,"VP Eng at Netlify, Vue core team, animation expert",eng_manager
+Tobias,Koppers,Principal Engineer,Microsoft,https://microsoft.com,sokra,https://github.com/sokra,"Webpack creator, Microsoft Edge team, bundler expert",principal/staff_eng
+Misko,Hevery,CTO,Builder.io,https://builder.io,mhevery,https://github.com/mhevery,"Angular creator, Qwik creator, performance optimization",startup_cto
+Devon,Govett,Principal Engineer,Adobe,https://adobe.com,devongovett,https://github.com/devongovett,"Parcel creator, Adobe team, native tooling expert",principal/staff_eng
+Jared,Palmer,Founder,Formik/Turborepo,https://jaredpalmer.com,jaredpalmer,https://github.com/jaredpalmer,"Formik creator, Turborepo creator, monorepo tooling",startup_cto
+Jordan,Walke,Creator,React,https://jordanwalke.com,jordwalke,https://github.com/jordwalke,"React creator, ReasonML contributor, functional programming",principal/staff_eng
+Sebastian,McKenzie,Creator,Babel/Rome,https://github.com/sebmck,sebmck,https://github.com/sebmck,"Babel creator, Rome creator, JS tooling pioneer",principal/staff_eng
+Christopher,Chedeau,Engineering Manager,Meta,https://meta.com,vjeux,https://github.com/vjeux,"React Native creator, Prettier creator, dev tools expert",eng_manager
+Dominic,Gannaway,Principal Engineer,Meta,https://meta.com,trueadm,https://github.com/trueadm,"React team, Prepack creator, performance optimization",principal/staff_eng
+Luna,Ruan,Principal Engineer,Vercel,https://vercel.com,lunaruan,https://github.com/lunaruan,"React team, Vercel team, concurrent features expert",principal/staff_eng
+Andrew,Clark,Principal Engineer,Vercel,https://vercel.com,acdlite,https://github.com/acdlite,"React team, Redux contributor, concurrent React architect",principal/staff_eng
+Brian,Vaughn,Principal Engineer,Meta,https://meta.com,bvaughn,https://github.com/bvaughn,"React DevTools creator, React team, profiling expert",principal/staff_eng
+Sophie,Alpert,Engineering Manager,Hex Technologies,https://hex.tech,sophiebits,https://github.com/sophiebits,"Former React team lead, Hex CTO, data tools expert",eng_manager
+Sunil,Pai,Principal Engineer,Cloudflare,https://cloudflare.com,threepointone,https://github.com/threepointone,"Cloudflare Workers team, React team alumni, edge computing",principal/staff_eng
+Mark,Erikson,Maintainer,Redux Toolkit,https://redux-toolkit.js.org,markerikson,https://github.com/markerikson,"Redux maintainer, state management expert, educator",oss_maintainer
+Nader,Dabit,Developer Relations,Edge & Node,https://edgeandnode.com,dabit3,https://github.com/dabit3,"GraphQL advocate, Web3 educator, developer experience",startup_cto
+Shawn,Wang,Head of DX,Airbyte,https://airbyte.com,swyx,https://github.com/sw-yx,"Developer experience leader, community builder, content creator",eng_manager
+Emma,Bostian,Principal Engineer,Spotify,https://spotify.com,emmabostian,https://github.com/EmmaBostian,"Spotify Design Systems, educator, accessibility advocate",principal/staff_eng
+Charlie,Gerard,Principal Engineer,Stripe,https://stripe.com,devdevcharlie,https://github.com/charliegerard,"Stripe team, creative coding, hardware/web intersection",principal/staff_eng
+Una,Kravets,Principal Engineer,Google,https://google.com,una,https://github.com/una,"Chrome team, CSS expert, web standards advocate",principal/staff_eng
+Maxime,Heckel,Staff Engineer,Stripe,https://stripe.com,MaximeHeckel,https://maximeheckel.com,"Stripe team, React/TypeScript expert, visual programming",principal/staff_eng
+Titus,Wormer,Maintainer,unified/remark,https://unifiedjs.com,wooorm,https://github.com/wooorm,"Unified ecosystem maintainer, markdown tooling expert",oss_maintainer
+Caleb,Porzio,Creator,Alpine.js/Livewire,https://calebporzio.com,calebporzio,https://github.com/calebporzio,"Alpine.js creator, Livewire creator, simplicity advocate",oss_maintainer
+Adam,Wathan,Creator,Tailwind CSS,https://tailwindcss.com,adamwathan,https://github.com/adamwathan,"Tailwind CSS creator, utility-first CSS advocate",oss_maintainer
+Steve,Schoger,Co-creator,Tailwind CSS,https://tailwindcss.com,steveschoger,https://steveschoger.com,"Tailwind co-creator, design systems expert, UI design",principal/staff_eng
+Jonathan,Reinink,Creator,Inertia.js,https://inertiajs.com,reinink,https://github.com/reinink,"Inertia.js creator, full-stack simplicity advocate",oss_maintainer
+Caleb,Doxsey,CTO,Sourcegraph,https://sourcegraph.com,calebdoxsey,https://github.com/calebdoxsey,"Sourcegraph CTO, code search expert, developer tools",startup_cto
+Beyang,Liu,Co-founder/CTO,Sourcegraph,https://sourcegraph.com,beyang,https://github.com/beyang,"Sourcegraph co-founder, code intelligence expert",startup_cto
+Mitchell,Hashimoto,Founder,HashiCorp,https://hashicorp.com,mitchellh,https://github.com/mitchellh,"HashiCorp founder, infrastructure tools creator",startup_cto
+Kelsey,Hightower,Principal Engineer,Google,https://google.com,kelseyhightower,https://github.com/kelseyhightower,"Kubernetes advocate, cloud native expert, DevOps thought leader",principal/staff_eng
+Jessie,Frazelle,Principal Engineer,Oxide Computer,https://oxide.computer,jessfraz,https://github.com/jessfraz,"Container security expert, systems programming advocate",principal/staff_eng
+Julia,Evans,Engineer,Recurse Center,https://jvns.ca,jvns,https://github.com/jvns,"Systems debugging expert, zines creator, networking tools",principal/staff_eng
+Brendan,Burns,Corporate VP,Microsoft,https://microsoft.com,brendandburns,https://github.com/brendandburns,"Kubernetes co-founder, distributed systems expert",eng_manager
+Joe,Beda,Principal Engineer,VMware,https://vmware.com,jbeda,https://github.com/jbeda,"Kubernetes co-founder, cloud platform expert",principal/staff_eng
+Tim,Hockin,Principal Engineer,Google,https://google.com,thockin,https://github.com/thockin,"Kubernetes co-founder, container orchestration expert",principal/staff_eng
+Daniel,Bryant,CTO,Syntasso,https://syntasso.io,danielbryantuk,https://github.com/danielbryantuk,"Cloud native expert, continuous delivery advocate",startup_cto
+Liz,Rice,Chief Open Source Officer,Isovalent,https://isovalent.com,lizrice,https://github.com/lizrice,"eBPF expert, cloud native security, CNCF advocate",eng_manager

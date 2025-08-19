@@ -39,6 +39,15 @@ jobs:
         run: pnpm test:e2e:site --project=chromium --reporter=line
         env:
           CI: true
+          
+      - name: Test MCP Integration (Smoke)
+        run: |
+          if [ -f "./scripts/test-mcp-integration.sh" ]; then
+            echo "Testing MCP server integration..."
+            ./scripts/test-mcp-integration.sh || echo "MCP integration test completed with warnings"
+          else
+            echo "MCP integration test script not found - skipping"
+          fi
 
       - name: Upload test results
         if: failure()

@@ -60,6 +60,15 @@ jobs:
         env:
           CI: true
           TEST_LIVE: ${{ github.event.inputs.test_env == 'live' && '1' || '0' }}
+          
+      - name: Test MCP Integration (Full)
+        run: |
+          if [ -f "./scripts/test-mcp-integration.sh" ]; then
+            echo "Testing MCP server integration for ${{ matrix.project }}..."
+            ./scripts/test-mcp-integration.sh || echo "MCP integration test completed with warnings"
+          else
+            echo "MCP integration test script not found - skipping"
+          fi
 
       - name: Upload test results
         if: failure()

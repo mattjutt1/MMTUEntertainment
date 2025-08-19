@@ -1,0 +1,24 @@
+import { defineConfig, devices } from '@playwright/test';
+
+const PORT = Number(process.env.PORT || 4173);
+const BASE = `http://127.0.0.1:${PORT}`;
+
+export default defineConfig({
+  testDir: 'products/site/e2e',
+  reporter: [['github'], ['line']],
+  use: {
+    baseURL: BASE,
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
+  webServer: {
+    command: `cd products/site && node build.js && pnpm dlx http-server dist -p ${PORT} -a 127.0.0.1 --ext html`,
+    port: PORT,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000
+  },
+});

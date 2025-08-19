@@ -1,0 +1,51 @@
+lead_id,date_contacted,template_id,channel,status,next_step,notes
+1,2025-08-17,T1,email,sent,await_response,Dan Abramov - Redux/React expert - Batch01 - Sent via Gmail
+2,2025-08-17,T1,email,sent,await_response,Kent Dodds - Epic Web educator - Batch01 - Sent via Gmail
+3,2025-08-17,T1,email,sent,await_response,Jason Miller - Preact/Chrome team - Batch01 - Sent via Gmail
+4,2025-08-17,T1,email,sent,await_response,Evan You - Vue.js creator - Batch01 - Sent via Gmail
+5,2025-08-17,T1,email,sent,await_response,Ryan Florence - Remix co-founder - Batch01 - Sent via Gmail
+6,2025-08-17,T1,email,sent,await_response,Michael Jackson - Remix co-founder - Batch01 - Sent via Gmail
+7,2025-08-17,T1,email,sent,await_response,Sebastien Lorber - Docusaurus maintainer - Batch01 - Sent via Gmail
+8,2025-08-17,T1,email,sent,await_response,Josh Comeau - CSS/React educator - Batch01 - Sent via Gmail
+9,2025-08-17,T1,email,sent,await_response,Cassidy Williams - Contenda CTO - Batch01 - Sent via Gmail
+10,2025-08-17,T1,email,sent,await_response,Guillermo Rauch - Vercel CEO - Batch01 - Sent via Gmail
+11,,,email,queued,send_initial,Rich Harris - Svelte creator
+12,,,email,queued,send_initial,Anthony Fu - Vue/Vite core
+13,,,email,queued,send_initial,Sindre Sorhus - npm packages
+14,,,email,queued,send_initial,Addy Osmani - Chrome team
+15,,,email,queued,send_initial,Sarah Drasner - Netlify VP Eng
+16,,,email,queued,send_initial,Tobias Koppers - Webpack creator
+17,,,email,queued,send_initial,Misko Hevery - Builder.io CTO
+18,,,email,queued,send_initial,Devon Govett - Parcel creator
+19,,,email,queued,send_initial,Jared Palmer - Formik/Turborepo
+20,,,email,queued,send_initial,Jordan Walke - React creator
+21,,,email,queued,send_initial,Sebastian McKenzie - Babel/Rome
+22,,,email,queued,send_initial,Christopher Chedeau - React Native
+23,,,email,queued,send_initial,Dominic Gannaway - React team
+24,,,email,queued,send_initial,Luna Ruan - React/Vercel
+25,,,email,queued,send_initial,Andrew Clark - React team
+26,,,email,queued,send_initial,Brian Vaughn - React DevTools
+27,,,email,queued,send_initial,Sophie Alpert - Hex CTO
+28,,,email,queued,send_initial,Sunil Pai - Cloudflare Workers
+29,,,email,queued,send_initial,Mark Erikson - Redux maintainer
+30,,,email,queued,send_initial,Nader Dabit - Edge & Node
+31,,,email,queued,send_initial,Shawn Wang - Airbyte DX lead
+32,,,email,queued,send_initial,Emma Bostian - Spotify Design
+33,,,email,queued,send_initial,Charlie Gerard - Stripe team
+34,,,email,queued,send_initial,Una Kravets - Chrome CSS
+35,,,email,queued,send_initial,Maxime Heckel - Stripe staff
+36,,,email,queued,send_initial,Titus Wormer - unified/remark
+37,,,email,queued,send_initial,Caleb Porzio - Alpine.js
+38,,,email,queued,send_initial,Adam Wathan - Tailwind CSS
+39,,,email,queued,send_initial,Steve Schoger - Tailwind design
+40,,,email,queued,send_initial,Jonathan Reinink - Inertia.js
+41,,,email,queued,send_initial,Caleb Doxsey - Sourcegraph CTO
+42,,,email,queued,send_initial,Beyang Liu - Sourcegraph co-founder
+43,,,email,queued,send_initial,Mitchell Hashimoto - HashiCorp
+44,,,email,queued,send_initial,Kelsey Hightower - Kubernetes
+45,,,email,queued,send_initial,Jessie Frazelle - Oxide Computer
+46,,,email,queued,send_initial,Julia Evans - systems debugging
+47,,,email,queued,send_initial,Brendan Burns - Microsoft K8s
+48,,,email,queued,send_initial,Joe Beda - VMware K8s
+49,,,email,queued,send_initial,Tim Hockin - Google K8s
+50,,,email,queued,send_initial,Liz Rice - Isovalent eBPF
