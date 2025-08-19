@@ -16,6 +16,14 @@
 
 **Reason**: Required checks are name-sensitive; this prevents future "what was that string again?" issues.
 
+> **Why other jobs can appear "skipped/neutral" but still comply**  
+> - GitHub treats **successful/skipped/neutral** as acceptable for required checks under branch protection.  
+> - We intentionally gate non-smoke jobs at the **job level** (not workflow level) so that docs-only PRs don't get blocked by "Pending" checks.  
+> - References:  
+>   - Skipped workflows can leave checks **Pending** (blocks merges). https://docs.github.com/actions/managing-workflow-runs/skipping-workflow-runs  
+>   - Skipped jobs via `if:` report **Success** (don't block). https://docs.github.com/actions/using-jobs/using-conditions-to-control-job-execution  
+>   - Branch protection accepts successful/skipped/neutral. https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+
 ### Re-verification Command
 ```bash
 gh pr checks https://github.com/mattjutt1/MMTUEntertainment/pull/5 --json name,state,completedAt,startedAt

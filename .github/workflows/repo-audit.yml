@@ -1,4 +1,16 @@
 name: Repository Self-Audit
+#
+# CI NOTE — job-level gating rationale + references:
+# - Workflow-level path filters ⇒ skipped workflow ⇒ "Pending" check (blocks merge).           (GitHub)
+#   https://docs.github.com/actions/managing-workflow-runs/skipping-workflow-runs
+# - Job-level `if:` skip ⇒ "Success/neutral" (acceptable for required checks).                 (GitHub)
+#   https://docs.github.com/actions/using-jobs/using-conditions-to-control-job-execution
+# - Per-job file gating with dorny/paths-filter (monorepo friendly).                           (GitHub Action)
+#   https://github.com/dorny/paths-filter
+# - Branch protection accepts successful/skipped/neutral.                                      (GitHub)
+#   https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+# - We keep concurrency to cancel stale CI.                                                    (GitHub)
+#   https://docs.github.com/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs
 
 on:
   workflow_dispatch:
