@@ -2,7 +2,7 @@ name: 'SAST Security Scan'
 
 on:
   pull_request:
-    paths: 
+    paths:
       - 'products/**'
       - 'packages/**'
       - 'apps/**'
@@ -10,7 +10,7 @@ on:
     paths-ignore:
       - 'archive/**'
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - 'products/**'
       - 'packages/**'
@@ -28,13 +28,11 @@ jobs:
     name: 'Semgrep SAST Analysis'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
       # Use Semgrep CI (native) instead of the deprecated wrapper
       # See: semgrep.dev docs → Sample CI configs
       - name: Run Semgrep SAST scan
@@ -46,14 +44,12 @@ jobs:
           generateSarif: true
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-          
       # Upload SARIF to GitHub Code scanning
       - name: Upload SARIF to GitHub
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
-          
       - name: Report scan summary
         if: always()
         run: |
