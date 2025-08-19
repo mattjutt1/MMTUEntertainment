@@ -5,10 +5,40 @@ on:
   push:
     branches: [main, setup/*]
   pull_request:
-    branches: [main]
+    types: [opened, synchronize, reopened]
+    # No workflow-level path filters. Gate at the job level to avoid Pending checks.
 
 jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      code_changed: ${{ steps.filter.outputs.code }}
+      workflows_changed: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - 'apps/**'
+              - 'products/**'
+              - 'packages/**'
+              - 'infra/**'
+              - 'scripts/**'
+              - '**/*.js'
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.py'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'yarn.lock'
+            workflows:
+              - '.github/workflows/**'
+
   repo-audit:
+    needs: detect
+    if: needs.detect.outputs.code_changed == 'true' || needs.detect.outputs.workflows_changed == 'true'
     runs-on: ubuntu-latest
     
     steps:
@@ -65,3 +95,11 @@ jobs:
           else
             echo "✅ Repository audit passed"
           fi
+
+  # Optional: explicit no-op job for observability on docs-only PRs
+  audit-noop:
+    needs: detect
+    if: needs.detect.outputs.code_changed != 'true' && needs.detect.outputs.workflows_changed != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No code/workflow changes detected; skipping repo audit."
