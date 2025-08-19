@@ -33,15 +33,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # Use Semgrep CI (native) instead of the deprecated wrapper
-      # See: semgrep.dev docs → Sample CI configs
+      # Install Semgrep CLI and run native CI
+      - name: Install Semgrep
+        run: |
+          python3 -m pip install semgrep
+          
       - name: Run Semgrep SAST scan
-        uses: returntocorp/semgrep@v1
-        id: semgrep
-        with:
-          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}   # optional if using Semgrep App
-          config: p/owasp-top-ten
-          generateSarif: true
+        run: |
+          semgrep --config=p/owasp-top-ten --sarif --output=semgrep.sarif .
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
       # Upload SARIF to GitHub Code scanning
