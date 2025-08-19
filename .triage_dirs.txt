@@ -1,0 +1,150 @@
+.
+├── MMTU-pivot
+├── _archive
+│   └── mmtu-site-2025-08-13_2230
+│       ├── public
+│       └── src
+│           ├── app
+│           │   ├── blog
+│           │   ├── contact
+│           │   ├── docs
+│           │   │   └── get-started
+│           │   ├── gallery
+│           │   ├── pricing
+│           │   ├── privacy
+│           │   └── terms
+│           └── components
+│               └── ui
+├── apps
+│   ├── DriftGuard-Checks
+│   │   ├── app
+│   │   ├── apps
+│   │   │   └── memeMixer-lite
+│   │   │       ├── functions
+│   │   │       └── src
+│   │   │           ├── components
+│   │   │           └── utils
+│   │   ├── assets
+│   │   │   ├── images
+│   │   │   └── screenshots
+│   │   ├── docs
+│   │   ├── functions
+│   │   │   ├── lib
+│   │   │   └── webhooks
+│   │   ├── scripts
+│   │   │   └── deployment
+│   │   ├── src
+│   │   │   ├── billing
+│   │   │   │   └── ui
+│   │   │   ├── mocks
+│   │   │   └── security
+│   │   ├── test
+│   │   ├── test-artifacts
+│   │   ├── test-results
+│   │   └── tests
+│   │       └── e2e
+│   ├── comparison-matrix
+│   │   ├── public
+│   │   └── src
+│   │       └── components
+│   ├── driftguard-webhook
+│   │   ├── src
+│   │   └── test
+│   ├── marketing
+│   │   ├── public
+│   │   └── src
+│   │       ├── app
+│   │       │   └── compare
+│   │       │       └── sonarcloud
+│   │       ├── components
+│   │       │   └── ui
+│   │       └── lib
+│   ├── marketplace-webhook
+│   ├── memeMixer-lite
+│   │   ├── functions
+│   │   │   └── api
+│   │   │       ├── assets
+│   │   │       └── stripe
+│   │   └── src
+│   │       └── components
+│   ├── portfolio-dashboard
+│   │   └── src
+│   │       ├── components
+│   │       └── providers
+│   ├── probot-app
+│   │   ├── apps
+│   │   │   └── probot-app
+│   │   └── src
+│   │       ├── features
+│   │       └── webhooks
+│   ├── reports
+│   │   ├── public
+│   │   ├── src
+│   │   │   ├── app
+│   │   │   │   └── soc2-express
+│   │   │   ├── components
+│   │   │   ├── lib
+│   │   │   └── pages
+│   │   └── templates
+│   ├── stream-overlay-studio
+│   │   ├── ops
+│   │   ├── public
+│   │   ├── scripts
+│   │   ├── src
+│   │   │   ├── app
+│   │   │   │   └── blitz
+│   │   │   ├── components
+│   │   │   ├── lib
+│   │   │   └── templates
+│   │   └── types
+│   └── web-toy-mvp
+├── data
+│   ├── exports
+│   │   └── stripe
+│   ├── processed
+│   │   └── metrics
+│   └── raw
+│       └── revenue
+├── docs
+│   ├── journal
+│   ├── marketplace
+│   ├── mcp
+│   ├── pivot
+│   └── policies
+├── driftguard-mvp
+├── growth
+│   ├── leads
+│   └── outreach
+│       └── batches
+├── infra
+│   ├── cloudflare
+│   │   └── wrangler.templates
+│   └── huggingface
+├── neuromap
+├── packages
+│   ├── entitlements
+│   │   └── src
+│   ├── feature-flags
+│   ├── portfolio-analytics
+│   └── pricing-engine
+│       └── src
+├── perp find
+├── pivot-checks
+├── products
+│   └── site
+│       ├── config
+│       ├── e2e
+│       │   └── fixtures
+│       ├── js
+│       ├── pages
+│       │   └── offer
+│       └── styles
+├── scripts
+├── test-repos
+│   └── driftguard-test-repo
+│       ├── functions
+│       │   └── webhooks
+│       └── src
+└── test-results
+
+148 directories

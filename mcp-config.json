@@ -1,0 +1,84 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/servers/main/schema.json",
+  "description": "MMTU Entertainment MCP Server Configuration",
+  "version": "1.0.0",
+  "mcpServers": {
+    "posthog": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-posthog"],
+      "env": {
+        "POSTHOG_API_KEY": "${POSTHOG_API_KEY}",
+        "POSTHOG_HOST": "${POSTHOG_HOST:-https://app.posthog.com}"
+      },
+      "description": "PostHog analytics and product metrics server",
+      "required_vars": ["POSTHOG_API_KEY"],
+      "setup_docs": "docs/mcp/posthog-setup.md"
+    },
+    "hubspot": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-hubspot"],
+      "env": {
+        "HUBSPOT_PRIVATE_APP_TOKEN": "${HUBSPOT_PRIVATE_APP_TOKEN}"
+      },
+      "description": "HubSpot CRM and marketing automation server",
+      "required_vars": ["HUBSPOT_PRIVATE_APP_TOKEN"],
+      "setup_docs": "docs/mcp/hubspot-setup.md"
+    },
+    "postgresql": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}"
+      },
+      "description": "PostgreSQL database server for analytics and metrics",
+      "required_vars": ["POSTGRES_CONNECTION_STRING"],
+      "setup_docs": "docs/mcp/postgresql-setup.md"
+    },
+    "grafana": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-grafana"],
+      "env": {
+        "GRAFANA_URL": "${GRAFANA_URL}",
+        "GRAFANA_API_KEY": "${GRAFANA_API_KEY}"
+      },
+      "description": "Grafana dashboards and monitoring server",
+      "required_vars": ["GRAFANA_URL", "GRAFANA_API_KEY"],
+      "setup_docs": "docs/mcp/grafana-setup.md"
+    },
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-kubernetes"],
+      "env": {
+        "KUBECONFIG": "${KUBECONFIG:-~/.kube/config}"
+      },
+      "description": "Kubernetes cluster management server",
+      "required_vars": [],
+      "setup_docs": "docs/mcp/kubernetes-setup.md"
+    },
+    "docker": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-docker"],
+      "env": {
+        "DOCKER_HOST": "${DOCKER_HOST:-unix:///var/run/docker.sock}"
+      },
+      "description": "Docker container management server",
+      "required_vars": [],
+      "setup_docs": "docs/mcp/docker-setup.md"
+    }
+  },
+  "metrics_targets": {
+    "LTV_CAC_ratio": "≥3.0",
+    "week4_retention": "≥20%",
+    "gross_margin": "≥60%"
+  },
+  "revenue_optimization": {
+    "enabled": true,
+    "data_sources": ["posthog", "hubspot", "postgresql"],
+    "reporting_frequency": "daily",
+    "alert_thresholds": {
+      "ltv_cac_below": 2.5,
+      "retention_below": 15,
+      "margin_below": 50
+    }
+  }
+}
