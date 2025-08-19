@@ -7,16 +7,14 @@ on:
       - 'packages/**'
       - 'apps/**'
       - '.github/workflows/semgrep.yml'
-    paths-ignore:
-      - 'archive/**'
+      - '!archive/**'
   push:
     branches: [main]
     paths:
       - 'products/**'
       - 'packages/**'
       - 'apps/**'
-    paths-ignore:
-      - 'archive/**'
+      - '!archive/**'
   workflow_dispatch:
 
 concurrency:
