@@ -19,11 +19,12 @@ export default defineConfig({
   },
 
   webServer: {
-    // IMPORTANT: run from products/site so relative paths (./config/links.json) resolve
-    command: `bash -lc 'cd products/site && node build.js --port ${PORT}'`,
+    // IMPORTANT: Build site and serve static files using industry standard `serve` package
+    command: `node build.js && npx serve dist -p ${PORT}`,
     url: BASE,
-    reuseExistingServer: true,
-    timeout: 60_000
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000, // Increased timeout for build + server startup
+    cwd: '.'
   },
 
   projects: [
