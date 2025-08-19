@@ -1,0 +1,47 @@
+name: docs-linkcheck
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    # No workflow-level path filters. Gate at the job level to avoid Pending checks.
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      docs_changed: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docs:
+              - 'docs/**'
+              - 'reports/**'
+              - '**/*.md'
+
+  linkcheck:
+    needs: detect
+    if: needs.detect.outputs.docs_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run lychee on markdown
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: "--no-progress --require-https --accept 200,999 **/*.md"
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  # Optional: explicit no-op job for observability on non-docs PRs
+  linkcheck-noop:
+    needs: detect
+    if: needs.detect.outputs.docs_changed != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No docs changes detected; skipping link check."
