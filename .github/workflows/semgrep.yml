@@ -21,42 +21,43 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true  # keep only the latest run for a branch/PR
+  cancel-in-progress: true
 
 jobs:
   semgrep:
     name: 'Semgrep SAST Analysis'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # Test basic functionality first
-      - name: Test basic commands
+
+      - name: Install Semgrep
+        run: python3 -m pip install semgrep
+
+      - name: Run Semgrep scan
         run: |
-          echo "Testing basic workflow functionality..."
-          python3 --version
-          pip --version
-          ls -la
-          pwd
-      # Skip SARIF upload for now - testing basic workflow
-      # - name: Upload SARIF to GitHub
-      #   if: always()
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: semgrep.sarif
+          semgrep --config=p/owasp-top-ten --sarif --output=semgrep.sarif .
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Upload SARIF to GitHub
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
       - name: Report scan summary
         if: always()
         run: |
           echo "## 🛡️ SAST Security Scan Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tool**: Semgrep (native CI) with OWASP Top 10 rules" >> $GITHUB_STEP_SUMMARY
-          echo "- **Scope**: Products, packages, apps (JavaScript/TypeScript)" >> $GITHUB_STEP_SUMMARY
-          echo "- **SARIF**: Results uploaded to GitHub Security → Code scanning" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tool**: Semgrep CLI with OWASP Top 10 rules" >> $GITHUB_STEP_SUMMARY
+          echo "- **Scope**: Products, packages, apps" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" == "success" ]; then
             echo "- **Status**: ✅ No critical security issues detected" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Status**: ⚠️ Security findings detected - review Security tab" >> $GITHUB_STEP_SUMMARY
-            echo "- **Action**: Review SARIF results and address high/critical findings" >> $GITHUB_STEP_SUMMARY
+            echo "- **Status**: ⚠️ Security findings detected" >> $GITHUB_STEP_SUMMARY
           fi
