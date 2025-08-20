@@ -7,7 +7,7 @@ paths = [
   "coverage/",
   "playwright-report/",
   "CHANGELOG.md",
-  "**/*.lock",
-  "**/*.snap"
+  ".*\.lock$",
+  ".*\.snap$"
 ]
 
