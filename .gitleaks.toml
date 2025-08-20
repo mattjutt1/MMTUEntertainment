@@ -10,6 +10,6 @@ paths = [
   "pnpm-lock.yaml",
   "package-lock.json",
   "yarn.lock",
-  "*.snap"
+  ".*\\.snap$"
 ]
 
