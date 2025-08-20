@@ -1,0 +1,5 @@
+# Add URLs or patterns that lychee should skip (one per line)
+# Example: Known rate-limited or private endpoints
+https://localhost
+http://localhost
+mailto:

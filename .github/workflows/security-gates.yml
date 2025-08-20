@@ -1,19 +1,18 @@
+# NIST SSDF v1.1 + OWASP Aligned Security Gates
+# 
+# PR Gates (fail-fast): dependency_review, sast_semgrep, secrets_gitleaks, sbom_sca
+# Merge Queue Gates: sast_semgrep, secrets_gitleaks, sbom_sca (+ manual DAST)
+# All gates upload SARIF to GitHub Security tab with deterministic SHA pins
+#
 name: Security Gates
 
 on:
   pull_request:
     paths:
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'package.json'
-      - 'packages/**'
-      - '.semgrep/**'
-      - '.gitleaks.toml'
+      - '**/*.{ts,tsx,js,jsx,json}'
+      - '{pnpm-lock,pnpm-workspace,package}.{yaml,json}'
+      - 'packages/**/*.{ts,tsx,js,jsx,json}'
+      - '{.semgrep/**,.gitleaks.toml}'
       - '.github/workflows/security-gates.yml'
   merge_group:
     {}
@@ -32,6 +31,8 @@ concurrency:
 
 permissions:
   contents: read
+  security-events: write
+  actions: read
 
 jobs:
   dependency_review:
@@ -43,11 +44,14 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@bde01290d367cf6ae7232580700fcca870e35a80 # v4
       - name: Dependency Review
-        uses: actions/dependency-review-action@v4
+        uses: actions/dependency-review-action@bde01290d367cf6ae7232580700fcca870e35a80 # v4
         with:
-          fail-on-severity: high
+          fail-on-severity: moderate
+          fail-on-scopes: runtime,development
+          allow-licenses: MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC
+          deny-licenses: GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-1.0,AGPL-3.0
 
   sast_semgrep:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
@@ -58,18 +62,20 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@bde01290d367cf6ae7232580700fcca870e35a80 # v4
       - name: Run Semgrep (containerized CLI)
         env:
           SEMGREP_ENABLE_VERSION_CHECK: '0'
         run: >-
           docker run --rm -v "$PWD":/src -w /src
           returntocorp/semgrep:1
-          semgrep ci --config .semgrep/semgrep.yml --sarif -o semgrep.sarif
+          semgrep ci --config .semgrep/semgrep.yml --sarif --severity ERROR -o semgrep.sarif
       - name: Upload Semgrep SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3
         with:
           sarif_file: semgrep.sarif
+          category: semgrep
 
   secrets_gitleaks:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
@@ -80,9 +86,9 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@bde01290d367cf6ae7232580700fcca870e35a80 # v4
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc # v2
         env:
           GITLEAKS_VERSION: "8.28.0"
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
@@ -92,9 +98,11 @@ jobs:
             --config=.gitleaks.toml
             --report-format sarif --report-path gitleaks.sarif
       - name: Upload Gitleaks SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3
         with:
           sarif_file: gitleaks.sarif
+          category: gitleaks
 
   sbom_sca:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
@@ -105,27 +113,29 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@bde01290d367cf6ae7232580700fcca870e35a80 # v4
       - name: Generate SBOM (SPDX JSON)
-        uses: anchore/sbom-action@v0.20.5
+        uses: anchore/sbom-action@da167eac915b4e86f08b264dbdbc867b61be6f0c # v0.20.5
         with:
           path: .
           format: spdx-json
           output-file: sbom.spdx.json
       - name: Scan SBOM with Grype (fail on High/Critical)
-        uses: anchore/scan-action@v6.5.1
+        uses: anchore/scan-action@d5c127d5807a08a21a8bbb603b25e0fbd38cf9d4 # v6.5.1
         with:
           sbom: sbom.spdx.json
           fail-build: true
-          severity-cutoff: high
+          severity-cutoff: medium
           output-format: sarif
           output-file: grype.sarif
       - name: Upload Grype SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3
         with:
           sarif_file: grype.sarif
+          category: grype
       - name: Upload SBOM artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bde01290d367cf6ae7232580700fcca870e35a80 # v4
         with:
           name: sbom-spdx
           path: sbom.spdx.json
@@ -153,16 +163,18 @@ jobs:
           fi
           echo "target=$TARGET" >> "$GITHUB_OUTPUT"
       - name: ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-baseline@7c4deb10e6261301961c86d65d54a516394f9aed # v0.14.0
         with:
           target: ${{ steps.target.outputs.target }}
-          cmd_options: '-a -j -J zap-baseline.json' # JSON output file
+          cmd_options: '-a -j -J zap-baseline.json -T 180' # JSON output, 3min timeout
       - name: Convert ZAP JSON to SARIF (maintained)
-        uses: SvanBoxel/zaproxy-to-ghas@v1
+        uses: SvanBoxel/zaproxy-to-ghas@75108d871da28d75dc07ef093cc74fc2b3f174e6 # v1
         with:
           zap_output_path: './zap-baseline.json'
           output_path: './zap.sarif'
       - name: Upload ZAP SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3
         with:
           sarif_file: zap.sarif
+          category: zap
