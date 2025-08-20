@@ -57,14 +57,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run Semgrep
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: .semgrep/semgrep.yml
-          generateSarif: true
-          uploadSarif: never
+      - name: Run Semgrep (containerized CLI)
         env:
           SEMGREP_ENABLE_VERSION_CHECK: '0'
+        run: >-
+          docker run --rm -v "$PWD":/src -w /src
+          returntocorp/semgrep:1
+          semgrep ci --config .semgrep/semgrep.yml --sarif -o semgrep.sarif
       - name: Upload Semgrep SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
@@ -105,13 +104,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Generate SBOM (SPDX JSON)
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@v0.20.5
         with:
           path: .
           format: spdx-json
           output-file: sbom.spdx.json
       - name: Scan SBOM with Grype (fail on High/Critical)
-        uses: anchore/scan-action@v3
+        uses: anchore/scan-action@v6.5.1
         with:
           sbom: sbom.spdx.json
           fail-build: true
@@ -151,17 +150,16 @@ jobs:
           fi
           echo "target=$TARGET" >> "$GITHUB_OUTPUT"
       - name: ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.10.0
+        uses: zaproxy/action-baseline@v0.14.0
         with:
           target: ${{ steps.target.outputs.target }}
-          cmd_options: '-a -j' # auth/active-esque hints + JSON output
-      - name: Convert ZAP JSON to SARIF
-        uses: jgstew/zap2sarif-action@v0.3.0
+          cmd_options: '-a -j -J zap-baseline.json' # JSON output file
+      - name: Convert ZAP JSON to SARIF (maintained)
+        uses: SvanBoxel/zaproxy-to-ghas@v1
         with:
-          inputPath: './zap-baseline.json'
-          outputPath: './zap.sarif'
+          zap_output_path: './zap-baseline.json'
+          output_path: './zap.sarif'
       - name: Upload ZAP SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: zap.sarif
-
