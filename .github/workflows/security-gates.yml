@@ -58,7 +58,7 @@ jobs:
         run: >-
           docker run --rm -v "$PWD":/src -w /src
           returntocorp/semgrep:1.131.0
-          semgrep ci --config=.semgrep/semgrep.yml --sarif --severity=ERROR -o semgrep.sarif
+          semgrep ci --config=.semgrep/semgrep.yml --sarif -o semgrep.sarif
       - name: Upload Semgrep SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3

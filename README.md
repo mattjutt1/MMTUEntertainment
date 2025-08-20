@@ -2,7 +2,7 @@
 
 ## Quick links (copy/paste into browser)
 - Repo: https://github.com/mattjutt1/MMTUEntertainment
-- Docs: ./docs/README.md
+- Docs: docs/README.md
 - Smoke workflow: `.github/workflows/site-e2e-smoke.yml`
 - Full workflow: `.github/workflows/site-e2e-full.yml`
 - Playwright config: `products/site/playwright.config.ts`
