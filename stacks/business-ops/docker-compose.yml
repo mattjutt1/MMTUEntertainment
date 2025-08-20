@@ -18,6 +18,10 @@
 #   Docs: https://listmonk.app/docs/installation/#docker
 #   Repo: https://github.com/knadh/listmonk
 #
+# - Cal.com: Scheduling & Calendar Management
+#   Docs: https://cal.com/docs/self-hosting/docker
+#   Repo: https://github.com/calcom/cal.com
+#
 # - Traefik: Reverse Proxy & TLS Termination
 #   Docs: https://doc.traefik.io/traefik/getting-started/quick-start/
 #
@@ -26,15 +30,13 @@
 #   Repo: https://github.com/nextcloud/all-in-one
 #
 # Profiles:
-# - core: EspoCRM, Zammad, Documenso, Listmonk, Traefik (default)
+# - core: EspoCRM, Zammad, Documenso, Listmonk, Cal.com, Traefik (default)
 # - nextcloud: Adds Nextcloud AIO
 # - minimal: Just Listmonk + Traefik for testing
 #
 # Usage:
 # COMPOSE_PROFILES=core docker compose up -d
 # COMPOSE_PROFILES=core,nextcloud docker compose up -d
-
-version: '3.8'
 
 services:
   # Reverse Proxy & TLS Termination
@@ -44,9 +46,9 @@ services:
     container_name: business-ops-traefik
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"  # Traefik dashboard
+      - "8090:80"
+      - "8443:443"
+      - "8091:8080"  # Traefik dashboard
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/traefik.yml:/traefik.yml:ro
@@ -194,20 +196,26 @@ services:
   #     - business-ops
 
   zammad:
-    image: zammad/zammad-docker-compose:zammad-6.3.0-7
+    image: zammad/zammad-docker-compose:6.5
     profiles: ["core"]
     container_name: business-ops-zammad
     restart: unless-stopped
     environment:
+      # PostgreSQL configuration (Zammad expects these specific variables)
+      POSTGRESQL_HOST: zammad-db
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USER: ${ZAMMAD_DB_USER:-zammad}
+      POSTGRESQL_PASS: ${ZAMMAD_DB_PASSWORD:-zammad_secret}
+      POSTGRESQL_DB: ${ZAMMAD_DB_NAME:-zammad}
+      POSTGRESQL_DB_CREATE: "true"
+      # Legacy DATABASE_URL for compatibility
       DATABASE_URL: postgresql://${ZAMMAD_DB_USER:-zammad}:${ZAMMAD_DB_PASSWORD:-zammad_secret}@zammad-db:5432/${ZAMMAD_DB_NAME:-zammad}
+      # Redis configuration
       REDIS_URL: redis://zammad-redis:6379
+      MEMCACHE_SERVERS: zammad-redis:6379
       # Disable Elasticsearch for reduced resource usage
       ELASTICSEARCH_ENABLED: "false"
-      # ELASTICSEARCH_HOST: zammad-elasticsearch
-      # ELASTICSEARCH_PORT: 9200
-      # ELASTICSEARCH_USER: elastic
-      # ELASTICSEARCH_PASSWORD: ${ZAMMAD_ES_PASSWORD:-zammad_es_secret}
-      MEMCACHE_SERVERS: zammad-redis:6379
+      # Zammad service configuration
       ZAMMAD_RAILSSERVER_HOST: zammad
       ZAMMAD_RAILSSERVER_PORT: 3000
       ZAMMAD_WEBSOCKET_HOST: zammad
@@ -361,6 +369,78 @@ services:
       retries: 3
       start_period: 30s
 
+  # Cal.com - Scheduling & Calendar Management
+  # Docs: https://cal.com/docs/self-hosting/docker
+  calcom-db:
+    image: postgres:14-alpine
+    profiles: ["core"]
+    container_name: business-ops-calcom-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${CALCOM_DB_NAME:-calendso}
+      POSTGRES_USER: ${CALCOM_DB_USER:-calendso}
+      POSTGRES_PASSWORD: ${CALCOM_DB_PASSWORD:-calcom_secret}
+    volumes:
+      - calcom-db-data:/var/lib/postgresql/data
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CALCOM_DB_USER:-calendso}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  calcom:
+    image: calcom/cal.com:latest
+    profiles: ["core"]
+    container_name: business-ops-calcom
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NEXTAUTH_SECRET: ${CALCOM_NEXTAUTH_SECRET:-calcom_auth_secret_key_min_32_chars}
+      CALCOM_ENCRYPTION_KEY: ${CALCOM_ENCRYPTION_KEY:-calcom_encryption_key_min_32_chars}
+      CALENDSO_ENCRYPTION_KEY: ${CALENDSO_ENCRYPTION_KEY:-calcom_encryption_key_min_32_chars}
+      DATABASE_URL: postgresql://${CALCOM_DB_USER:-calendso}:${CALCOM_DB_PASSWORD:-calcom_secret}@calcom-db:5432/${CALCOM_DB_NAME:-calendso}
+      DATABASE_DIRECT_URL: postgresql://${CALCOM_DB_USER:-calendso}:${CALCOM_DB_PASSWORD:-calcom_secret}@calcom-db:5432/${CALCOM_DB_NAME:-calendso}
+      NEXTAUTH_URL: ${CALCOM_NEXTAUTH_URL:-http://localhost:3000}
+      NEXT_PUBLIC_WEBAPP_URL: ${CALCOM_WEBAPP_URL:-http://localhost:3000}
+      # Email configuration (optional)
+      EMAIL_FROM: ${CALCOM_EMAIL_FROM:-noreply@localhost}
+      EMAIL_SERVER_HOST: ${SMTP_HOST:-localhost}
+      EMAIL_SERVER_PORT: ${SMTP_PORT:-587}
+      EMAIL_SERVER_USER: ${SMTP_USER:-}
+      EMAIL_SERVER_PASSWORD: ${SMTP_PASS:-}
+      # Disable telemetry for privacy
+      CALCOM_TELEMETRY_DISABLED: "1"
+      # License (AGPL-3.0)
+      CALCOM_LICENSE_KEY: ${CALCOM_LICENSE_KEY:-}
+    volumes:
+      - calcom-data:/calcom/uploads
+    networks:
+      - business-ops
+    depends_on:
+      calcom-db:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calcom.rule=Host(`cal.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.calcom.entrypoints=websecure"
+      - "traefik.http.routers.calcom.tls.certresolver=letsencrypt"
+      - "traefik.http.services.calcom.loadbalancer.server.port=3000"
+      - "traefik.http.routers.calcom-http.rule=Host(`cal.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.calcom-http.entrypoints=web"
+      - "traefik.http.routers.calcom-http.middlewares=redirect-to-https"
+    ports:
+      - "8085:3000"  # Direct access for development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   # Nextcloud AIO - Groupware Suite (Optional Profile)
   # Docs: https://github.com/nextcloud/all-in-one#docker-compose
   nextcloud-aio:
@@ -436,6 +516,12 @@ volumes:
     name: business-ops-listmonk-db-data
   listmonk-uploads:
     name: business-ops-listmonk-uploads
+    
+  # Cal.com
+  calcom-db-data:
+    name: business-ops-calcom-db-data
+  calcom-data:
+    name: business-ops-calcom-data
     
   # Nextcloud AIO
   nextcloud-aio-mastercontainer:
