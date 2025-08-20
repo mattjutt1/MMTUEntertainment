@@ -1,7 +1,8 @@
 # NIST SSDF v1.1 + OWASP Aligned Security Gates
 # 
-# PR Gates (fail-fast): dependency_review, sast_semgrep, secrets_gitleaks, sbom_sca
+# PR Gates (fail-fast): sast_semgrep, secrets_gitleaks, sbom_sca
 # Merge Queue Gates: sast_semgrep, secrets_gitleaks, sbom_sca (+ manual DAST)
+# Note: dependency_review disabled (requires GitHub Advanced Security)
 # All gates upload SARIF to GitHub Security tab with deterministic SHA pins
 #
 name: Security Gates
@@ -35,22 +36,11 @@ permissions:
   actions: read
 
 jobs:
-  dependency_review:
-    if: github.event_name == 'pull_request'
-    name: Dependency Review (fail on High)
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Dependency Review
-        uses: actions/dependency-review-action@bc41886e18ea39df68b1b1245f4184881938e050 # v4.7.2
-        with:
-          fail-on-severity: moderate
-          fail-on-scopes: runtime,development
-          allow-licenses: MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC
+  # dependency_review:
+  #   # DISABLED: Requires GitHub Advanced Security for private repos
+  #   if: github.event_name == 'pull_request'
+  #   name: Dependency Review (fail on High)
+  #   runs-on: ubuntu-latest
 
   sast_semgrep:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
@@ -67,7 +57,7 @@ jobs:
           SEMGREP_ENABLE_VERSION_CHECK: '0'
         run: >-
           docker run --rm -v "$PWD":/src -w /src
-          returntocorp/semgrep:1
+          returntocorp/semgrep:1.131.0
           semgrep ci --config=.semgrep/semgrep.yml --sarif --severity=ERROR -o semgrep.sarif
       - name: Upload Semgrep SARIF
         if: always()
