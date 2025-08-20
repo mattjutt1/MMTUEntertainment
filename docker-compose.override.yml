@@ -14,10 +14,13 @@ services:
     env_file:
       - ops/env/.env.zammad  # create locally from .env.zammad.example
     ports:
-      - "8086:3000"  # Direct access for development
+      - "8084:8080"  # Match base configuration port
     healthcheck:
-      test: ["CMD", "bash", "-lc", "curl -fsS http://localhost:3000 || exit 1"]
+      test: ["CMD", "bash", "-lc", "curl -fsS http://localhost:8080 || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 20
       start_period: 40s
+    volumes:
+      - zammad-data:/opt/zammad:rw
+    entrypoint: ["/bin/bash", "-lc", "rm -f tmp/pids/server.pid && /docker-entrypoint.sh"]
