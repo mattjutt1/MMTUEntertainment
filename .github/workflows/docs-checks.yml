@@ -1,0 +1,47 @@
+name: Docs Checks
+
+on:
+  pull_request:
+    paths:
+      - "**/*.md"
+      - "docs/**"
+      - ".lycheeignore"
+      - ".github/workflows/docs-checks.yml"
+  merge_group:
+    paths:
+      - "**/*.md"
+      - "docs/**"
+      - ".lycheeignore"
+      - ".github/workflows/docs-checks.yml"
+
+concurrency:
+  group: docs-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-ci:
+    name: docs-ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install cspell
+        run: npm install -g cspell@7.2.0
+      
+      - name: Spell check
+        run: cspell "**/*.md" --no-progress --show-suggestions --gitignore
+      
+      - name: Install lychee
+        run: |
+          curl -sSL https://github.com/lycheeverse/lychee/releases/download/lychee-v0.15.1/lychee-v0.15.1-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C /usr/local/bin
+          chmod +x /usr/local/bin/lychee
+      
+      - name: Link check
+        run: lychee --verbose --no-progress --exclude-file .lycheeignore "**/*.md"
