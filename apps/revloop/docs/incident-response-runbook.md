@@ -361,6 +361,74 @@ WE_RULES="false"   # Disable for high-traffic periods
 
 ---
 
+## Observability & Metrics
+
+### Prometheus Metrics Integration
+
+The Revenue Loop system includes optional Prometheus metrics for monitoring Andon events and performance tracking.
+
+#### Metrics Configuration
+
+**Enable Metrics**: Set `METRICS_PORT` environment variable
+```bash
+export METRICS_PORT="9464"  # Enable metrics server on port 9464
+```
+
+**Available Metrics**:
+- `revloop_andon_attention_total{rule="sigma|weco"}` - Count of ATTENTION-level alerts
+- `revloop_andon_stop_total{rule="sigma|weco"}` - Count of CRITICAL-level alerts
+- Standard Node.js process metrics (CPU, memory, event loop)
+
+#### Metrics Access
+
+**Local Development**:
+```bash
+# Start service with metrics enabled
+METRICS_PORT=9464 npm run dev
+
+# View metrics in Prometheus text format
+curl http://localhost:9464/metrics
+```
+
+**Production Monitoring**:
+```yaml
+# prometheus.yml scrape configuration
+scrape_configs:
+  - job_name: 'revloop-andon'
+    static_configs:
+      - targets: ['revloop-service:9464']
+    scrape_interval: 15s
+    metrics_path: /metrics
+```
+
+#### Metrics Analysis
+
+**Alert Volume Tracking**:
+- Monitor `rate(revloop_andon_attention_total[5m])` for alert frequency trends
+- Track `revloop_andon_stop_total` for critical incident counts
+- Compare sigma vs. Western Electric rule effectiveness via `rule` label
+
+**Performance Dashboards**:
+```promql
+# Alert rate by rule type
+rate(revloop_andon_attention_total[5m]) by (rule)
+
+# Critical alert frequency (daily)
+increase(revloop_andon_stop_total[1d])
+
+# False positive analysis (if manual resolution tracking available)
+revloop_andon_attention_total / (manual_resolutions + auto_resolutions)
+```
+
+#### Cardinality Management
+
+The metrics system uses **bounded labels** to prevent cardinality explosion:
+- `rule` label: Only "sigma" or "weco" values (2 cardinality)
+- No dynamic user/session/transaction IDs in labels
+- Safe for production environments with high throughput
+
+---
+
 ## Tools and Resources
 
 ### Monitoring Dashboards

@@ -6,6 +6,7 @@
  */
 
 import { startServer } from './api/server.js';
+import { startMetricsServer } from './metrics/registry.js';
 
 async function main() {
   console.log('🚀 Starting RevLoop Digital Andon service...');
@@ -13,6 +14,17 @@ async function main() {
   try {
     await startServer();
     console.log('✅ RevLoop service started successfully');
+    
+    // Start optional metrics server if METRICS_PORT is specified
+    const metricsPort = process.env.METRICS_PORT;
+    if (metricsPort) {
+      const port = parseInt(metricsPort, 10);
+      if (isNaN(port) || port <= 0 || port > 65535) {
+        console.warn(`⚠️ Invalid METRICS_PORT: ${metricsPort} - metrics disabled`);
+      } else {
+        startMetricsServer(port);
+      }
+    }
     
     // Graceful shutdown handling
     process.on('SIGTERM', () => {

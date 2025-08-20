@@ -18,6 +18,7 @@ import {
   ProcessCapability,
   SPC_CONFIG
 } from '../types/andon.js';
+import { recordAndon } from '../metrics/registry.js';
 
 /**
  * Configurable SPC thresholds with Western Electric Rules support
@@ -189,6 +190,17 @@ export class AndonMonitor {
     };
 
     this.activeAlerts.set(stage, alert);
+
+    // Record metrics for Andon events (feature-gated via METRICS_PORT)
+    if (process.env.METRICS_PORT) {
+      const rule = USE_WESTERN_ELECTRIC ? "weco" : "sigma";
+      
+      if (newState === AndonState.ATTENTION) {
+        recordAndon("attention", rule);
+      } else if (newState === AndonState.STOP) {
+        recordAndon("stop", rule);
+      }
+    }
 
     // Execute TPS response protocol based on state
     switch (newState) {
