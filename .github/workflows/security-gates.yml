@@ -1,0 +1,167 @@
+name: Security Gates
+
+on:
+  pull_request:
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/*.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - 'packages/**'
+      - '.semgrep/**'
+      - '.gitleaks.toml'
+      - '.github/workflows/security-gates.yml'
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Target URL for ZAP Baseline (required for manual run)'
+        required: false
+        type: string
+  schedule:
+    - cron: '0 6 * * 1' # Weekly, Mondays at 06:00 UTC
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  dependency_review:
+    if: github.event_name == 'pull_request'
+    name: Dependency Review (fail on High)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  sast_semgrep:
+    if: github.event_name == 'pull_request'
+    name: SAST - Semgrep
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: .semgrep/semgrep.yml
+          generateSarif: true
+          uploadSarif: never
+        env:
+          SEMGREP_ENABLE_VERSION_CHECK: '0'
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
+  secrets_gitleaks:
+    if: github.event_name == 'pull_request'
+    name: Secrets - Gitleaks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        with:
+          args: >-
+            detect --no-git --source .
+            --config=.gitleaks.toml
+            --report-format sarif --report-path gitleaks.sarif
+      - name: Upload Gitleaks SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: gitleaks.sarif
+
+  sbom_sca:
+    if: github.event_name == 'pull_request'
+    name: SBOM + SCA (Syft/Grype)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate SBOM (SPDX JSON)
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+      - name: Scan SBOM with Grype (fail on High/Critical)
+        uses: anchore/scan-action@v3
+        with:
+          sbom: sbom.spdx.json
+          fail-build: true
+          severity-cutoff: high
+          output-format: sarif
+          output-file: grype.sarif
+      - name: Upload Grype SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: grype.sarif
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-spdx
+          path: sbom.spdx.json
+
+  dast_zap:
+    name: DAST - OWASP ZAP Baseline (manual/weekly)
+    runs-on: ubuntu-latest
+    # Only run for manual dispatch or scheduled events
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Determine target URL
+        id: target
+        run: |
+          set -euo pipefail
+          TARGET="${{ github.event.inputs.target_url || '' }}"
+          if [ -z "$TARGET" ]; then
+            TARGET="${{ vars.ZAP_BASELINE_URL || '' }}"
+          fi
+          if [ -z "$TARGET" ]; then
+            echo "No ZAP target URL provided via workflow_dispatch input 'target_url' or repository variable 'ZAP_BASELINE_URL'." >&2
+            exit 1
+          fi
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          target: ${{ steps.target.outputs.target }}
+          cmd_options: '-a -j' # auth/active-esque hints + JSON output
+      - name: Convert ZAP JSON to SARIF
+        uses: jgstew/zap2sarif-action@v0.3.0
+        with:
+          inputPath: './zap-baseline.json'
+          outputPath: './zap.sarif'
+      - name: Upload ZAP SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: zap.sarif
+

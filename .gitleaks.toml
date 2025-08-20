@@ -1,13 +1,13 @@
-title = "MMTU Gitleaks Config"
-
+# Minimal allowlist to reduce noise from generated/vendor files
 [allowlist]
-description = "Test keys & known false positives"
 paths = [
-  "tests/.*",
-  ".*fixtures.*", 
-  ".*example.*"
+  "node_modules/",
+  "dist/",
+  "build/",
+  "coverage/",
+  "playwright-report/",
+  "CHANGELOG.md",
+  "**/*.lock",
+  "**/*.snap"
 ]
-regexes = [
-  '''(?i)test(_|-)?(key|token|secret)[a-z0-9_\-]{8,}''',
-  '''(?i)dummy(pass(word)?|token|secret)'''
-]
+
