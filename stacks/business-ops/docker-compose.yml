@@ -401,7 +401,7 @@ services:
     environment:
       NEXTAUTH_SECRET: ${CALCOM_NEXTAUTH_SECRET:-calcom_auth_secret_key_min_32_chars}
       CALCOM_ENCRYPTION_KEY: ${CALCOM_ENCRYPTION_KEY:-calcom_encryption_key_min_32_chars}
-      CALENDSO_ENCRYPTION_KEY: ${CALENDSO_ENCRYPTION_KEY:-calcom_encryption_key_min_32_chars}
+      CALENDSO_ENCRYPTION_KEY: ${CALENDSO_ENCRYPTION_KEY:-Jv0Y0oczIfiln+6xOTESzUDMl1GBalkSkcZRTq4fPS0=}
       DATABASE_URL: postgresql://${CALCOM_DB_USER:-calendso}:${CALCOM_DB_PASSWORD:-calcom_secret}@calcom-db:5432/${CALCOM_DB_NAME:-calendso}
       DATABASE_DIRECT_URL: postgresql://${CALCOM_DB_USER:-calendso}:${CALCOM_DB_PASSWORD:-calcom_secret}@calcom-db:5432/${CALCOM_DB_NAME:-calendso}
       NEXTAUTH_URL: ${CALCOM_NEXTAUTH_URL:-http://localhost:3000}
