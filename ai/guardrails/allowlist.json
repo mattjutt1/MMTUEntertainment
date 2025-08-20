@@ -1,0 +1,5 @@
+{
+  "tools": ["web.fetch", "file.read", "calculator.eval", "time.now"],
+  "allowedDomains": ["mmtuentertainment.com", "github.com"],
+  "maxToolCallsPerRun": 20
+}
