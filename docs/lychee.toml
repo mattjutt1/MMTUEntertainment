@@ -1,0 +1,5 @@
+exclude = ["^http://localhost", "^https://localhost", "^mailto:"]
+accept = ["200..399"]
+max-concurrency = 8
+timeout = "15s"
+user-agent = "lychee (MMTU docs bot)"

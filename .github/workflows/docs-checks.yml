@@ -1,0 +1,35 @@
+name: docs-checks
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "**/*.md"
+  workflow_dispatch: {}
+concurrency:
+  group: docs-checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  docs-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Spell check (cspell)
+        uses: streetsidesoftware/cspell-action@v6
+        with:
+          config: "cspell.json"
+          incremental_files_only: true
+      - name: Link check (lychee)
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >
+            --config docs/lychee.toml
+            --verbose
+            --no-progress
+            {docs,README.md,**/*.md}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

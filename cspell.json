@@ -1,0 +1,12 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    ".git",
+    ".github/**/yarn.lock"
+  ],
+  "words": ["Diátaxis", "Playwright", "lychee", "MMTUEntertainment"],
+  "flagWords": ["definately", "seperately"]
+}
