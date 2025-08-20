@@ -1,8 +1,33 @@
-# Default owners
-* @your-org/platform @your-org/security
+# Code Owners - MMTU Entertainment
+# Auto-assigns reviews for critical paths
 
-# Security config ownership
+# Core Revenue Products
+/products/site/                     @mattjutt1
+/apps/DriftGuard-Checks/            @mattjutt1
+/apps/marketing/                    @mattjutt1
+/apps/reports/                      @mattjutt1
+
+# Business Infrastructure
+/packages/                          @mattjutt1
+/infra/                            @mattjutt1
+
+# CI/CD & Security
+/.github/workflows/                 @mattjutt1
+/.github/actions/                   @mattjutt1
+
+# Configuration & Docs
+/docs/pivot/                        @mattjutt1
+/docs/policies/                     @mattjutt1
+/.claude/                          @mattjutt1
+/mcp-config.json                   @mattjutt1
+
+# Archive Operations (require review)
+/archive/                          @mattjutt1
+
+# Default fallback for unlisted paths
+*                                  @mattjutt1
+
+# Security config ownership (overrides fallback)
 .github/** @your-org/security
 .semgrep/** @your-org/security
 .gitleaks.toml @your-org/security
-
