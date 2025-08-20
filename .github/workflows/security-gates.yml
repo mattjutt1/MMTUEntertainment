@@ -86,7 +86,7 @@ jobs:
         if: always()
         uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3
         with:
-          sarif_file: gitleaks.sarif
+          sarif_file: results.sarif
           category: gitleaks
 
   sbom_sca:
