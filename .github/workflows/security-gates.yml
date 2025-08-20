@@ -51,7 +51,6 @@ jobs:
           fail-on-severity: moderate
           fail-on-scopes: runtime,development
           allow-licenses: MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC
-          deny-licenses: GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-1.0,AGPL-3.0
 
   sast_semgrep:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
@@ -69,7 +68,7 @@ jobs:
         run: >-
           docker run --rm -v "$PWD":/src -w /src
           returntocorp/semgrep:1
-          semgrep ci --config .semgrep/semgrep.yml --sarif --severity ERROR -o semgrep.sarif
+          semgrep ci --config=.semgrep/semgrep.yml --sarif --severity=ERROR -o semgrep.sarif
       - name: Upload Semgrep SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3
@@ -90,13 +89,9 @@ jobs:
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc # v2
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_VERSION: "8.28.0"
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
-        with:
-          args: >-
-            detect --no-git --source .
-            --config=.gitleaks.toml
-            --report-format sarif --report-path gitleaks.sarif
       - name: Upload Gitleaks SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3
