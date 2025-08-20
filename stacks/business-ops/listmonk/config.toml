@@ -30,7 +30,6 @@ allow_export = false
 allow_wipe = false
 
 # Default 'from' e-mail for campaigns.
-[smtp]
 # Multiple SMTP blocks can be added for multiple SMTP servers.
 [[smtp]]
 enabled = false
