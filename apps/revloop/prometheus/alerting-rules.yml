@@ -1,0 +1,141 @@
+# Prometheus Alerting Rules for RevLoop Andon System
+# Alerts follow P1/P2/P3 severity levels from incident response runbook
+#
+# Usage:
+#   prometheus --config.file=prometheus.yml --web.enable-lifecycle
+#   curl -X POST http://localhost:9090/-/reload
+
+groups:
+  - name: revloop_andon_alerts
+    rules:
+      # P1 CRITICAL: Any STOP event indicates revenue-affecting issue
+      - alert: RevLoopAndonStop
+        expr: sum(increase(revloop_andon_stop_total[5m])) > 0
+        for: 2m  # Sustained 2m to avoid flapping
+        labels:
+          severity: P1
+          service: revloop
+          alert_type: andon_stop
+          sla: "MTTA_15min_MTTR_1hr"
+        annotations:
+          summary: "🚨 RevLoop Andon STOP - Critical Issue Detected"
+          description: |
+            STOP events detected in last 5 minutes: {{ $value }}
+            
+            This indicates a >3σ deviation from baseline requiring immediate intervention.
+            
+            **Immediate Actions Required:**
+            • Acknowledge alert within 15 minutes (SLA)
+            • Assess revenue impact and user experience
+            • Begin root cause analysis
+            • Notify revenue team and on-call engineer
+            
+            Dashboard: http://localhost:3001/dashboard
+            Runbook: /apps/revloop/docs/incident-response-runbook.md
+          runbook_url: "https://github.com/MMTUEntertainment/revloop/blob/main/docs/incident-response-runbook.md#p1---critical-stop"
+
+      # P2 HIGH: ATTENTION surge indicates elevated drop-off rates
+      - alert: RevLoopAndonAttentionSurge
+        expr: sum(increase(revloop_andon_attention_total[10m])) by (rule) > 5
+        for: 5m  # Allow brief spikes, alert on sustained surge
+        labels:
+          severity: P2
+          service: revloop
+          alert_type: andon_attention
+          sla: "MTTA_1hr_MTTR_4hr"
+        annotations:
+          summary: "⚠️ RevLoop Andon ATTENTION Surge"
+          description: |
+            High ATTENTION event volume in last 10 minutes by rule {{ $labels.rule }}: {{ $value }}
+            
+            This indicates sustained >2σ deviations or Western Electric rule triggers.
+            
+            **Actions Required:**
+            • Enhanced monitoring for 30 minutes
+            • Review recent deployments and changes
+            • Assess for escalation to P1 if conditions worsen
+            
+            Dashboard: http://localhost:3001/dashboard
+            Alerts: http://localhost:3001/alerts
+          runbook_url: "https://github.com/MMTUEntertainment/revloop/blob/main/docs/incident-response-runbook.md#p2---high-attention"
+
+      # P1 CRITICAL: Metrics missing indicates monitoring failure
+      - alert: RevLoopAndonMetricsMissing
+        expr: absent(revloop_andon_stop_total) or absent(revloop_andon_attention_total)
+        for: 10m  # Allow brief collection gaps
+        labels:
+          severity: P1
+          service: revloop
+          alert_type: monitoring_failure
+          sla: "MTTA_15min_MTTR_1hr"
+        annotations:
+          summary: "🔍 RevLoop Andon Metrics Missing"
+          description: |
+            Andon counters not scraped for 10+ minutes.
+            
+            **Possible Causes:**
+            • RevLoop service down (METRICS_PORT not set)
+            • Prometheus scrape target misconfigured
+            • Network connectivity issues
+            • Service restart without metrics enabled
+            
+            **Immediate Actions:**
+            • Check RevLoop service health: http://localhost:3001/health
+            • Verify METRICS_PORT environment variable set
+            • Check Prometheus scrape targets status
+            • Review service logs for startup errors
+          runbook_url: "https://github.com/MMTUEntertainment/revloop/blob/main/docs/incident-response-runbook.md#tools-and-resources"
+
+      # P2 HIGH: High false positive rate (if manual resolution tracking available)
+      - alert: RevLoopAndonHighFalsePositiveRate
+        expr: |
+          (
+            sum(increase(revloop_andon_attention_total[1h])) /
+            (sum(increase(revloop_andon_attention_total[1h])) + sum(increase(revloop_andon_stop_total[1h])))
+          ) > 0.8
+        for: 30m
+        labels:
+          severity: P2
+          service: revloop
+          alert_type: quality_degradation
+        annotations:
+          summary: "📊 RevLoop Andon High False Positive Rate"
+          description: |
+            ATTENTION events comprise >80% of total alerts in last hour.
+            
+            This may indicate:
+            • SPC thresholds too sensitive (tune Z_ATTENTION/Z_STOP)
+            • Western Electric rules triggering excessively 
+            • Baseline statistical models need recalibration
+            
+            **Tuning Actions:**
+            • Review threshold configuration (Z_ATTENTION, Z_STOP)
+            • Consider disabling Western Electric rules (WE_RULES=false)
+            • Analyze baseline calculation accuracy
+          runbook_url: "https://github.com/MMTUEntertainment/revloop/blob/main/docs/incident-response-runbook.md#spc-configuration"
+
+      # P3 NORMAL: Rule imbalance detection (monitoring operational health)
+      - alert: RevLoopAndonRuleImbalance
+        expr: |
+          abs(
+            sum(increase(revloop_andon_attention_total{rule="sigma"}[4h])) -
+            sum(increase(revloop_andon_attention_total{rule="weco"}[4h]))
+          ) / 
+          sum(increase(revloop_andon_attention_total[4h])) > 0.9
+        for: 2h
+        labels:
+          severity: P3
+          service: revloop
+          alert_type: operational_insight
+        annotations:
+          summary: "🔧 RevLoop Andon Rule Detection Imbalance"
+          description: |
+            Significant imbalance between Sigma and Western Electric rule triggers over 4 hours.
+            
+            This suggests one detection method is significantly more/less sensitive.
+            Consider reviewing rule effectiveness and tuning parameters.
+            
+            **Analysis Actions:**
+            • Compare rule effectiveness metrics
+            • Review Western Electric rule configuration
+            • Analyze statistical baseline accuracy

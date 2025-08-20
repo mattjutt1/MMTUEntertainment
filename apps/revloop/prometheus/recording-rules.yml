@@ -1,0 +1,57 @@
+# Prometheus Recording Rules for RevLoop Andon Metrics
+# Pre-compute common queries for dashboard performance
+#
+# Usage:
+#   prometheus --config.file=prometheus.yml --web.enable-lifecycle
+#   curl -X POST http://localhost:9090/-/reload
+
+groups:
+  - name: revloop_andon_records
+    interval: 30s
+    rules:
+      # STOP events in last 5 minutes by rule type
+      - record: revloop:stop_5m
+        expr: sum(increase(revloop_andon_stop_total[5m])) by (rule)
+        labels:
+          service: revloop
+          metric_type: andon_event
+        
+      # ATTENTION events in last 10 minutes by rule type  
+      - record: revloop:attention_10m
+        expr: sum(increase(revloop_andon_attention_total[10m])) by (rule)
+        labels:
+          service: revloop
+          metric_type: andon_event
+          
+      # Total Andon events (combined) in last 5 minutes
+      - record: revloop:andon_events_5m
+        expr: |
+          sum(increase(revloop_andon_stop_total[5m])) by (rule) +
+          sum(increase(revloop_andon_attention_total[5m])) by (rule)
+        labels:
+          service: revloop
+          metric_type: andon_event
+          
+      # Andon event rate per minute (1 hour window)
+      - record: revloop:andon_rate_1h
+        expr: |
+          sum(rate(revloop_andon_stop_total[1h]) + rate(revloop_andon_attention_total[1h])) by (rule) * 60
+        labels:
+          service: revloop
+          metric_type: andon_rate
+          
+      # Rule effectiveness comparison (Western Electric vs Sigma)
+      - record: revloop:rule_effectiveness_5m
+        expr: |
+          (
+            sum(increase(revloop_andon_stop_total{rule="weco"}[5m])) +
+            sum(increase(revloop_andon_attention_total{rule="weco"}[5m]))
+          ) /
+          (
+            sum(increase(revloop_andon_stop_total[5m])) +
+            sum(increase(revloop_andon_attention_total[5m]))
+          )
+        labels:
+          service: revloop
+          metric_type: rule_analysis
+          rule: weco
