@@ -1,10 +1,8 @@
 version: "3.9"
 services:
-  cal:
+  calcom:
     env_file:
       - ops/env/.env.cal  # create locally from .env.cal.example
-    ports:
-      - "8082:3000"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 15s
@@ -16,9 +14,9 @@ services:
     env_file:
       - ops/env/.env.zammad  # create locally from .env.zammad.example
     ports:
-      - "8084:8080"
+      - "8086:3000"  # Direct access for development
     healthcheck:
-      test: ["CMD", "bash", "-lc", "curl -fsS http://localhost:8080 || exit 1"]
+      test: ["CMD", "bash", "-lc", "curl -fsS http://localhost:3000 || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 20
