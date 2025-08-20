@@ -1,13 +1,17 @@
+---
 name: 'Site E2E Smoke'
 
-on:
+"on":
   pull_request:
-    branches: [ main ]
-    # No workflow-level path filters. Gate at the job level to avoid Pending checks.
+    branches: [main]
+    paths:
+      - 'products/site/**'
+      - '.github/workflows/site-e2e-smoke.yml'
+      - '!archive/**'
   workflow_dispatch:
 
 concurrency:
-  group: site-e2e-smoke-${{ github.ref }}
+  group: site-e2e-smoke-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -23,8 +27,6 @@ jobs:
           filters: |
             site:
               - 'products/site/**'
-              - 'apps/revloop/**'
-              - 'packages/ledger-core/**'
               - '.github/workflows/site-e2e-smoke.yml'
               - '!archive/**'
 
@@ -56,7 +58,7 @@ jobs:
         run: pnpm test:e2e:site --project=chromium --reporter=line
         env:
           CI: true
-          
+
       - name: Test MCP Integration (Smoke)
         run: |
           if [ -f "./scripts/test-mcp-integration.sh" ]; then
@@ -69,23 +71,27 @@ jobs:
       - name: Test Revenue Loop MVP (Smoke)
         run: |
           echo "Testing Revenue Loop MVP components..."
-          
+
           # Test Double-Entry validation (fast unit tests)
           if [ -d "packages/ledger-core" ]; then
             echo "✓ Testing Double-Entry posting rules..."
             cd packages/ledger-core
-            timeout 30s pnpm test --silent --testNamePattern="valid payment transaction should pass|unbalanced transaction should fail" || echo "Ledger tests completed"
+            timeout 30s pnpm test --silent \
+              --testNamePattern="valid payment transaction should pass|unbalanced transaction should fail" \
+              || echo "Ledger tests completed"
             cd ../..
           fi
-          
+
           # Test Digital Andon monitoring (basic functionality)
           if [ -d "apps/revloop" ]; then
             echo "✓ Testing Digital Andon monitoring..."
             cd apps/revloop
-            timeout 30s pnpm test --silent --testNamePattern="should process dropoff events|should track events by stage" || echo "Andon tests completed"
+            timeout 30s pnpm test --silent \
+              --testNamePattern="should process dropoff events|should track events by stage" \
+              || echo "Andon tests completed"
             cd ../..
           fi
-          
+
           echo "Revenue Loop smoke tests completed within time budget"
 
       - name: Upload test results
@@ -101,15 +107,17 @@ jobs:
       - name: Report test summary
         if: always()
         run: |
-          echo "## 🧪 Site E2E Smoke Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Runtime Target**: ≤3 minutes" >> $GITHUB_STEP_SUMMARY
-          echo "- **Browser**: Chromium only" >> $GITHUB_STEP_SUMMARY
-          echo "- **Scope**: Critical revenue funnel paths + Revenue Loop MVP" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "- **Status**: ✅ All smoke tests passed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- **Status**: ❌ Smoke tests failed - investigate immediately" >> $GITHUB_STEP_SUMMARY
-          fi
+          {
+            echo "## 🧪 Site E2E Smoke Test Results"
+            echo "- **Runtime Target**: ≤3 minutes"
+            echo "- **Browser**: Chromium only"
+            echo "- **Scope**: Critical revenue funnel paths + Revenue Loop MVP"
+            if [ "${{ job.status }}" == "success" ]; then
+              echo "- **Status**: ✅ All smoke tests passed"
+            else
+              echo "- **Status**: ❌ Smoke tests failed - investigate immediately"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # Optional: explicit no-op job for observability on non-site PRs
   smoke-noop:
