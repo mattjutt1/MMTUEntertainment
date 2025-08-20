@@ -1,0 +1,140 @@
+# Listmonk Configuration
+# Documentation: https://listmonk.app/docs/configuration/
+
+[app]
+# Interface and port where the app will run.
+address = "0.0.0.0:9000"
+
+# Admin credentials for first-time setup
+# Change these for production deployments
+admin_username = "admin"
+admin_password = "admin123_change_me"
+
+# Database.
+[db]
+host = "listmonk-db"
+port = 5432
+user = "listmonk"
+password = "listmonk_secret"
+database = "listmonk"
+ssl_mode = "disable"
+max_open = 25
+max_idle = 25
+max_lifetime = "300s"
+
+# Privacy settings
+[privacy]
+# Allow list subscribers to export their data.
+allow_blocklist = false
+allow_export = false
+allow_wipe = false
+
+# Default 'from' e-mail for campaigns.
+[smtp]
+# Multiple SMTP blocks can be added for multiple SMTP servers.
+[[smtp]]
+enabled = false
+host = "localhost"
+port = 587
+auth_protocol = "login"
+username = ""
+password = ""
+hello_hostname = "localhost"
+max_conns = 10
+max_msg_retries = 2
+idle_timeout = "15s"
+wait_timeout = "5s"
+tls_enabled = true
+tls_skip_verify = false
+email_headers = []
+
+[smtp.from_email]
+# From address format: "Name <email@domain.com>"
+name = "Listmonk"
+email = "noreply@localhost"
+
+# Upload settings
+[upload]
+# File upload settings
+provider = "filesystem"
+filesystem_upload_path = "./uploads"
+filesystem_upload_uri = "/uploads"
+
+# S3 compatible upload settings (uncomment and configure for production)
+# [upload.s3]
+# aws_access_key_id = "your-access-key"
+# aws_secret_access_key = "your-secret-key"
+# aws_default_region = "us-east-1"
+# bucket = "your-bucket"
+# bucket_domain = "your-domain.com"
+# bucket_path = "/path/to/files"
+# bucket_type = "public"
+
+# Media and template settings
+[media]
+upload_path = "./uploads"
+upload_uri = "/uploads"
+provider = "filesystem"
+
+# Bounce processing
+[bounce]
+enabled = false
+webhooks_enabled = false
+
+# [bounce.mailbox]
+# enabled = false
+# type = "pop"
+# host = "localhost"
+# port = 995
+# username = ""
+# password = ""
+# unsub_url = ""
+# scan_interval = "15s"
+# tls_enabled = true
+# tls_skip_verify = false
+
+# Performance and security settings
+[performance]
+# Number of concurrent workers that will attempt to send messages simultaneously.
+concurrency = 5
+
+# The number of messages to pull from the queue in a single iteration.
+message_rate = 5
+
+# The number of subscriptions to pull from the DB in a single iteration.
+batch_size = 1000
+
+# Maximum sendrate per second per SMTP connection
+max_send_errors = 1000
+
+# Application security settings
+[security]
+enable_captcha = false
+captcha_key = ""
+captcha_secret = ""
+
+# Optional: Enable OpenID Connect authentication
+# [security.oidc]
+# enabled = false
+# provider_url = ""
+# client_id = ""
+# client_secret = ""
+
+# Appearance and customization
+[appearance]
+# Application logo and favicon
+admin_logo = ""
+public_logo = ""
+favicon = ""
+
+# Custom CSS
+custom_css = ""
+
+# Frontend public URL (for generating unsubscribe links etc.)
+root_url = "http://localhost:9000"
+
+# Language and localization
+lang = "en"
+
+# Optional: Enable additional languages
+# available_langs = ["en", "es", "fr", "de", "it"]

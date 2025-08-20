@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "gmail": {
+      "command": "npx",
+      "args": ["@gongrzhe/server-gmail-autoauth-mcp"],
+      "env": {
+        "GMAIL_SCOPES": "https://www.googleapis.com/auth/gmail.send,https://www.googleapis.com/auth/gmail.readonly"
+      }
+    },
+    "gdrive": {
+      "command": "npx",
+      "args": ["-y", "@isaacphi/mcp-gdrive"],
+      "env": {
+        "CLIENT_ID": "<your-google-oauth-client-id>",
+        "CLIENT_SECRET": "<your-google-oauth-client-secret>",
+        "GDRIVE_CREDS_DIR": "/home/your-username/.config/mcp-gdrive"
+      }
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["@supabase-community/supabase-mcp"],
+      "env": {
+        "SUPABASE_URL": "https://your-project.supabase.co",
+        "SUPABASE_ANON_KEY": "<your-anon-key>",
+        "SUPABASE_SERVICE_ROLE_KEY": "<your-service-role-key-read-only>"
+      }
+    }
+  },
+  "globalShortcuts": {
+    "claude.openChat": "Ctrl+Shift+C"
+  },
+  "ui": {
+    "codeEditorFontFamily": "SF Mono, Monaco, Inconsolata, 'Roboto Mono', Consolas, 'Courier New', monospace",
+    "codeEditorFontSize": 13
+  },
+  "client": {
+    "model": "claude-3-5-sonnet-20241022"
+  }
+}

@@ -1,0 +1,132 @@
+# Traefik Dynamic Configuration
+# Docs: https://doc.traefik.io/traefik/reference/dynamic-configuration/
+
+# TLS Configuration
+tls:
+  options:
+    default:
+      sslProtocols:
+        - "TLSv1.2"
+        - "TLSv1.3"
+      cipherSuites:
+        - "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
+        - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+        - "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
+        - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+        - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+        - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+    mintls13:
+      minVersion: "VersionTLS13"
+
+  # Self-signed certificate for development
+  certificates:
+    - certFile: /certs/localhost.crt
+      keyFile: /certs/localhost.key
+      stores:
+        - default
+
+# HTTP Configuration
+http:
+  # Middlewares
+  middlewares:
+    # Security headers
+    security-headers:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+          - POST
+          - DELETE
+        accessControlAllowOriginList:
+          - "https://localhost"
+          - "https://127.0.0.1"
+        accessControlMaxAge: 100
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+        referrerPolicy: "same-origin"
+        sslProxyHeaders:
+          X-Forwarded-Proto: https
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+        customResponseHeaders:
+          X-Robots-Tag: "noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+          X-Forwarded-Proto: https
+          server: ""
+
+    # Rate limiting
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 200
+        period: 1m
+        sourceCriterion:
+          ipStrategy:
+            depth: 1
+
+    # Auth middleware (basic auth for development)
+    auth:
+      basicAuth:
+        users:
+          # admin:admin (change in production)
+          - "admin:$2y$10$8I0UCvEK7LPKqj8oESgj5OzXy.Gv4MN8f8z0Y5Y5Y5Y5Y5Y5Y5Y5Y5"
+
+    # Redirect to HTTPS
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    # Compress responses
+    compress:
+      compress: {}
+
+    # CORS for API endpoints
+    cors-api:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - "*"
+        accessControlAllowOriginList:
+          - "https://localhost"
+          - "https://127.0.0.1"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: 100
+
+  # Services (for static routes or custom backends)
+  services:
+    # Health check service
+    health:
+      loadBalancer:
+        servers:
+          - url: "http://traefik:8080/ping"
+
+  # Routers (static routes)
+  routers:
+    # Traefik dashboard with auth
+    traefik-dashboard:
+      rule: "Host(`traefik.localhost`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      service: api@internal
+      entryPoints:
+        - websecure
+      middlewares:
+        - auth
+        - security-headers
+      tls:
+        certResolver: letsencrypt
+
+    # Health check endpoint
+    health-check:
+      rule: "Host(`health.localhost`)"
+      service: health
+      entryPoints:
+        - websecure
+      middlewares:
+        - security-headers
+      tls:
+        certResolver: letsencrypt

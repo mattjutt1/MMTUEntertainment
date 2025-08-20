@@ -1,0 +1,442 @@
+# Business-Ops Starter Stack
+# OSS business applications with MCP integration for Claude Code
+# 
+# Services:
+# - EspoCRM: Customer Relationship Management
+#   Docs: https://docs.espocrm.com/administration/installation/#docker
+#   Repo: https://github.com/espocrm/espocrm-docker
+# 
+# - Zammad: Helpdesk & Customer Support  
+#   Docs: https://docs.zammad.org/en/latest/install/docker-compose.html
+#   Repo: https://github.com/zammad/zammad-docker-compose
+#
+# - Documenso: Digital Document Signing
+#   Docs: https://docs.documenso.com/self-hosting/docker
+#   Repo: https://github.com/documenso/documenso
+#
+# - Listmonk: Email Newsletter & Marketing
+#   Docs: https://listmonk.app/docs/installation/#docker
+#   Repo: https://github.com/knadh/listmonk
+#
+# - Traefik: Reverse Proxy & TLS Termination
+#   Docs: https://doc.traefik.io/traefik/getting-started/quick-start/
+#
+# - Nextcloud AIO: Groupware Suite (optional profile)
+#   Docs: https://github.com/nextcloud/all-in-one#docker-compose
+#   Repo: https://github.com/nextcloud/all-in-one
+#
+# Profiles:
+# - core: EspoCRM, Zammad, Documenso, Listmonk, Traefik (default)
+# - nextcloud: Adds Nextcloud AIO
+# - minimal: Just Listmonk + Traefik for testing
+#
+# Usage:
+# COMPOSE_PROFILES=core docker compose up -d
+# COMPOSE_PROFILES=core,nextcloud docker compose up -d
+
+version: '3.8'
+
+services:
+  # Reverse Proxy & TLS Termination
+  traefik:
+    image: traefik:v3.0
+    profiles: ["core", "minimal", "nextcloud"]
+    container_name: business-ops-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./traefik/dynamic.yml:/dynamic.yml:ro
+      - ./traefik/certs:/certs:ro
+      - traefik-logs:/var/log/traefik
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.file.filename=/dynamic.yml
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-admin@localhost}
+      - --certificatesresolvers.letsencrypt.acme.storage=/certs/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+      - --log.level=INFO
+      - --accesslog=true
+    environment:
+      - TRAEFIK_API_DASHBOARD=true
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # EspoCRM - Customer Relationship Management
+  # Docs: https://docs.espocrm.com/administration/installation/#docker
+  espocrm-db:
+    image: mariadb:10.11
+    profiles: ["core"]
+    container_name: business-ops-espocrm-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ESPOCRM_DB_ROOT_PASSWORD:-espocrm_root_secret}
+      MYSQL_DATABASE: ${ESPOCRM_DB_NAME:-espocrm}
+      MYSQL_USER: ${ESPOCRM_DB_USER:-espocrm}
+      MYSQL_PASSWORD: ${ESPOCRM_DB_PASSWORD:-espocrm_secret}
+    volumes:
+      - espocrm-db-data:/var/lib/mysql
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  espocrm:
+    image: espocrm/espocrm:latest
+    profiles: ["core"]
+    container_name: business-ops-espocrm
+    restart: unless-stopped
+    environment:
+      ESPOCRM_DATABASE_HOST: espocrm-db
+      ESPOCRM_DATABASE_NAME: ${ESPOCRM_DB_NAME:-espocrm}
+      ESPOCRM_DATABASE_USER: ${ESPOCRM_DB_USER:-espocrm}
+      ESPOCRM_DATABASE_PASSWORD: ${ESPOCRM_DB_PASSWORD:-espocrm_secret}
+      ESPOCRM_ADMIN_USERNAME: ${ESPOCRM_ADMIN_USER:-admin}
+      ESPOCRM_ADMIN_PASSWORD: ${ESPOCRM_ADMIN_PASSWORD:-admin123}
+      ESPOCRM_SITE_URL: ${ESPOCRM_SITE_URL:-http://localhost:8080}
+    volumes:
+      - espocrm-data:/var/www/html
+    networks:
+      - business-ops
+    depends_on:
+      espocrm-db:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.espocrm.rule=Host(`espocrm.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.espocrm.entrypoints=websecure"
+      - "traefik.http.routers.espocrm.tls.certresolver=letsencrypt"
+      - "traefik.http.services.espocrm.loadbalancer.server.port=80"
+      - "traefik.http.routers.espocrm-http.rule=Host(`espocrm.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.espocrm-http.entrypoints=web"
+      - "traefik.http.routers.espocrm-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    ports:
+      - "8081:80"  # Direct access for development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/v1/App/user"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Zammad - Helpdesk & Customer Support
+  # Docs: https://docs.zammad.org/en/latest/install/docker-compose.html
+  zammad-db:
+    image: postgres:14-alpine
+    profiles: ["core"]
+    container_name: business-ops-zammad-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${ZAMMAD_DB_NAME:-zammad}
+      POSTGRES_USER: ${ZAMMAD_DB_USER:-zammad}
+      POSTGRES_PASSWORD: ${ZAMMAD_DB_PASSWORD:-zammad_secret}
+    volumes:
+      - zammad-db-data:/var/lib/postgresql/data
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ZAMMAD_DB_USER:-zammad}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  zammad-redis:
+    image: redis:7-alpine
+    profiles: ["core"]
+    container_name: business-ops-zammad-redis
+    restart: unless-stopped
+    volumes:
+      - zammad-redis-data:/data
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Elasticsearch disabled by default to reduce resource usage
+  # Uncomment for production deployment
+  # zammad-elasticsearch:
+  #   image: bitnami/elasticsearch:8.8.2
+  #   profiles: ["core"]
+  #   container_name: business-ops-zammad-elasticsearch  
+  #   restart: unless-stopped
+  #   environment:
+  #     - discovery.type=single-node
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - ELASTIC_PASSWORD=${ZAMMAD_ES_PASSWORD:-zammad_es_secret}
+  #   volumes:
+  #     - zammad-es-data:/bitnami/elasticsearch/data
+  #   networks:
+  #     - business-ops
+
+  zammad:
+    image: zammad/zammad-docker-compose:zammad-6.3.0-7
+    profiles: ["core"]
+    container_name: business-ops-zammad
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${ZAMMAD_DB_USER:-zammad}:${ZAMMAD_DB_PASSWORD:-zammad_secret}@zammad-db:5432/${ZAMMAD_DB_NAME:-zammad}
+      REDIS_URL: redis://zammad-redis:6379
+      # Disable Elasticsearch for reduced resource usage
+      ELASTICSEARCH_ENABLED: "false"
+      # ELASTICSEARCH_HOST: zammad-elasticsearch
+      # ELASTICSEARCH_PORT: 9200
+      # ELASTICSEARCH_USER: elastic
+      # ELASTICSEARCH_PASSWORD: ${ZAMMAD_ES_PASSWORD:-zammad_es_secret}
+      MEMCACHE_SERVERS: zammad-redis:6379
+      ZAMMAD_RAILSSERVER_HOST: zammad
+      ZAMMAD_RAILSSERVER_PORT: 3000
+      ZAMMAD_WEBSOCKET_HOST: zammad
+      ZAMMAD_WEBSOCKET_PORT: 6042
+    volumes:
+      - zammad-data:/opt/zammad/storage
+      - zammad-var:/opt/zammad/var
+    networks:
+      - business-ops
+    depends_on:
+      zammad-db:
+        condition: service_healthy
+      zammad-redis:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.zammad.rule=Host(`zammad.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.zammad.entrypoints=websecure"
+      - "traefik.http.routers.zammad.tls.certresolver=letsencrypt"
+      - "traefik.http.services.zammad.loadbalancer.server.port=3000"
+      - "traefik.http.routers.zammad-http.rule=Host(`zammad.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.zammad-http.entrypoints=web"
+      - "traefik.http.routers.zammad-http.middlewares=redirect-to-https"
+    ports:
+      - "8082:3000"  # Direct access for development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/v1/getting_started"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # Documenso - Digital Document Signing
+  # Docs: https://docs.documenso.com/self-hosting/docker
+  documenso-db:
+    image: postgres:14-alpine
+    profiles: ["core"]
+    container_name: business-ops-documenso-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DOCUMENSO_DB_NAME:-documenso}
+      POSTGRES_USER: ${DOCUMENSO_DB_USER:-documenso}
+      POSTGRES_PASSWORD: ${DOCUMENSO_DB_PASSWORD:-documenso_secret}
+    volumes:
+      - documenso-db-data:/var/lib/postgresql/data
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DOCUMENSO_DB_USER:-documenso}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  documenso:
+    image: documenso/documenso:latest
+    profiles: ["core"]
+    container_name: business-ops-documenso
+    restart: unless-stopped
+    environment:
+      NEXTAUTH_URL: ${DOCUMENSO_NEXTAUTH_URL:-http://localhost:8083}
+      NEXTAUTH_SECRET: ${DOCUMENSO_NEXTAUTH_SECRET:-documenso_auth_secret_key_min_32_chars}
+      DATABASE_URL: postgresql://${DOCUMENSO_DB_USER:-documenso}:${DOCUMENSO_DB_PASSWORD:-documenso_secret}@documenso-db:5432/${DOCUMENSO_DB_NAME:-documenso}
+      DIRECT_URL: postgresql://${DOCUMENSO_DB_USER:-documenso}:${DOCUMENSO_DB_PASSWORD:-documenso_secret}@documenso-db:5432/${DOCUMENSO_DB_NAME:-documenso}
+      SMTP_HOST: ${SMTP_HOST:-localhost}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@localhost}
+      # Self-signed certificate for development (production should use proper certs)
+      SIGNING_CERTIFICATE: ${DOCUMENSO_SIGNING_CERT:-/app/cert.p12}
+      SIGNING_CERTIFICATE_PASSWORD: ${DOCUMENSO_SIGNING_CERT_PASSWORD:-documenso}
+    volumes:
+      - documenso-data:/app/data
+      - ./traefik/certs:/app/certs:ro
+    networks:
+      - business-ops
+    depends_on:
+      documenso-db:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.documenso.rule=Host(`documenso.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.documenso.entrypoints=websecure"
+      - "traefik.http.routers.documenso.tls.certresolver=letsencrypt"
+      - "traefik.http.services.documenso.loadbalancer.server.port=3000"
+      - "traefik.http.routers.documenso-http.rule=Host(`documenso.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.documenso-http.entrypoints=web"
+      - "traefik.http.routers.documenso-http.middlewares=redirect-to-https"
+    ports:
+      - "8083:3000"  # Direct access for development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Listmonk - Email Newsletter & Marketing
+  # Docs: https://listmonk.app/docs/installation/#docker
+  listmonk-db:
+    image: postgres:14-alpine
+    profiles: ["core", "minimal"]
+    container_name: business-ops-listmonk-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${LISTMONK_DB_NAME:-listmonk}
+      POSTGRES_USER: ${LISTMONK_DB_USER:-listmonk}
+      POSTGRES_PASSWORD: ${LISTMONK_DB_PASSWORD:-listmonk_secret}
+    volumes:
+      - listmonk-db-data:/var/lib/postgresql/data
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LISTMONK_DB_USER:-listmonk}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  listmonk:
+    image: listmonk/listmonk:latest
+    profiles: ["core", "minimal"]
+    container_name: business-ops-listmonk
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./listmonk/config.toml:/listmonk/config.toml:ro
+      - listmonk-uploads:/listmonk/uploads
+    networks:
+      - business-ops
+    depends_on:
+      listmonk-db:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.listmonk.rule=Host(`listmonk.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.listmonk.entrypoints=websecure"
+      - "traefik.http.routers.listmonk.tls.certresolver=letsencrypt"
+      - "traefik.http.services.listmonk.loadbalancer.server.port=9000"
+      - "traefik.http.routers.listmonk-http.rule=Host(`listmonk.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.listmonk-http.entrypoints=web"
+      - "traefik.http.routers.listmonk-http.middlewares=redirect-to-https"
+    ports:
+      - "9000:9000"  # Direct access for development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Nextcloud AIO - Groupware Suite (Optional Profile)
+  # Docs: https://github.com/nextcloud/all-in-one#docker-compose
+  nextcloud-aio:
+    image: nextcloud/all-in-one:latest
+    profiles: ["nextcloud"]
+    container_name: business-ops-nextcloud-aio
+    restart: unless-stopped
+    environment:
+      APACHE_PORT: 11000
+      APACHE_IP_BINDING: 0.0.0.0
+      NEXTCLOUD_DATADIR: /var/lib/nextcloud/data
+      NEXTCLOUD_MOUNT: /var/lib/nextcloud
+      WATCHTOWER_DOCKER_SOCKET_PATH: /var/run/docker.sock
+    volumes:
+      - nextcloud-aio-mastercontainer:/mnt/docker-aio-config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - business-ops
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=11000"
+      - "traefik.http.routers.nextcloud-http.rule=Host(`nextcloud.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.nextcloud-http.entrypoints=web"
+      - "traefik.http.routers.nextcloud-http.middlewares=redirect-to-https"
+    ports:
+      - "8084:11000"  # AIO interface
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11000"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 120s
+
+networks:
+  business-ops:
+    driver: bridge
+    name: business-ops-network
+
+volumes:
+  # Traefik
+  traefik-logs:
+    name: business-ops-traefik-logs
+    
+  # EspoCRM
+  espocrm-db-data:
+    name: business-ops-espocrm-db-data
+  espocrm-data:
+    name: business-ops-espocrm-data
+    
+  # Zammad  
+  zammad-db-data:
+    name: business-ops-zammad-db-data
+  zammad-redis-data:
+    name: business-ops-zammad-redis-data
+  zammad-data:
+    name: business-ops-zammad-data
+  zammad-var:
+    name: business-ops-zammad-var
+  # zammad-es-data:
+  #   name: business-ops-zammad-es-data
+    
+  # Documenso
+  documenso-db-data:
+    name: business-ops-documenso-db-data
+  documenso-data:
+    name: business-ops-documenso-data
+    
+  # Listmonk
+  listmonk-db-data:
+    name: business-ops-listmonk-db-data
+  listmonk-uploads:
+    name: business-ops-listmonk-uploads
+    
+  # Nextcloud AIO
+  nextcloud-aio-mastercontainer:
+    name: business-ops-nextcloud-aio-mastercontainer

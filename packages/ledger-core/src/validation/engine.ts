@@ -49,7 +49,14 @@ export class PostingValidationEngine {
         errors.push(...accountValidation.errors);
       }
 
-      // 4. Business rule validation
+      // 4. Enhanced FX invariants validation
+      const fxValidation = this.validateFXInvariants(entries);
+      if (!fxValidation.isValid) {
+        errors.push(...fxValidation.errors);
+      }
+      warnings.push(...fxValidation.warnings);
+
+      // 5. Business rule validation
       const ruleValidation = await this.validateBusinessRules(entries);
       if (!ruleValidation.isValid) {
         errors.push(...ruleValidation.errors);
@@ -81,6 +88,81 @@ export class PostingValidationEngine {
         }
       };
     }
+  }
+
+  /**
+   * Enhanced FX invariants validation following hledger patterns
+   * Ref: https://hledger.org/currency-conversion.html
+   * Invariant 1: Amounts must sum to zero per commodity (strict hledger compliance)
+   * Invariant 2: Multi-currency conversions require equity conversion entries
+   */
+  private validateFXInvariants(entries: PostingEntry[]): { 
+    isValid: boolean; 
+    errors: string[]; 
+    warnings: string[] 
+  } {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // Group entries by currency for per-commodity validation
+    const byCommodity = this.groupByCommodity(entries);
+    
+    // Invariant 1: Each commodity must sum to exactly zero (hledger compliance)
+    for (const [currency, commodityEntries] of byCommodity) {
+      const sum = commodityEntries.reduce((total, entry) => {
+        return total + this.calculateBalanceChange(entry);
+      }, 0);
+      
+      if (Math.abs(sum) > 0.001) { // Strict tolerance for FX
+        errors.push(
+          `FX Invariant violation: ${currency} amounts do not sum to zero ` +
+          `(difference: ${sum.toFixed(4)}) - hledger compliance required`
+        );
+      }
+    }
+
+    // Invariant 2: Multi-currency transactions should have equity conversions
+    if (byCommodity.size > 1 && !this.hasEquityConversion(entries)) {
+      warnings.push(
+        'Multi-currency transaction without equity conversion entry - ' +
+        'consider hledger pattern: https://hledger.org/currency-conversion.html'
+      );
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings
+    };
+  }
+
+  /**
+   * Group posting entries by currency/commodity
+   */
+  private groupByCommodity(entries: PostingEntry[]): Map<string, PostingEntry[]> {
+    const groups = new Map<string, PostingEntry[]>();
+    
+    for (const entry of entries) {
+      const currency = entry.currency || 'USD';
+      const existing = groups.get(currency) || [];
+      existing.push(entry);
+      groups.set(currency, existing);
+    }
+    
+    return groups;
+  }
+
+  /**
+   * Check if transaction includes equity conversion entries (FX best practice)
+   */
+  private hasEquityConversion(entries: PostingEntry[]): boolean {
+    return entries.some(entry => 
+      entry.accountType === AccountType.EQUITY && 
+      (entry.description?.toLowerCase().includes('conversion') ||
+       entry.description?.toLowerCase().includes('forex') ||
+       entry.description?.toLowerCase().includes('exchange') ||
+       entry.accountCode.startsWith('3200')) // Standard FX equity account range
+    );
   }
 
   /**

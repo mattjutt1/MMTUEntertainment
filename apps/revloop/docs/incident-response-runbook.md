@@ -11,9 +11,14 @@ This runbook provides step-by-step procedures for responding to Digital Andon al
 ## Alert Severity Levels
 
 ### 🔴 P1 - CRITICAL (STOP)
-**SLA**: Response 15min, Resolution 1hr  
-**Threshold**: >3σ deviation from baseline  
+**SLA**: MTTA 15min, MTTR 1hr  
+**Threshold**: >3σ deviation from baseline (configurable via `Z_STOP`)  
 **Impact**: Revenue-affecting outage
+
+**MTTA/MTTR Targets**:
+- **Mean Time to Acknowledge (MTTA)**: 15 minutes
+- **Mean Time to Repair (MTTR)**: 1 hour
+- **Escalation**: Auto-escalate if MTTA exceeded
 
 **Immediate Actions**:
 1. **STOP** - Acknowledge alert within 15 minutes
@@ -22,9 +27,14 @@ This runbook provides step-by-step procedures for responding to Digital Andon al
 4. **INVESTIGATE** - Begin root cause analysis
 
 ### 🟡 P2 - HIGH (ATTENTION)  
-**SLA**: Response 1hr, Resolution 4hr  
-**Threshold**: >2σ deviation from baseline  
-**Impact**: Elevated drop-off rates
+**SLA**: MTTA 1hr, MTTR 4hr  
+**Threshold**: >2σ deviation from baseline (configurable via `Z_ATTENTION`)  
+**Impact**: Elevated drop-off rates, Western Electric rules triggered
+
+**MTTA/MTTR Targets**:
+- **Mean Time to Acknowledge (MTTA)**: 1 hour
+- **Mean Time to Repair (MTTR)**: 4 hours
+- **Escalation**: Escalate to P1 if MTTR exceeded or conditions worsen
 
 **Immediate Actions**:
 1. **MONITOR** - Enhanced observation for 30 minutes
@@ -33,9 +43,14 @@ This runbook provides step-by-step procedures for responding to Digital Andon al
 4. **DOCUMENT** - Log findings for trend analysis
 
 ### 🟢 P3 - NORMAL
-**SLA**: Standard monitoring  
+**SLA**: MTTA 4hr, MTTR 24hr  
 **Threshold**: <2σ from baseline  
-**Impact**: Normal operations
+**Impact**: Normal operations, routine optimization opportunities
+
+**MTTA/MTTR Targets**:
+- **Mean Time to Acknowledge (MTTA)**: 4 hours (non-urgent)
+- **Mean Time to Repair (MTTR)**: 24 hours (next business day)
+- **Escalation**: Review in weekly operational meetings
 
 **Actions**:
 1. **CONTINUE** - Standard monitoring procedures
@@ -302,6 +317,50 @@ IMPROVEMENTS: [Process/system enhancements made]
 
 ---
 
+## SPC Configuration
+
+### Environment Variables
+Configure Statistical Process Control thresholds via environment variables:
+
+```bash
+# SPC Threshold Configuration
+export Z_ATTENTION="2.0"    # Sigma level for attention alerts (default: 2.0)
+export Z_STOP="3.0"         # Sigma level for critical alerts (default: 3.0)
+export WE_RULES="true"      # Enable Western Electric rules (default: true)
+```
+
+### Western Electric Rules
+When enabled (`WE_RULES=true`), the system applies enhanced sensitivity rules:
+
+- **Rule 2**: 2 out of 3 consecutive points beyond 2σ from centerline
+- **Early Detection**: Triggers P2 alerts before reaching `Z_ATTENTION` threshold
+- **Production Tuning**: Can be disabled in high-noise environments
+
+### Configuration Examples
+
+**High Sensitivity (Development)**:
+```bash
+Z_ATTENTION="1.5"  # Lower threshold for development
+Z_STOP="2.5"       # Lower critical threshold
+WE_RULES="true"    # Enable early detection
+```
+
+**Standard Production**:
+```bash
+Z_ATTENTION="2.0"  # Standard 2-sigma attention
+Z_STOP="3.0"       # Standard 3-sigma critical
+WE_RULES="true"    # Balanced sensitivity
+```
+
+**Low Noise (High Traffic)**:
+```bash
+Z_ATTENTION="2.5"  # Higher threshold for noisy data
+Z_STOP="3.5"       # Higher critical threshold
+WE_RULES="false"   # Disable for high-traffic periods
+```
+
+---
+
 ## Tools and Resources
 
 ### Monitoring Dashboards
@@ -330,10 +389,18 @@ IMPROVEMENTS: [Process/system enhancements made]
 | P2 High | 1 hour | 4 hours | 30 minutes |
 | P3 Normal | 4 hours | 24 hours | Daily summary |
 
-### Statistical Thresholds
+### Statistical Thresholds (Configurable)
 - **Normal**: <2σ from baseline
-- **Attention**: 2σ to 3σ from baseline  
-- **Critical**: >3σ from baseline
+- **Attention**: ≥2σ from baseline (env: `Z_ATTENTION`, default: 2.0)
+- **Critical**: ≥3σ from baseline (env: `Z_STOP`, default: 3.0)
+- **Western Electric**: 2 of 3 points beyond 2σ (env: `WE_RULES`, default: true)
+
+### MTTA/MTTR Performance Targets
+| Severity | MTTA Target | MTTR Target | Escalation Trigger |
+|----------|-------------|-------------|-------------------|
+| P1 Critical | 15 minutes | 1 hour | Auto if MTTA exceeded |
+| P2 High | 1 hour | 4 hours | Manual if MTTR exceeded |
+| P3 Normal | 4 hours | 24 hours | Weekly review cycle |
 
 ### Revenue Impact Calculation
 ```

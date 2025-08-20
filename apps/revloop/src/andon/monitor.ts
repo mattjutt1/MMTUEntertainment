@@ -19,11 +19,30 @@ import {
   SPC_CONFIG
 } from '../types/andon.js';
 
+/**
+ * Configurable SPC thresholds with Western Electric Rules support
+ * Environment variables provide production-tunable parameters
+ */
+export const ATTENTION_Z = parseFloat(process.env.Z_ATTENTION ?? '2.0');
+export const STOP_Z = parseFloat(process.env.Z_STOP ?? '3.0');
+export const USE_WESTERN_ELECTRIC = process.env.WE_RULES === 'true' || process.env.WE_RULES === undefined;
+
+/**
+ * Western Electric Rules for enhanced SPC sensitivity
+ * Optional rules that can trigger alerts before sigma thresholds
+ */
+interface WesternElectricState {
+  recent2Sigma: number[];  // Track recent 2σ violations
+  recent1Sigma: number[];  // Track recent 1σ violations
+  trendPoints: number[];   // Track increasing/decreasing trends
+}
+
 export class AndonMonitor {
   private config: MonitoringConfig;
   private activeAlerts: Map<string, AndonAlert> = new Map();
   private historicalData: DropoffEvent[] = [];
   private baselineMetrics: Map<string, StatisticalMetrics> = new Map();
+  private westernElectricState: Map<string, WesternElectricState> = new Map();
 
   constructor(config: MonitoringConfig) {
     this.config = config;
@@ -74,8 +93,8 @@ export class AndonMonitor {
     // Calculate sigma level (how many standard deviations from mean)
     const sigmaLevel = Math.abs(currentDropoffRate - baseline.mean) / baseline.standardDeviation;
 
-    // Determine Andon state based on sigma level
-    const newState = this.determineAndonState(sigmaLevel);
+    // Determine Andon state based on sigma level (pass stage for Western Electric rules)
+    const newState = this.determineAndonState(sigmaLevel, stage);
     const existingAlert = this.activeAlerts.get(stage);
 
     // Only create/update alert if state changed or escalated
@@ -92,15 +111,61 @@ export class AndonMonitor {
 
   /**
    * Determine Andon state based on sigma level (TPS quality gates)
+   * Uses configurable thresholds and optional Western Electric rules
    */
-  private determineAndonState(sigmaLevel: number): AndonState {
-    if (sigmaLevel >= this.config.alertThresholds.stop) {
+  private determineAndonState(sigmaLevel: number, stage?: string): AndonState {
+    // Use configurable thresholds instead of config values
+    if (sigmaLevel >= STOP_Z) {
       return AndonState.STOP;
-    } else if (sigmaLevel >= this.config.alertThresholds.attention) {
+    } else if (sigmaLevel >= ATTENTION_Z) {
       return AndonState.ATTENTION;
-    } else {
-      return AndonState.NORMAL;
     }
+    
+    // Check Western Electric rules for early detection (if enabled and stage provided)
+    if (USE_WESTERN_ELECTRIC && stage && this.checkWesternElectricRules(stage, sigmaLevel)) {
+      return AndonState.ATTENTION;
+    }
+    
+    return AndonState.NORMAL;
+  }
+  
+  /**
+   * Western Electric Rules implementation for enhanced SPC sensitivity
+   * Rule 2: 2 out of 3 consecutive points beyond 2σ from centerline
+   */
+  private checkWesternElectricRules(stage: string, currentSigma: number): boolean {
+    if (!this.westernElectricState.has(stage)) {
+      this.westernElectricState.set(stage, {
+        recent2Sigma: [],
+        recent1Sigma: [],
+        trendPoints: []
+      });
+    }
+    
+    const state = this.westernElectricState.get(stage)!;
+    
+    // Track 2σ violations for Rule 2
+    if (currentSigma >= 2.0) {
+      state.recent2Sigma.push(currentSigma);
+    } else {
+      state.recent2Sigma.push(0); // Non-violation
+    }
+    
+    // Keep only last 3 points
+    if (state.recent2Sigma.length > 3) {
+      state.recent2Sigma.shift();
+    }
+    
+    // Rule 2: 2 out of 3 consecutive points beyond 2σ
+    if (state.recent2Sigma.length === 3) {
+      const violationCount = state.recent2Sigma.filter(sigma => sigma >= 2.0).length;
+      if (violationCount >= 2) {
+        console.log(`Western Electric Rule 2 triggered for ${stage}: 2 of 3 points beyond 2σ`);
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   /**
