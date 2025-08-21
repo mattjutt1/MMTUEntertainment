@@ -29,7 +29,9 @@
     "XOXP", "xoxp", "notionhq", "gongrzhe", "autoauth", "isaacphi", 
     "gdrive", "GDRIVE", "curations", "pasteable", "Faircode", "yourco",
     "Luca", "Pacioli", "Pacioli's", "Sakichi", "Kiichiro", "Shewhart",
-    "Eliyahu", "Goldratt", "Kaplan"
+    "Eliyahu", "Goldratt", "Kaplan", "Drucker's", "Doerr", "kpis",
+    "Investopedia", "Axelos", "Synder", "Leapsome", "Diátaxis",
+    "CALENDSO", "NEXTAUTH", "tulpn", "isready", "Mbps", "calcom"
   ],
   "ignorePaths": [
     "node_modules/**",
