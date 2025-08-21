@@ -1,5 +1,4 @@
 title = "MMTU Gitleaks Config"
-# Updated to support CI workflow requirements
 
 # Allowlist for test secrets and generated files
 [allowlist]
