@@ -35,6 +35,8 @@ rules:
     languages: [javascript, typescript]
     severity: WARNING
     patterns:
-      - pattern: "'http://'+..."
-      - pattern: '"http://"+...'
-      - pattern-regex: "http://[^\\s\"']+"
+      - pattern: |
+          "http://" + ...
+      - pattern: |
+          'http://' + ...
+      - pattern-regex: 'http://[^\s"'']+'
