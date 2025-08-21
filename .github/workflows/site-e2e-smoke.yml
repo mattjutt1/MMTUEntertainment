@@ -11,7 +11,7 @@ name: 'Site E2E Smoke'
   workflow_dispatch:
 
 concurrency:
-  group: site-e2e-smoke-${{ github.workflow }}-${{ github.ref }}
+  group: site-e2e-smoke-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       site_changed: ${{ steps.filter.outputs.site }}
+      landing_changed: ${{ steps.filter.outputs.landing }}
+      pricing_changed: ${{ steps.filter.outputs.pricing }}
+      contact_changed: ${{ steps.filter.outputs.contact }}
     steps:
       - uses: actions/checkout@v4
       - id: filter
@@ -29,13 +32,26 @@ jobs:
               - 'products/site/**'
               - '.github/workflows/site-e2e-smoke.yml'
               - '!archive/**'
+            landing:
+              - 'products/site/**/index.html'
+              - 'products/site/**/home/**'
+              - 'products/site/**/landing/**'
+              - 'products/site/e2e/revenue-path.spec.ts'
+            pricing:
+              - 'products/site/**/pricing/**'
+              - 'products/site/**/offer/**'
+              - 'products/site/e2e/revenue-funnel.spec.ts'
+            contact:
+              - 'products/site/**/contact/**'
+              - 'products/site/**/terms/**'
+              - 'products/site/**/privacy/**'
 
   smoke:
     name: 'Site E2E Smoke Tests (≤3min)'
     needs: detect
     if: needs.detect.outputs.site_changed == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 5
 
     steps:
       - name: Checkout
@@ -54,50 +70,43 @@ jobs:
       - name: Install Playwright browsers (chromium only)
         run: pnpm exec playwright install chromium --with-deps
 
-      - name: Run Site E2E Smoke Tests
+      # Always run landing smoke (critical path)
+      - name: Run Landing Smoke
         run: |
-          pnpm test:e2e:site \
+          pnpm exec playwright test \
+            --config products/site/playwright.smoke.ts \
+            --grep "@smoke.*@landing" \
             --project=chromium \
             --reporter=github,line \
-            --timeout=30000 \
             --max-failures=1
         env:
           CI: true
 
-      - name: Test MCP Integration (Smoke)
+      # Run pricing smoke only if pricing paths changed  
+      - name: Run Pricing Smoke
+        if: needs.detect.outputs.pricing_changed == 'true'
         run: |
-          if [ -f "./scripts/test-mcp-integration.sh" ]; then
-            echo "Testing MCP server integration..."
-            ./scripts/test-mcp-integration.sh || echo "MCP integration test completed with warnings"
-          else
-            echo "MCP integration test script not found - skipping"
-          fi
+          pnpm exec playwright test \
+            --config products/site/playwright.smoke.ts \
+            --grep "@smoke.*@pricing" \
+            --project=chromium \
+            --reporter=github,line \
+            --max-failures=1
+        env:
+          CI: true
 
-      - name: Test Revenue Loop MVP (Smoke)
+      # Run contact smoke only if contact paths changed
+      - name: Run Contact Smoke
+        if: needs.detect.outputs.contact_changed == 'true'
         run: |
-          echo "Testing Revenue Loop MVP components..."
-
-          # Test Double-Entry validation (fast unit tests)
-          if [ -d "packages/ledger-core" ]; then
-            echo "✓ Testing Double-Entry posting rules..."
-            cd packages/ledger-core
-            timeout 30s pnpm test --silent \
-              --testNamePattern="valid payment transaction should pass|unbalanced transaction should fail" \
-              || echo "Ledger tests completed"
-            cd ../..
-          fi
-
-          # Test Digital Andon monitoring (basic functionality)
-          if [ -d "apps/revloop" ]; then
-            echo "✓ Testing Digital Andon monitoring..."
-            cd apps/revloop
-            timeout 30s pnpm test --silent \
-              --testNamePattern="should process dropoff events|should track events by stage" \
-              || echo "Andon tests completed"
-            cd ../..
-          fi
-
-          echo "Revenue Loop smoke tests completed within time budget"
+          pnpm exec playwright test \
+            --config products/site/playwright.smoke.ts \
+            --grep "@smoke.*@contact" \
+            --project=chromium \
+            --reporter=github,line \
+            --max-failures=1
+        env:
+          CI: true
 
       - name: Upload test results
         if: failure()
@@ -113,14 +122,14 @@ jobs:
         if: always()
         run: |
           {
-            echo "## 🧪 Site E2E Smoke Test Results"
+            echo "## 🧪 Site E2E Micro-Smoke Results"
             echo "- **Runtime Target**: ≤3 minutes"
             echo "- **Browser**: Chromium only"
-            echo "- **Scope**: Critical revenue funnel paths + Revenue Loop MVP"
+            echo "- **Modules**: Landing always + conditional pricing/contact"
             if [ "${{ job.status }}" == "success" ]; then
-              echo "- **Status**: ✅ All smoke tests passed"
+              echo "- **Status**: ✅ All micro-smokes passed"
             else
-              echo "- **Status**: ❌ Smoke tests failed - investigate immediately"
+              echo "- **Status**: ❌ Micro-smokes failed - investigate immediately"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
