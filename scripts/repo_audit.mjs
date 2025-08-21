@@ -17,17 +17,12 @@ const BASE_ARTIFACTS = [
 
 // Additional artifacts for main/production branches
 const FULL_ARTIFACTS = [
-  'docs/pricing-catalog.v2.json',
-  'apps/reports/src/components/PricingTiers.tsx',
-  'apps/stream-overlay-studio/package.json'
+  'docs/pricing-catalog.v2.json'
 ];
 
+// Only apps/revloop is tracked in git, others are gitignored
 const EXPECTED_APPS = [
-  'apps/comparison-matrix',
-  'apps/probot-app', 
-  'apps/reports',
-  'apps/stream-overlay-studio',
-  'apps/web-toy-mvp'
+  'apps/revloop'
 ];
 
 function executeCommand(command) {
