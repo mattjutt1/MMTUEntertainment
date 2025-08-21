@@ -81,7 +81,7 @@ jobs:
           BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
           git fetch --depth=1 origin "$BASE_REF":"refs/remotes/origin/$BASE_REF"
-          echo "SEMGREP_BASELINE_COMMIT=$(git merge-base HEAD origin/$BASE_REF)" >> $GITHUB_ENV
+          echo "SEMGREP_BASELINE_COMMIT=$(git merge-base HEAD "origin/$BASE_REF")" >> "$GITHUB_ENV"
           git rev-parse --abbrev-ref HEAD; git rev-parse --short HEAD; echo "$SEMGREP_BASELINE_COMMIT"
       
       - name: Run Semgrep full scan (non-blocking) → SARIF
@@ -113,7 +113,7 @@ jobs:
           BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
           git fetch --depth=1 origin "$BASE_REF":"refs/remotes/origin/$BASE_REF"
-          echo "BASELINE=$(git merge-base HEAD origin/$BASE_REF)" >> $GITHUB_ENV
+          echo "BASELINE=$(git merge-base HEAD "origin/$BASE_REF")" >> "$GITHUB_ENV"
           echo "Baseline is $BASELINE"
       
       - name: Run Semgrep blocking gate (High/Critical delta)
