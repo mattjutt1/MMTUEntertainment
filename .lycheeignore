@@ -17,3 +17,20 @@ docs/scripts/test-mcp-integration.sh
 apps/revloop/docs/
 growth/outreach/TODO_
 postgresql:/
+
+# Missing external URLs and placeholders
+https://docs.documenso.com/self-hosting/docker
+https://github.com/gongrzhe/server-gmail-autoauth-mcp
+https://supabase.com/docs/guides/ai/mcp
+https://pr-123.mmtu-marketing.pages.dev/
+https://a1b2c3d4.mmtu-marketing.pages.dev/
+https://mmtu-marketing.pages.dev/
+https://github.com/\[org\]/\[repo\]/actions/workflows/stack-health-check.yml
+https://github.com/mattjutt1/MMTUEntertainment/blob/main/legal/PRIVACY.md
+https://github.com/mattjutt1/MMTUEntertainment/tree/main/apps/DriftGuard-Checks
+https://github.com/mattjutt1/MMTUEntertainment/blob/main/legal/TERMS.md
+https://app.hubspot.com/settings/integrations/private-apps
+^https://www\.mmtuentertainment\.com/
+^http://www\.mmtuentertainment\.com/
+^https://mmtuentertainment\.com/
+^http://mmtuentertainment\.com/
