@@ -66,7 +66,7 @@ jobs:
           
       - name: Install dependencies
         run: |
-          npm install -g jq
+          # jq is already available in GitHub Actions Ubuntu runners
           
       - name: Run repository audit
         run: |
@@ -100,7 +100,7 @@ jobs:
           
       - name: Fail if critical issues found
         run: |
-          CRITICAL_FAILURES=$(jq -r '.summary.critical_failures' audit-report.json)
+          CRITICAL_FAILURES=$(/usr/bin/jq -r '.summary.critical_failures' audit-report.json)
           if [ "$CRITICAL_FAILURES" != "0" ]; then
             echo "❌ Critical audit failures detected: $CRITICAL_FAILURES"
             exit 1
