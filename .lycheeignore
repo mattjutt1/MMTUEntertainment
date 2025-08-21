@@ -6,6 +6,8 @@
 ^http://127\.0\.0\.1(:\d+)?/
 # Example: temporary preview domains (comment why & expiry)
 # ^https://preview\.example\.com/
+^https://www\.mmtu\.com/
+^https://staging\.mmtu\.com/
 
 # Missing scripts and files (placeholder URLs)
 ^file:///work/docs/scripts/
