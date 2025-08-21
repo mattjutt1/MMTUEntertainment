@@ -1,0 +1,58 @@
+name: Docs Checks
+
+on:
+  pull_request:
+    paths:
+      - "**/*.md"
+      - "docs/**"
+      - ".lycheeignore"
+      - ".lychee.toml"
+      - ".github/workflows/docs-checks.yml"
+  merge_group:
+    paths:
+      - "**/*.md"
+      - "docs/**"
+      - ".lycheeignore"
+      - ".lychee.toml"
+      - ".github/workflows/docs-checks.yml"
+
+concurrency:
+  group: docs-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-ci:  # keep this name stable; it's required in branch protection
+    name: docs-ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # optional if you plan to auto-open issues on failures
+      # issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
+        with:
+          node-version: '20'
+      
+      - name: Install cspell
+        run: npm install -g cspell@7.2.0
+      
+      - name: Spell check
+        run: cspell "**/*.md" --no-progress --show-suggestions --gitignore
+      
+      - name: Link check
+        uses: lycheeverse/lychee-action@7da8ec1fc4e01b5a12062ac6c589c10a4ce70d67 # v1.10.0
+        with:
+          args: --verbose --no-progress --config .lychee.toml --exclude-file .lycheeignore "**/*.md"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # helps with github.com rate limits
+      
+      - name: Upload lychee report (artifact)
+        if: failure()
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        with:
+          name: lychee-report
+          path: lychee/out.md
