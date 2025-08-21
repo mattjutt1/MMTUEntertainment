@@ -7,7 +7,11 @@
 # Example: temporary preview domains (comment why & expiry)
 # ^https://preview\.example\.com/
 
-# Missing scripts (placeholder URLs)
+# Missing scripts and files (placeholder URLs)
 ^file:///work/docs/scripts/
 ^file:///work/docs/mcp/postgresql:
 ^file:///work/docs/pivot/postgresql:
+docs/scripts/test-mcp-integration.sh
+apps/revloop/docs/
+growth/outreach/TODO_
+postgresql:/
