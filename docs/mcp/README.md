@@ -46,7 +46,7 @@ The MCP (Model Context Protocol) integration enables direct access to:
 3. Add to `.env.mcp`: `POSTHOG_API_KEY=your_key_here`
 
 ### HubSpot Setup
-1. Go to https://app.hubspot.com/settings/integrations/private-apps
+1. Go to https://developers.hubspot.com/docs/api/private-apps
 2. Create a new private app with scopes: contacts, companies, deals, tickets (read/write)
 3. Copy the private app token
 4. Add to `.env.mcp`: `HUBSPOT_PRIVATE_APP_TOKEN=your_token_here`

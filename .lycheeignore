@@ -6,3 +6,8 @@
 ^http://127\.0\.0\.1(:\d+)?/
 # Example: temporary preview domains (comment why & expiry)
 # ^https://preview\.example\.com/
+
+# Missing scripts (placeholder URLs)
+^file:///work/docs/scripts/
+^file:///work/docs/mcp/postgresql:
+^file:///work/docs/pivot/postgresql:

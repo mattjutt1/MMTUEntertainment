@@ -31,7 +31,8 @@
     "Luca", "Pacioli", "Pacioli's", "Sakichi", "Kiichiro", "Shewhart",
     "Eliyahu", "Goldratt", "Kaplan", "Drucker's", "Doerr", "kpis",
     "Investopedia", "Axelos", "Synder", "Leapsome", "Diátaxis",
-    "CALENDSO", "NEXTAUTH", "tulpn", "isready", "Mbps", "calcom"
+    "CALENDSO", "NEXTAUTH", "tulpn", "isready", "Mbps", "calcom",
+    "SSDF", "Syft"
   ],
   "ignorePaths": [
     "node_modules/**",
