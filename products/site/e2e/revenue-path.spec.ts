@@ -10,9 +10,9 @@ const fixturesPath = isLiveMode
 
 const testConfig = JSON.parse(fs.readFileSync(fixturesPath, 'utf8'));
 
-test.describe('Revenue Path E2E Tests', () => {
+test.describe('Revenue Path E2E Tests @smoke @landing', () => {
   
-  test('Home page loads with offers visible', async ({ page }) => {
+  test('Home page loads with offers visible @smoke @landing', async ({ page }) => {
     await page.goto('/');
     
     // Check page loads successfully
@@ -105,7 +105,7 @@ test.describe('Revenue Path E2E Tests', () => {
     await expect(page.locator('text=Free Updates')).toBeVisible();
   });
 
-  test('Contact page has working email links', async ({ page }) => {
+  test('Contact page has working email links @smoke @contact', async ({ page }) => {
     await page.goto('/contact');
     
     // Check page loads
