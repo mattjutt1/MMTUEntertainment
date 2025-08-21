@@ -52,6 +52,6 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - run: pnpm i --frozen-lockfile
-      - run: pnpm dlx playwright install --with-deps chromium
+      - run: pnpm dlx playwright install --with-deps chromium || pnpm dlx playwright install chromium
       - run: pnpm exec playwright test -c products/site/playwright.config.ts -g "billing smoke" --project=chromium --reporter=line
 
