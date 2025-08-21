@@ -1,0 +1,538 @@
+Here’s what we should do now with the data — and exactly what to tell Claude (Sonnet) to execute.
+
+5-bullet summary
+
+Turn your shortlist into a runnable starter stack (CRM, helpdesk, e-sign, email) + MCP configs Claude can use.
+
+Add a compose file, runbook, license guard, and MCP config examples behind a PR.
+
+Keep it light: Docker-based apps with clear upstream docs (EspoCRM, Zammad, Documenso, Listmonk, optional Nextcloud AIO). 
+docs.espocrm.com
+docs.zammad.org
+GitHub
++2
+GitHub
++2
+
+Wire Claude to your tools via MCP and include example Claude Desktop/Code settings for Gmail/Drive/Supabase. 
+Anthropic
++1
+GitHub
++1
+Model Context Protocol
+
+Add a tiny CI gate to validate compose and a script to flag non-OSI licenses so docs don’t drift.
+
+Next actions (you + me)
+
+Send Claude (Sonnet) the handoff below to create a branch, add files, and open a PR.
+
+When the PR opens, we verify the services boot and MCP configs work; if green, merge.
+
+Pick 1–2 workflows (e.g., “support email → Zammad ticket → Documenso sign → EspoCRM deal”) and demo.
+
+Handoff to Claude (Sonnet 4) — “execute mode”
+
+Use Sonnet 4 for this (no Opus needed). Paste as one message.
+
+Goal
+Create a minimal, founder-friendly Business-Ops Starter Stack (Docker) and MCP examples; open a PR with docs + scripts.
+
+Constraints
+
+Do not change existing CI gates.
+
+Keep everything additive.
+
+Use images with clear upstream docs (links inline in files).
+
+Default to local dev; no real secrets committed.
+
+Create on branch stack/oss-business-ops-20250819
+
+1) Compose file stacks/business-ops/docker-compose.yml
+Services (all optional via profiles):
+
+espocrm (CRM), zammad (helpdesk), documenso (e-sign), listmonk + listmonk-db (email, Postgres), traefik (reverse proxy, optional).
+
+Volumes, healthchecks, .env.example, and comments with upstream docs:
+
+EspoCRM Docker install (official). 
+GitHub
+docs.espocrm.com
+
+Zammad docker-compose (official). 
+docs.zammad.org
+GitHub
+
+Documenso compose install (repo). 
+GitHub
+
+Listmonk docker/compose (docs). 
+listmonk.app
+
+Nextcloud AIO (commented “optional profile”). 
+GitHub
+
+2) MCP examples
+Add docs/mcp/examples/claude-desktop.json with example entries for:
+
+Gmail MCP (@gongrzhe/server-gmail-autoauth-mcp) with note on OAuth scopes; link repo. 
+GitHub
+npm
+
+Google Drive MCP (isaacphi/mcp-gdrive) with note on Drive scopes. 
+mcp-get.com
+
+Supabase MCP (supabase-community) with read_only reminder. 
+GitHub
+Supabase
+
+Also add docs/mcp/README.md linking Claude Code MCP setup & settings pages. 
+Anthropic
++1
+
+3) Runbook docs/runbooks/business-ops-stack.md
+
+Ports, first-run URLs, default admin setup checklists.
+
+“What good looks like” smoke: each container healthy + UI reachable (EspoCRM wizard, Zammad welcome, Documenso UI, Listmonk dashboard).
+
+Security notes: enforce HTTPS behind proxy; least-priv DB users; OAuth scopes minimal. (Reference upstream docs above.)
+
+4) License guard scripts/verify-licenses.sh
+
+Grep the docs table for SA (source-available) flags; fail CI if SA entries aren’t labeled.
+
+Document exceptions if any.
+
+5) Update your OSS table docs/OSS-First Business Builder Stack.md
+
+Add Cal.com (Scheduling, AGPL core, open-core note). 
+GitHub
+Cal
+
+Add Listmonk row (if not already) with docker/compose snippet + AGPL. 
+GitHub
+listmonk.app
+
+For Nextcloud, reference AIO one-liner; for Dolibarr, link the official docker repo. 
+Nextcloud
+GitHub
+
+6) CI (non-blocking) .github/workflows/compose-validate.yml
+
+Job-level gated with dorny/paths-filter to run only on changes under stacks/business-ops/**.
+
+Steps: docker compose -f stacks/business-ops/docker-compose.yml config -q and bash scripts/verify-licenses.sh.
+
+Commit & PR
+
+Conventional commits; PR title: feat(stack): business-ops starter + mcp examples (docs-only)
+
+PR body must include: services, ports, upstream links, and the smoke checklist.
+
+Test/Run
+
+docker compose -f stacks/business-ops/docker-compose.yml --profile core up -d
+
+Verify healthchecks & UIs open; paste outputs and screenshots to PR.
+
+Done criteria
+
+All containers healthy; UIs reachable; runbook checkboxes ticked.
+
+MCP config tested in Claude Desktop (list tools from each server).
+
+Rollback
+
+docker compose down -v to stop/clean; revert branch PR.
+
+Why these picks (anchors)
+
+Claude ↔ tools via MCP (official docs + examples). 
+Anthropic
+Model Context Protocol
+
+EspoCRM official Docker docs; Zammad docker-compose; Documenso OSS e-sign; Listmonk single-binary/compose; Nextcloud AIO for simple groupware. 
+docs.espocrm.com
+GitHub
++2
+GitHub
++2
+listmonk.app
+
+Gmail MCP auto-auth; Supabase MCP first-party; Drive MCP community; all active and documented. 
+GitHub
++1
+Supabase
+mcp-get.com
+
+ROI, Risk, Rollback
+
+ROI: day-1 capabilities (leads, tickets, signatures, newsletter) + Claude automations in a single PR.
+
+Risk: mis-scoped OAuth/DB permissions; mitigate with least privilege and HTTPS (runbook).
+
+Rollback: purely additive; stop containers + close PR.
+
+5-bullet summary
+
+Scope: Bring stack up locally via Docker Compose, run service smokes, wire MCP servers, and prove basic flows.
+
+Gate: “Site E2E Smoke Tests (≤3min)” remains the sole required check; security jobs are gated and won’t block docs-only PRs.
+
+Key risks: TLS/certs for Documenso; Elasticsearch choice for Zammad; OAuth setup for MCP.
+
+Acceptance: Each app reachable, first-run wizards complete, sample record flows work; MCP tools callable in Claude Desktop.
+
+Rollback: git revert PR, or docker compose down -v + remove project-scoped .mcp.json.
+
+Next actions (for Claude to execute)
+
+Run Pre-flight + Bring-up (core) + Service smokes below.
+
+Wire MCP servers in Claude Desktop and run smoke tools.
+
+Post artifact bundle (ports, health, screenshots, .mcp.json) back to PR.
+
+Dry-run checklist (copy to Claude)
+A) Pre-flight
+
+Verify runtime:
+
+docker --version && docker compose version
+
+
+Validate compose:
+
+docker compose -f stacks/business-ops/docker-compose.yml config -q
+
+
+Check ports free (adjust as per compose):
+
+sudo lsof -iTCP -sTCP:LISTEN | grep -E '80|81|3000|9000' || true
+
+
+Confirm volumes dir writable; create .env if required.
+
+B) Bring-up (core profile only)
+COMPOSE_PROFILES=core \
+docker compose -f stacks/business-ops/docker-compose.yml up -d
+docker compose -f stacks/business-ops/docker-compose.yml ps
+
+
+Note published ports (ps output) for each service.
+
+C) Service smokes (one per app)
+1) EspoCRM (CRM)
+
+Open the mapped HTTP port from compose ps (example: http://localhost:8080) and complete the install wizard per EspoCRM’s Docker guide. 
+docs.espocrm.com
++1
+GitHub
+
+Confirm: can create an Account + Contact; export CSV succeeds.
+
+2) Zammad (Helpdesk)
+
+Use the official zammad-docker-compose recipe; default scenario includes PostgreSQL + (optionally) Elasticsearch. If Elasticsearch is disabled, set ELASTICSEARCH_ENABLED=false and use the provided scenario. 
+GitHub
+
+Confirm: helpdesk loads, initial admin created, inbound email channel wizard reachable.
+
+3) Documenso (E-sign)
+
+Bring up via project’s docker compose; ensure valid TLS (self-signed requires extra steps). If signing fails with cert errors, follow the maintainer guide for self-signed setup. 
+GitHub
++1
+
+Confirm: upload a test PDF, add a signer, complete a signing flow.
+
+4) Listmonk (Email marketing)
+
+Initialize DB and admin per docs; default UI listens on port defined by compose (often 9000). 
+listmonk.app
++1
+
+Confirm: create a list, add a subscriber, send a test campaign (local SMTP or sandbox).
+
+5) (Optional) Nextcloud AIO
+
+Only if the compose profile enables it. Use the official AIO method if you test this path. 
+GitHub
+Nextcloud
+Nextcloud community
+
+Confirm: login + file sync works.
+
+D) MCP setup (Claude Desktop)
+
+Use project-scoped servers so .mcp.json lives in repo root (team-shareable). Anthropic docs show claude mcp add and how to manage servers. 
+Anthropic
+
+1) Gmail (AutoAuth)
+
+Follow repo instructions to create OAuth creds; run first-time auth; then add to Claude Desktop:
+
+{
+  "mcpServers": {
+    "gmail": { "command": "npx", "args": ["@gongrzhe/server-gmail-autoauth-mcp"] }
+  }
+}
+
+
+(Auth puts credentials under ~/.gmail-mcp/.) 
+GitHub
+
+Smoke: call send_email to yourself; verify delivery.
+
+2) Google Drive & Sheets
+
+Use @isaacphi/mcp-gdrive; supply CLIENT_ID/SECRET + creds dir.
+Example project config:
+
+{
+  "mcpServers": {
+    "gdrive": {
+      "command": "npx",
+      "args": ["-y","@isaacphi/mcp-gdrive"],
+      "env": {
+        "CLIENT_ID":"<id>",
+        "CLIENT_SECRET":"<secret>",
+        "GDRIVE_CREDS_DIR":"/path/to/.config/mcp-gdrive"
+      }
+    }
+  }
+}
+
+
+Then run auth once (npx @isaacphi/mcp-gdrive), and smoke gdrive_search + gsheets_update_cell. 
+GitHub
+
+3) Supabase
+
+Use supabase-community/supabase-mcp; follow guide to connect a project (PAT + project ref). 
+GitHub
+Supabase
+
+Smoke: list_tables and a non-destructive select against a sample table. (Known open issues exist; if latest tag fails, pin a stable release.) 
+GitHub
++1
+
+4) Optional: Inspect servers visually
+
+Use MCP Inspector to exercise tools and capture screenshots / logs for the PR.
+
+npx @modelcontextprotocol/inspector
+# UI at http://localhost:6274
+
+
+GitHub
+Model Context Protocol
+
+E) CI / gating sanity
+
+Our workflows already use job-level gating via dorny/paths-filter so docs-only PRs won’t hang; confirm the detect → main-job/noop pattern in latest runs. 
+GitHub
+
+Acceptance criteria (merge-ready)
+
+EspoCRM, Zammad, Documenso, Listmonk each reachable; first-run setup completed; one sample flow per app succeeds (record, ticket, signature, campaign). 
+docs.espocrm.com
+GitHub
++1
+listmonk.app
+
+MCP: Gmail send_email works; GDrive gsheets_update_cell works; Supabase list_tables works (or pinned stable). 
+GitHub
++2
+GitHub
++2
+
+Artifacts attached to PR: docker compose ps output (ports), screenshots of each app home, .mcp.json, and Inspector screenshots. 
+GitHub
+
+Required check “Site E2E Smoke Tests (≤3min)” still passes on the branch.
+
+ROI, risk, rollback
+
+ROI: Confirms we can run sales/support/signature/marketing ops + MCP automations with no SaaS spend; enables immediate dogfooding.
+
+Risk: Documenso TLS config; Zammad ES resource usage; MCP OAuth scope hygiene. Mitigate with self-signed guide, ELASTICSEARCH_ENABLED=false for small tests, least-privilege OAuth. 
+GitHub
++1
+
+Rollback:
+
+docker compose -f stacks/business-ops/docker-compose.yml down -v
+rm -f .mcp.json
+# revert branch if needed
+git revert <PR-merge-sha>
+
+Handoff block (paste to Claude)
+
+Goal: Stand up Business-Ops stack (core profile), run smokes, wire Gmail/Drive/Supabase MCP, attach artifacts to PR.
+Constraints: No prod data; no destructive DB ops; pin Supabase MCP to stable if @latest fails. 
+GitHub
+
+Files: stacks/business-ops/docker-compose.yml, .env, .mcp.json.
+Test/Run: Follow sections A→E above; record ports and screenshots; use Inspector for MCP validation. 
+GitHub
+
+Done: All acceptance criteria met; artifacts posted; smoke gate green.
+
+Business-Ops Starter Stack — Operator Runbook (v1)
+
+Apps (core): EspoCRM, Zammad, Documenso, Listmonk. Optional: Nextcloud AIO. Assistants: Claude Code + MCP servers (Gmail, Google Drive/Sheets, Supabase).
+Purpose: one screen of “how to bring it up, smoke it, back it up, and wire MCP.”
+
+1) Prereqs (host)
+
+Docker + Docker Compose installed; 4 GB+ RAM minimum (Zammad), and if you enable Elasticsearch set vm.max_map_count=262144. 
+docs.zammad.org
+
+Open ports per your compose mapping (Listmonk defaults to 0.0.0.0:9000 unless changed). 
+listmonk.app
+
+For Nextcloud AIO (optional), use the official AIO image/repo. 
+Docker Hub
+GitHub
+
+2) Bring-up (core profile)
+# validate then start
+docker compose -f stacks/business-ops/docker-compose.yml config -q
+COMPOSE_PROFILES=core docker compose -f stacks/business-ops/docker-compose.yml up -d
+docker compose -f stacks/business-ops/docker-compose.yml ps
+
+
+Visit each service on the mapped host ports from compose ps. (EspoCRM has official Docker install guidance with compose examples.) 
+Gist
+
+3) First-run setup (per app)
+
+EspoCRM (CRM): Complete the install wizard; see official Docker/installation docs. Backups require app files + DB dump (see “Backups” below). 
+docs.espocrm.com
++2
+docs.espocrm.com
++2
+
+Zammad (Helpdesk): If low on resources, you can run without Elasticsearch by setting ELASTICSEARCH_ENABLED=false (not recommended for prod). If you do enable ES, apply the sysctl and memory guidance. 
+docs.zammad.org
++1
+GitHub
+
+Documenso (E-sign): Set required env vars (NEXTAUTH_URL, NEXTAUTH_SECRET, DB + SMTP); production needs a signing certificate. Self-signed works but won’t be “trusted” by most PDF readers (still cryptographically valid). 
+Docker Hub
+docs.documenso.com
++1
+
+Listmonk (Email/newsletters): Requires Postgres; default app address is 0.0.0.0:9000. Follow the install/init docs or the docker/compose flow. 
+listmonk.app
++1
+
+Nextcloud AIO (optional): Use the AIO one-liner/compose from the official repo; it bundles most services and simplifies ops. 
+GitHub
+
+4) Wire Claude via MCP (local/project-scoped)
+
+Claude Code MCP config: Add servers at the project level (see MCP + settings docs). 
+Anthropic
++1
+
+Gmail MCP (AutoAuth) — add as a server and perform first-time OAuth: repo has quick setup and “auto-auth” flow. 
+GitHub
+
+Google Drive/Sheets MCP — server exposes Drive search/read and Sheets R/W tools. 
+GitHub
+
+Supabase MCP — tools for listing tables, running queries, etc., maintained in the Supabase Community org. 
+GitHub
++1
+
+MCP Inspector (optional) — run npx @modelcontextprotocol/inspector to click-test tools; UI on :6274, proxy on :6277. 
+GitHub
+
+5) Backups & updates (minimum viable)
+
+General (Docker volumes): Persist data on named volumes; back up by stopping the app and archiving volume contents, or use Docker Desktop’s Volumes Backup & Share extension. 
+Docker Documentation
+Docker
+
+EspoCRM: Back up files + DB (tar app dir + MySQL/MariaDB dump) per official guide. 
+docs.espocrm.com
+
+Listmonk: Always back up Postgres before upgrades; schema upgrades run via --upgrade. 
+listmonk.app
+
+Zammad/Documenso: Treat Postgres volumes as your RPO anchor; export DB and capture any app data volumes before upgrades (follow each project’s docs/compose notes). 
+docs.zammad.org
+Docker Hub
+
+6) Health & smoke
+
+After bring-up: docker compose ps shows healthy/Up states. Open app UIs and perform:
+
+EspoCRM: create Account + Contact. 
+docs.espocrm.com
+
+Zammad: complete admin onboarding; verify email channel wizard opens. 
+docs.zammad.org
+
+Documenso: upload a PDF, add a signer, complete one signing flow (ensure correct NEXTAUTH_URL + cert). 
+Docker Hub
+docs.documenso.com
+
+Listmonk: create a list, add a subscriber, send a test campaign. 
+listmonk.app
+
+7) Security minimums (day-1)
+
+TLS everywhere (reverse proxy or AIO); if testing with self-signed, note trust limitations and install CA roots where needed. 
+docs.documenso.com
+Docker Documentation
+
+Least privilege: Scoped OAuth (e.g., Gmail read-only vs modify), non-root DB users per app. 
+Anthropic
+
+Elasticsearch (Zammad): if enabled, size memory and kernel params; otherwise set ELASTICSEARCH_ENABLED=false. 
+docs.zammad.org
++1
+
+Secrets: Configure via environment/secrets files; never commit creds. (Follow each project’s env var docs.) 
+listmonk.app
+docs.documenso.com
+
+8) Troubleshooting quick hits
+
+Compose validation: docker compose config -q to catch YAML/env errors.
+
+Zammad won’t start: check vm.max_map_count, memory, and ES env; or temporarily disable ES. 
+docs.zammad.org
++1
+
+Documenso sign fails: verify NEXTAUTH_URL, SMTP, and a valid signing certificate (self-signed allowed but untrusted UI markers). 
+Docker Hub
+docs.documenso.com
+
+Listmonk UI missing: ensure Postgres is reachable and LISTMONK_app__address exposes :9000. 
+listmonk.app
+
+MCP tool testing: run the Inspector to verify tool schemas and responses. 
+GitHub
+
+9) Done criteria (green light to merge)
+
+All four apps are Up/healthy, first-run wizards complete, and one end-to-end action per app succeeds (record, ticket, signature, campaign). Sources above confirm required steps. 
+Gist
+docs.zammad.org
+docs.documenso.com
+listmonk.app
+
+Claude Desktop lists each MCP tool and returns data in Inspector. 
+Anthropic
+GitHub
+
+Reference MCP overview & why this stack integrates cleanly with Claude Code: Anthropic’s MCP standard + Claude Code docs. 
+Anthropic
++1

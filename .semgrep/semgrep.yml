@@ -1,0 +1,40 @@
+---
+paths:
+  exclude:
+    - node_modules/**
+    - dist/**
+    - build/**
+    - coverage/**
+    - playwright-report/**
+    - '**/*.test.*'
+    - '**/__tests__/**'
+    - '**/*.spec.*'
+
+rules:
+  - id: js-ts-avoid-eval
+    message: Avoid use of eval(); prefer safer alternatives.
+    languages: [javascript, typescript]
+    severity: WARNING
+    patterns:
+      - pattern: eval(...)
+
+  - id: js-ts-child-process-exec
+    message: >-
+      Avoid executing shell commands; use safer spawn APIs and validate inputs.
+    languages: [javascript, typescript]
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: child_process.exec(...)
+          - pattern: child_process.execSync(...)
+          - pattern: require('child_process').exec(...)
+          - pattern: require('child_process').execSync(...)
+
+  - id: js-ts-insecure-http
+    message: Insecure HTTP URL detected; prefer HTTPS.
+    languages: [javascript, typescript]
+    severity: WARNING
+    patterns:
+      - pattern: "'http://'+..."
+      - pattern: '"http://"+...'
+      - pattern-regex: "http://[^\\s\"']+"

@@ -1,0 +1,12 @@
+# Documentation: https://lychee.cli.rs/usage/cli/
+exclude_all_private = false
+timeout = 20
+max_retries = 2
+retry_wait_time = 2
+# github_token is provided via environment variable GITHUB_TOKEN
+user_agent = "MMTU-docs-check (+https://www.mmtuentertainment.com)"
+# Accept these status codes as OK for HEAD/GET quirks:
+accept = [200, 203, 206, 301, 302, 303, 307, 308, 401, 403]
+# Limit to documentation and markdown by default (tune as needed):
+include_verbatim = true
+threads = 8

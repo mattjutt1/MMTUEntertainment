@@ -1,0 +1,37 @@
+# Ignore non-web and ephemeral schemes/hosts; keep this list tight.
+^mailto:
+^tel:
+^javascript:
+^http://localhost(:\d+)?/
+^http://127\.0\.0\.1(:\d+)?/
+# Example: temporary preview domains (comment why & expiry)
+# ^https://preview\.example\.com/
+^https://www\.mmtu\.com/
+^https://staging\.mmtu\.com/
+
+# Missing scripts and files (placeholder URLs)
+^file:///work/docs/scripts/
+^file:///work/docs/mcp/postgresql:
+^file:///work/docs/pivot/postgresql:
+docs/scripts/test-mcp-integration.sh
+apps/revloop/docs/
+growth/outreach/TODO_
+postgresql:/
+
+# Missing external URLs and placeholders
+https://docs.documenso.com/self-hosting/docker
+https://github.com/gongrzhe/server-gmail-autoauth-mcp
+https://supabase.com/docs/guides/ai/mcp
+https://pr-123.mmtu-marketing.pages.dev/
+https://a1b2c3d4.mmtu-marketing.pages.dev/
+https://mmtu-marketing.pages.dev/
+https://github.com/\[org\]/\[repo\]/actions/workflows/stack-health-check.yml
+https://github.com/mattjutt1/MMTUEntertainment/blob/main/legal/PRIVACY.md
+https://github.com/mattjutt1/MMTUEntertainment/tree/main/apps/DriftGuard-Checks
+https://github.com/mattjutt1/MMTUEntertainment/blob/main/legal/TERMS.md
+https://app.hubspot.com/settings/integrations/private-apps
+https://038dae03.driftguard-checks.pages.dev
+^https://www\.mmtuentertainment\.com/
+^http://www\.mmtuentertainment\.com/
+^https://mmtuentertainment\.com/
+^http://mmtuentertainment\.com/

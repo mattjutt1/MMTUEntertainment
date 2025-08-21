@@ -19,7 +19,7 @@ Add to `src/app/layout.tsx` or individual pages:
    - Type: TXT
    - Name: @
    - Content: `google-site-verification=...` (from GSC)
-4. Submit sitemap: `https://www.mmtuentertainment.com/sitemap.xml`
+4. Submit sitemap: `https://www.mmtuentertainment.com/sitemap.xml` (TODO: verify sitemap is accessible)
 
 ### 3. Meta Tags Audit
 Current status: ✅ Title and description set in layout.tsx

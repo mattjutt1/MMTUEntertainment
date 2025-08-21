@@ -1,0 +1,159 @@
+# Alertmanager Configuration for RevLoop Andon System
+# Routes alerts to appropriate Slack channels based on severity
+#
+# Setup:
+#   1. Create Slack app with Incoming Webhooks
+#   2. Replace SLACK_WEBHOOK_URL with your actual webhook
+#   3. Invite bot to #revloop-alerts and #revloop-critical channels
+#
+# Usage:
+#   alertmanager --config.file=alertmanager.yml
+
+global:
+  # Global SMTP, Slack API, etc configs
+  resolve_timeout: 5m
+  slack_api_url: 'SLACK_WEBHOOK_URL'  # Replace with your Slack webhook URL
+
+# Routing tree - determines which receiver gets which alerts
+route:
+  # Default receiver for all alerts
+  receiver: 'slack-critical'
+  
+  # Group alerts by common characteristics to reduce noise
+  group_by: ['alertname', 'service', 'severity']
+  
+  # Wait 30s for additional alerts before sending (batching)
+  group_wait: 30s
+  
+  # Send follow-up notifications every 5 minutes for ongoing issues
+  group_interval: 5m
+  
+  # Re-send resolved notifications every 2 hours for critical issues
+  repeat_interval: 2h
+  
+  # Routing rules (first match wins)
+  routes:
+    # P1 Critical alerts -> #revloop-critical (immediate)
+    - match:
+        severity: P1
+      receiver: 'slack-critical'
+      group_wait: 10s        # Faster grouping for critical
+      group_interval: 2m     # More frequent updates
+      repeat_interval: 30m   # Repeat more often
+      
+    # P2 High alerts -> #revloop-alerts (standard)
+    - match:
+        severity: P2
+      receiver: 'slack-alerts'
+      
+    # P3 Normal alerts -> #revloop-monitoring (batched)
+    - match:
+        severity: P3
+      receiver: 'slack-monitoring'
+      group_wait: 5m         # Longer batching for low priority
+      group_interval: 30m    # Less frequent updates
+      repeat_interval: 4h    # Repeat less often
+
+# Alert receivers define where/how to send notifications
+receivers:
+  # Critical alerts (P1) - immediate attention required
+  - name: 'slack-critical'
+    slack_configs:
+      - channel: '#revloop-critical'
+        send_resolved: true
+        username: 'RevLoop Andon Monitor'
+        icon_emoji: ':rotating_light:'
+        
+        # Title with clear severity and status
+        title: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }} ({{ .CommonLabels.severity }})'
+        title_link: 'http://localhost:3001/dashboard'
+        
+        # Rich notification with action buttons
+        text: |
+          {{ range .Alerts }}
+          *{{ .Annotations.summary }}*
+          {{ .Annotations.description }}
+          
+          *Service:* {{ .Labels.service }}
+          *Alert Type:* {{ .Labels.alert_type }}
+          *SLA:* {{ .Labels.sla }}
+          {{ if .Labels.runbook_url }}*Runbook:* {{ .Labels.runbook_url }}{{ end }}
+          {{ end }}
+          
+        # Color coding for visual priority
+        color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+        
+        # Action buttons for quick response
+        actions:
+          - type: button
+            text: 'View Dashboard'
+            url: 'http://localhost:3001/dashboard'
+          - type: button
+            text: 'View Alerts'
+            url: 'http://localhost:3001/alerts'
+          - type: button
+            text: 'Incident Runbook'
+            url: 'https://github.com/MMTUEntertainment/revloop/blob/main/docs/incident-response-runbook.md'
+
+  # Standard alerts (P2) - elevated attention
+  - name: 'slack-alerts'
+    slack_configs:
+      - channel: '#revloop-alerts'
+        send_resolved: true
+        username: 'RevLoop Andon Monitor'
+        icon_emoji: ':warning:'
+        
+        title: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }} ({{ .CommonLabels.severity }})'
+        title_link: 'http://localhost:3001/dashboard'
+        
+        text: |
+          {{ range .Alerts }}
+          *{{ .Annotations.summary }}*
+          {{ .Annotations.description }}
+          
+          *Service:* {{ .Labels.service }}
+          {{ if .Labels.alert_type }}*Type:* {{ .Labels.alert_type }}{{ end }}
+          {{ if .Labels.runbook_url }}*Runbook:* {{ .Labels.runbook_url }}{{ end }}
+          {{ end }}
+          
+        color: '{{ if eq .Status "firing" }}warning{{ else }}good{{ end }}'
+
+  # Monitoring alerts (P3) - operational insights
+  - name: 'slack-monitoring'
+    slack_configs:
+      - channel: '#revloop-monitoring'
+        send_resolved: true
+        username: 'RevLoop Andon Monitor'
+        icon_emoji: ':chart_with_upwards_trend:'
+        
+        title: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}'
+        title_link: 'http://localhost:3001/dashboard'
+        
+        # Simplified format for low-priority alerts
+        text: |
+          {{ range .Alerts }}
+          {{ .Annotations.summary }}
+          {{ .Annotations.description }}
+          {{ end }}
+          
+        color: '{{ if eq .Status "firing" }}#439FE0{{ else }}good{{ end }}'
+
+# Inhibition rules (suppress lower priority alerts when higher priority firing)
+inhibit_rules:
+  # Suppress ATTENTION surge alerts when STOP alerts are firing
+  - source_matchers:
+      - alertname="RevLoopAndonStop"
+    target_matchers:
+      - alertname="RevLoopAndonAttentionSurge"
+    equal: ['service']
+    
+  # Suppress rule imbalance alerts when metrics are missing
+  - source_matchers:
+      - alertname="RevLoopAndonMetricsMissing"
+    target_matchers:
+      - alertname="RevLoopAndonRuleImbalance"
+    equal: ['service']
+
+# Templates for reusable message formatting
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'

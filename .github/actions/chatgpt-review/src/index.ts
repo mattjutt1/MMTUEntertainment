@@ -22,7 +22,7 @@ async function checkEntitlement(installationId: string): Promise<EntitlementResp
       return { hasAccess: false, plan: 'none', message: 'Failed to check entitlements' }
     }
     
-    return await response.json()
+    return await response.json() as EntitlementResponse
   } catch (error) {
     console.error('Entitlement check failed:', error)
     return { hasAccess: false, plan: 'none', message: 'Entitlement check failed' }

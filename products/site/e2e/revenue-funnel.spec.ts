@@ -6,7 +6,7 @@ const OFFERS = [
   { path: '/offer/997', price: '$997', title: 'Security Transformation Complete', product: 'p997' }
 ];
 
-test.describe('Three-Tier Revenue Funnel', () => {
+test.describe('Three-Tier Revenue Funnel @smoke @pricing', () => {
   
   test.beforeEach(async ({ page }) => {
     // Set up console error monitoring
@@ -20,7 +20,7 @@ test.describe('Three-Tier Revenue Funnel', () => {
   OFFERS.forEach(({ path, price, title, product }) => {
     test.describe(`${title} (${price})`, () => {
       
-      test('should render offer page correctly', async ({ page }) => {
+      test('should render offer page correctly @smoke @pricing', async ({ page }) => {
         await page.goto(path);
         
         // Check page loads and has correct title

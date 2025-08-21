@@ -1,0 +1,33 @@
+name: Weekly Market Digest
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Monday 9 AM UTC
+  workflow_dispatch:
+
+jobs:
+  generate-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate decisions digest
+        run: |
+          echo "# Weekly Decisions Digest - $(date)" > digest.md
+          echo "## Active Bets Status" >> digest.md
+          gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")' >> digest.md
+          echo "## Completed This Week" >> digest.md
+          gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Done" and .updatedAt > "'$(date -d '7 days ago' -Idate)'")' >> digest.md
+          echo "## Governance Metrics" >> digest.md
+          echo "- Active bet count: $(gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")' | wc -l)" >> digest.md
+          echo "- ≤3 bet compliance: $(if [ $(gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")' | wc -l) -le 3 ]; then echo "✅ PASS"; else echo "❌ FAIL"; fi)" >> digest.md
+          echo "## Weekly Review Actions" >> digest.md
+          echo "- [ ] Review kill/scale signals for each active bet" >> digest.md
+          echo "- [ ] Assess upside evidence and progress metrics" >> digest.md  
+          echo "- [ ] Validate circle of competence alignment" >> digest.md
+          echo "- [ ] Update bet status based on 4-week cycle rules" >> digest.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-digest-${{ github.run_number }}
+          path: digest.md

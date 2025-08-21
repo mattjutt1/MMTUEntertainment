@@ -1,0 +1,34 @@
+name: ai-guardrails
+
+on:
+  pull_request:
+    paths:
+      - "ai/**"
+      - "src/**/agents/**"
+      - ".github/workflows/ai-guardrails.yml"
+  push:
+    branches: ["*"]
+    paths:
+      - "ai/**"
+      - "src/**/agents/**"
+
+concurrency:
+  group: ai-guardrails-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guardrails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      
+      - name: Run guardrail checks
+        run: |
+          node ai/scripts/check-guardrails.mjs
+          node ai/tests/prompt-injection.test.mjs

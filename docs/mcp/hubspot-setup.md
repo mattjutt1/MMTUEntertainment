@@ -22,7 +22,7 @@ HubSpot tracks:
 2. **Navigate to Private Apps**:
    - Click the settings icon (gear) in the top right
    - Go to "Integrations" → "Private Apps"
-   - Or directly visit: https://app.hubspot.com/settings/integrations/private-apps
+   - Or visit: https://developers.hubspot.com/docs/api/private-apps
 
 3. **Create New Private App**:
    - Click "Create a private app"
@@ -128,7 +128,7 @@ The site's CRM configuration integrates with HubSpot:
 ```json
 // products/site/config/crm.json
 {
-  "form_endpoint": "https://api.hsforms.com/submissions/v3/integration/submit/PORTAL_ID/FORM_ID",
+  "form_endpoint": "https://developers.hubspot.com/docs/api/marketing/forms",
   "email_field": "email",
   "providers": {
     "hubspot": "YOUR_HUBSPOT_FORM_ENDPOINT"

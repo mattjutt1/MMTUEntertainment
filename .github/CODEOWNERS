@@ -26,3 +26,8 @@
 
 # Default fallback for unlisted paths
 *                                  @mattjutt1
+
+# Security config ownership (overrides fallback)
+.github/** @your-org/security
+.semgrep/** @your-org/security
+.gitleaks.toml @your-org/security

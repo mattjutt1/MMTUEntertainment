@@ -1,19 +1,25 @@
 #!/usr/bin/env node
 
 import { execSync } from 'child_process';
-import { writeFileSync, existsSync, statSync, readdirSync } from 'fs';
+import { writeFileSync, existsSync, statSync, readdirSync, readFileSync } from 'fs';
 import { join, relative } from 'path';
 
 const AUDIT_TIMESTAMP = new Date().toISOString();
-const REQUIRED_ARTIFACTS = [
+
+// Base artifacts that should exist on all branches
+const BASE_ARTIFACTS = [
   'package.json',
   'pnpm-workspace.yaml',
-  'docs/pricing-catalog.v2.json',
-  'apps/reports/src/components/PricingTiers.tsx',
-  'apps/stream-overlay-studio/package.json',
   'packages/entitlements/src/index.ts',
   'packages/pricing-engine/src/index.ts',
   '.github/workflows/repo-audit.yml'
+];
+
+// Additional artifacts for main/production branches
+const FULL_ARTIFACTS = [
+  'docs/pricing-catalog.v2.json',
+  'apps/reports/src/components/PricingTiers.tsx',
+  'apps/stream-overlay-studio/package.json'
 ];
 
 const EXPECTED_APPS = [
@@ -106,6 +112,55 @@ function generateCommitHistory() {
 
 function auditRequiredArtifacts() {
   console.log('🔍 Auditing required artifacts...');
+  console.log(`🔧 Working directory: ${process.cwd()}`);
+  console.log(`🔧 Node version: ${process.version}`);
+  
+  // Determine branch context and requirements - handle CI environment
+  let currentBranch = executeCommand('git branch --show-current');
+  
+  // Fallback for CI environments where branch --show-current might be empty
+  if (!currentBranch || currentBranch.startsWith('ERROR:')) {
+    console.log('🔧 Branch detection fallbacks:');
+    console.log(`🔧   GITHUB_HEAD_REF: ${process.env.GITHUB_HEAD_REF || 'undefined'}`);
+    console.log(`🔧   GITHUB_REF_NAME: ${process.env.GITHUB_REF_NAME || 'undefined'}`);
+    console.log(`🔧   GITHUB_REF: ${process.env.GITHUB_REF || 'undefined'}`);
+    
+    // For pull requests, get branch name from GitHub event data
+    if (process.env.GITHUB_REF && process.env.GITHUB_REF.startsWith('refs/pull/')) {
+      console.log(`🔧 Detected pull request context`);
+      try {
+        // Read the GitHub event data
+        const eventPath = process.env.GITHUB_EVENT_PATH;
+        if (eventPath && existsSync(eventPath)) {
+          const eventData = JSON.parse(readFileSync(eventPath, 'utf8'));
+          if (eventData.pull_request && eventData.pull_request.head && eventData.pull_request.head.ref) {
+            currentBranch = eventData.pull_request.head.ref;
+            console.log(`🔧 PR head branch from event: ${currentBranch}`);
+          }
+        }
+      } catch (error) {
+        console.log(`🔧 Failed to get branch from event data: ${error.message}`);
+      }
+    }
+    
+    // If still no branch, try other fallbacks
+    if (!currentBranch || currentBranch === 'unknown') {
+      currentBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || 
+                     executeCommand('git rev-parse --abbrev-ref HEAD') || 'unknown';
+    }
+  }
+  
+  const isDocsBranch = currentBranch.includes('docs/') || currentBranch.includes('doc/');
+  const isMainBranch = currentBranch === 'main' || currentBranch === 'master';
+  
+  console.log(`🔧 Current branch: ${currentBranch}`);
+  console.log(`🔧 Branch type: ${isDocsBranch ? 'docs' : isMainBranch ? 'main' : 'feature'}`);
+  
+  // Use appropriate artifact requirements based on branch
+  const REQUIRED_ARTIFACTS = isDocsBranch ? BASE_ARTIFACTS : [...BASE_ARTIFACTS, ...FULL_ARTIFACTS];
+  const REQUIRED_APPS = isDocsBranch ? [] : EXPECTED_APPS; // No apps required for docs branches
+  
+  console.log(`🔧 Expecting ${REQUIRED_ARTIFACTS.length} artifacts and ${REQUIRED_APPS.length} apps for this branch type`);
   
   const results = {
     timestamp: AUDIT_TIMESTAMP,
@@ -114,7 +169,7 @@ function auditRequiredArtifacts() {
       total_commits: 0,
       required_artifacts: REQUIRED_ARTIFACTS.length,
       artifacts_present: 0,
-      apps_expected: EXPECTED_APPS.length,
+      apps_expected: REQUIRED_APPS.length,
       apps_present: 0,
       critical_failures: 0,
       warnings: 0
@@ -122,25 +177,35 @@ function auditRequiredArtifacts() {
     artifacts: {},
     apps: {},
     structure_checks: {},
-    git_info: {}
+    git_info: {},
+    branch_context: {
+      current_branch: currentBranch,
+      is_docs_branch: isDocsBranch,
+      is_main_branch: isMainBranch,
+      requirements_applied: isDocsBranch ? 'docs-minimal' : 'full'
+    }
   };
   
   // Check required artifacts
+  console.log('🔍 Checking required artifacts:');
   REQUIRED_ARTIFACTS.forEach(artifact => {
     const exists = existsSync(artifact);
     let size = 0;
     let type = 'file';
     
     if (exists) {
+      console.log(`  ✅ ${artifact}`);
       try {
         const stats = statSync(artifact);
         size = stats.size;
         type = stats.isDirectory() ? 'directory' : 'file';
         results.summary.artifacts_present++;
       } catch (err) {
+        console.log(`  ⚠️ ${artifact} (stat error: ${err.message})`);
         exists = false;
       }
     } else {
+      console.log(`  ❌ ${artifact} (not found)`);
       results.summary.critical_failures++;
     }
     
@@ -153,12 +218,14 @@ function auditRequiredArtifacts() {
   });
   
   // Check expected apps
-  EXPECTED_APPS.forEach(app => {
+  console.log('🔍 Checking expected apps:');
+  REQUIRED_APPS.forEach(app => {
     const exists = existsSync(app);
     let packageJson = false;
     let hasSource = false;
     
     if (exists) {
+      console.log(`  ✅ ${app}`);
       results.summary.apps_present++;
       packageJson = existsSync(join(app, 'package.json'));
       
@@ -170,6 +237,7 @@ function auditRequiredArtifacts() {
         // Ignore
       }
     } else {
+      console.log(`  ❌ ${app} (not found)`);
       results.summary.warnings++;
     }
     

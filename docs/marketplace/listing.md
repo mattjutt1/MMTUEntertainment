@@ -57,15 +57,15 @@ DriftGuard Checks provides **policy-driven PR quality gates** that integrate nat
 
 ### Support & Documentation
 
-- **Documentation**: https://docs.mmtuentertainment.com/driftguard
+- **Documentation**: https://github.com/mattjutt1/MMTUEntertainment/tree/main/apps/DriftGuard-Checks
 - **Support Email**: support@mmtuentertainment.com
 - **Response Time**: 24 hours for paid plans, 48 hours for free tier
 - **Community**: GitHub Discussions in DriftGuard repository
 
 ### Legal
 
-- **Privacy Policy**: https://www.mmtuentertainment.com/privacy
-- **Terms of Service**: https://www.mmtuentertainment.com/terms
+- **Privacy Policy**: https://github.com/mattjutt1/MMTUEntertainment/blob/main/legal/PRIVACY.md
+- **Terms of Service**: https://github.com/mattjutt1/MMTUEntertainment/blob/main/legal/TERMS.md
 - **Security**: SOC 2 Type II compliant, data encrypted in transit and at rest
 
 ## Screenshot Captions & Alt Text

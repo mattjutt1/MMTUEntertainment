@@ -1,4 +1,16 @@
 name: actionlint
+#
+# CI NOTE — why we gate at the JOB level (not workflow level)
+# - Skipping a WORKFLOW via branch/path filters can leave its check "Pending" and block merges.  (GitHub)
+#   https://docs.github.com/actions/managing-workflow-runs/skipping-workflow-runs
+# - Skipping a JOB via an `if:` condition reports "Success/neutral" and won't block merges.     (GitHub)
+#   https://docs.github.com/actions/using-jobs/using-conditions-to-control-job-execution
+# - We use dorny/paths-filter to decide per-job if lint should run.                             (GitHub Action)
+#   https://github.com/dorny/paths-filter
+# - Branch protection accepts successful/skipped/neutral states for required checks.           (GitHub)
+#   https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+# - Concurrency cancels stale runs to save CI minutes.                                         (GitHub)
+#   https://docs.github.com/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -32,4 +44,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: rhysd/actionlint@v1
+      - uses: rhysd/actionlint@v1.7.7

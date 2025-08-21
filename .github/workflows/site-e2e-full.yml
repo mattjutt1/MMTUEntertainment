@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   full-e2e:
-    name: 'Site E2E Full Suite (${{ inputs.browsers || "all" }} browsers)'
+    name: 'Site E2E Full Suite (${{ inputs.browsers || ''all'' }} browsers)'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -102,15 +102,15 @@ jobs:
           TEST_ENV: ${{ github.event.inputs.test_env || 'default (placeholder mode)' }}
           RESULT_STATUS: ${{ needs.full-e2e.result }}
         run: |
-          echo "## 🧪 Site E2E Full Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Trigger**: $TRIGGER" >> $GITHUB_STEP_SUMMARY
-          echo "- **Browsers**: $BROWSERS" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment**: $TEST_ENV" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status**: $RESULT_STATUS" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧪 Site E2E Full Test Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Trigger**: $TRIGGER" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Browsers**: $BROWSERS" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Environment**: $TEST_ENV" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Status**: $RESULT_STATUS" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
           if [ "$RESULT_STATUS" != "success" ]; then
-            echo "⚠️ **Action Required**: Check test artifacts and fix failing tests" >> $GITHUB_STEP_SUMMARY
-            echo "📊 **Debug**: Download test artifacts from the Actions run" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Action Required**: Check test artifacts and fix failing tests" >> "$GITHUB_STEP_SUMMARY"
+            echo "📊 **Debug**: Download test artifacts from the Actions run" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "✅ **All tests passed**: Revenue funnel is stable across browsers" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All tests passed**: Revenue funnel is stable across browsers" >> "$GITHUB_STEP_SUMMARY"
           fi
