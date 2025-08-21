@@ -118,9 +118,20 @@ function auditRequiredArtifacts() {
   // Determine branch context and requirements - handle CI environment
   let currentBranch = executeCommand('git branch --show-current');
   
+  // Debug: Show all GitHub environment variables
+  console.log('🔧 GitHub Environment Variables:');
+  Object.keys(process.env)
+    .filter(key => key.startsWith('GITHUB_'))
+    .forEach(key => console.log(`🔧   ${key}: ${process.env[key]}`));
+  
   // Fallback for CI environments where branch --show-current might be empty
   if (!currentBranch || currentBranch.startsWith('ERROR:')) {
     // Try alternative methods to get branch name
+    console.log('🔧 Branch detection fallbacks:');
+    console.log(`🔧   GITHUB_HEAD_REF: ${process.env.GITHUB_HEAD_REF}`);
+    console.log(`🔧   GITHUB_REF_NAME: ${process.env.GITHUB_REF_NAME}`);
+    console.log(`🔧   GITHUB_REF: ${process.env.GITHUB_REF}`);
+    
     currentBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || 
                    executeCommand('git rev-parse --abbrev-ref HEAD') || 'unknown';
   }
