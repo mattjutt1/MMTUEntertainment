@@ -15,7 +15,7 @@ test.describe('billing smoke', () => {
     });
 
     await page.goto('/');
-    await page.getByRole('button', { name: 'Go Pro' }).click();
+    await page.getByRole('link', { name: 'Security Audit - $999' }).click();
     await expect(page).toHaveURL('https://example.com/redirect');
   });
 

@@ -173,11 +173,14 @@ jobs:
     steps:
       - name: Determine target URL
         id: target
+        env:
+          TARGET_URL_INPUT: ${{ github.event.inputs.target_url }}
+          ZAP_BASELINE_URL_VAR: ${{ vars.ZAP_BASELINE_URL }}
         run: |
           set -euo pipefail
-          TARGET="${{ github.event.inputs.target_url || '' }}"
+          TARGET="${TARGET_URL_INPUT:-}"
           if [ -z "$TARGET" ]; then
-            TARGET="${{ vars.ZAP_BASELINE_URL || '' }}"
+            TARGET="${ZAP_BASELINE_URL_VAR:-}"
           fi
           if [ -z "$TARGET" ]; then
             echo "No ZAP target URL provided via workflow_dispatch input 'target_url' or repository variable 'ZAP_BASELINE_URL'." >&2
