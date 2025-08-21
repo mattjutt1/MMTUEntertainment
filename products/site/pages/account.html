@@ -17,8 +17,8 @@
   <main>
     <div class="container">
       <h1>Account</h1>
-      <button id="manage-billing">Manage billing</button>
-      <p id="portal-error" style="color:red"></p>
+      <p>Account functionality will be available after foundation is complete.</p>
+      <p><a href="/contact">Contact us</a> for more information.</p>
     </div>
   </main>
   <footer>
@@ -32,21 +32,6 @@
       </p>
     </div>
   </footer>
-  <script>
-  (function(){
-    async function openPortal(){
-      const returnUrl = window.location.href;
-      // In real app, resolve customerId from session; here we use a placeholder passed server-side.
-      const customerId = 'cus_PLACEHOLDER';
-      const r = await fetch('/api/billing/portal', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ customerId, returnUrl })});
-      const data = await r.json();
-      if(r.ok && data.url){ window.location.href = data.url; } else { throw new Error(data.error||'Portal failed'); }
-    }
-    const btn = document.getElementById('manage-billing');
-    const out = document.getElementById('portal-error');
-    btn.addEventListener('click', async ()=>{ out.textContent=''; try{ await openPortal(); }catch(e){ out.textContent = e.message; }});
-  })();
-  </script>
 </body>
 </html>
 
