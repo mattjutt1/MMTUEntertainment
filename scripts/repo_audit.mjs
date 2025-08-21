@@ -107,7 +107,6 @@ function generateCommitHistory() {
 function auditRequiredArtifacts() {
   console.log('🔍 Auditing required artifacts...');
   console.log(`🔧 Working directory: ${process.cwd()}`);
-  console.log(`🔧 Script directory: ${__dirname || 'N/A'}`);
   console.log(`🔧 Node version: ${process.version}`);
   
   const results = {
