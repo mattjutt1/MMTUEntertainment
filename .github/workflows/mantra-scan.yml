@@ -1,0 +1,16 @@
+name: mantra-scan
+on:
+  workflow_dispatch: {}
+concurrency:
+  group: mantra-scan
+  cancel-in-progress: true
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "# Mantra – (auto-generated)" > docs/Mantra-Report.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mantra-report
+          path: docs/Mantra-Report.md

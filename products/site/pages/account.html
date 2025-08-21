@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account | MMTU Entertainment</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <header>
+    <nav aria-label="Main navigation">
+      <div class="nav-container">
+        <a href="/" class="logo">MMTU Entertainment</a>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <div class="container">
+      <h1>Account</h1>
+      <button id="manage-billing">Manage billing</button>
+      <p id="portal-error" style="color:red"></p>
+    </div>
+  </main>
+  <footer>
+    <div class="container">
+      <p>
+        &copy; 2025 MMTU Entertainment.
+        <a href="/terms">Terms</a> |
+        <a href="/privacy">Privacy</a> |
+        <a href="/legal/disclosures">Ads &amp; Endorsements</a> |
+        <a href="#" id="cookie-preferences-link">Cookie Preferences</a>
+      </p>
+    </div>
+  </footer>
+  <script>
+  (function(){
+    async function openPortal(){
+      const returnUrl = window.location.href;
+      // In real app, resolve customerId from session; here we use a placeholder passed server-side.
+      const customerId = 'cus_PLACEHOLDER';
+      const r = await fetch('/api/billing/portal', {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ customerId, returnUrl })});
+      const data = await r.json();
+      if(r.ok && data.url){ window.location.href = data.url; } else { throw new Error(data.error||'Portal failed'); }
+    }
+    const btn = document.getElementById('manage-billing');
+    const out = document.getElementById('portal-error');
+    btn.addEventListener('click', async ()=>{ out.textContent=''; try{ await openPortal(); }catch(e){ out.textContent = e.message; }});
+  })();
+  </script>
+</body>
+</html>
+

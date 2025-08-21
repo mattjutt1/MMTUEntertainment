@@ -1,0 +1,148 @@
+# Project Instructions - Service Health Workflow
+
+## Mission & Pillars
+**Mission:** We build software that fixes what truly hurts—so real people win.
+
+**Pillars**
+1) Empathy-first discovery
+2) Practical, low-friction solutions
+3) Foundation before hype
+
+
+## For Contributors & AI Assistants
+
+### Service Health Workflow Standard
+This repo uses the **Service Health Workflow** as the primary CI health gate for infrastructure changes.
+
+**Status Check Name**: `Stack Health Check / Services Health Check (core)`
+
+**Purpose**: Validates Business-Ops Stack (Cal.com + Zammad) before merging infrastructure changes.
+
+## When This Workflow Triggers
+
+### Automatic Triggers
+```yaml
+Infrastructure Files:
+  - stacks/business-ops/docker-compose*.yml
+  - stacks/business-ops/.env*
+  - .github/workflows/stack-health-check.yml
+
+Schedule:
+  - Every 6 hours for continuous monitoring
+```
+
+### Manual Triggers
+- Infrastructure troubleshooting
+- Service health validation
+- Pre-deployment verification
+
+## Contributor Workflow
+
+### 1. Infrastructure Changes
+**Before creating PR**:
+```bash
+# Navigate to business-ops stack
+cd stacks/business-ops
+
+# Test locally using validation script
+../scripts/run-stack-health-local.sh
+
+# Create PR only after local validation passes
+```
+
+### 2. PR Creation
+**Required checklist**: Use `docs/Checklist-PR-Smoke.md`
+
+**Expected CI behavior**:
+- Workflow execution: <15 minutes
+- Retry logic: Cal.com (12×15s), Zammad (8×20s)
+- Success criteria: Both services respond with HTTP 200
+
+### 3. After Merge
+**Follow-up checklist**: Use `docs/Checklist-After-Merge.md`
+
+**Monitor for**:
+- Scheduled workflow execution (every 6 hours)
+- No regression alerts
+- Consistent 8+/10 stack health score
+
+## AI Assistant Guidelines
+
+### For Infrastructure Tasks
+1. **Always validate locally** before suggesting CI execution
+2. **Use correct status check names** in branch protection guidance
+3. **Reference evidence documentation** for retry logic and timeouts
+4. **Follow lean principles**: Minimal YAML, rich documentation
+
+### Required Knowledge
+- **Health Endpoints**: Cal.com `/auth/setup?step=1`, Zammad `/`
+- **Service Architecture**: Multi-service Zammad (Rails + PostgreSQL + Redis + Memcached)
+- **Timeout Limits**: 15-minute CI execution maximum
+- **Evidence Base**: See `docs/best-practices/smoke-testing-references.md`
+
+### Common Issues & Solutions
+
+#### Cal.com Health Check Fails
+```bash
+# Check service status
+docker compose ps
+
+# Test endpoint manually
+curl -v "http://localhost:8085/auth/setup?step=1"
+
+# Common causes: Port conflicts, database initialization delays
+```
+
+#### Zammad Health Check Fails
+```bash
+# Check multi-service status
+docker compose ps | grep zammad
+
+# Test Rails server directly
+RAILS_IP=$(docker inspect business-ops_zammad-railsserver_1 | jq -r '.[0].NetworkSettings.Networks."business-ops-network".IPAddress')
+curl -v "http://$RAILS_IP:3000"
+
+# Common causes: Database migrations, Redis connectivity
+```
+
+#### CI Timeout Issues
+- **Investigation**: Check container startup logs
+- **Resolution**: Adjust retry intervals in workflow
+- **Emergency**: Admin override with incident documentation
+
+## Quality Standards
+
+### Success Criteria
+- **Local validation passes** before PR creation
+- **CI execution completes** within 15-minute timeout
+- **Health endpoints respond** with expected status codes
+- **Documentation updated** when changing infrastructure
+
+### Evidence-Based Decisions
+All configuration decisions backed by research:
+- **Retry logic**: 30% instability reduction (MoldStud research)
+- **Timeout limits**: <15min industry standard (TestingXperts)
+- **Critical path focus**: Validated by multiple authorities
+
+### Performance Targets
+- **CI Pass Rate**: >95%
+- **Mean Time to Detection**: <15 minutes
+- **False Positive Rate**: <5%
+- **Stack Health Maintenance**: 8+/10 consistent score
+
+## Documentation References
+
+### Quick Links
+- **Branch Protection**: `docs/Branch-Protection.md`
+- **Pre-PR Checklist**: `docs/Checklist-PR-Smoke.md`
+- **Post-Merge Checklist**: `docs/Checklist-After-Merge.md`
+- **Research Evidence**: `docs/best-practices/smoke-testing-references.md`
+
+### Workflow Files
+- **CI Definition**: `.github/workflows/stack-health-check.yml`
+- **Local Script**: `scripts/run-stack-health-local.sh`
+- **Infrastructure**: `stacks/business-ops/docker-compose.override.yml`
+
+---
+
+**Philosophy**: Evidence-based infrastructure validation enabling confident development velocity while maintaining 8+/10 operational health.

@@ -61,8 +61,31 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 MMTU Entertainment. <a href="/terms">Terms</a> | <a href="/privacy">Privacy</a></p>
+            <p>
+                &copy; 2025 MMTU Entertainment.
+                <a href="/terms">Terms</a> |
+                <a href="/privacy">Privacy</a> |
+                <a href="/legal/disclosures">Ads &amp; Endorsements</a> |
+                <a href="#" id="cookie-preferences-link">Cookie Preferences</a>
+            </p>
         </div>
+        <script>
+        // Optional: wire to your consent manager if present
+        (function(){
+          var el = document.getElementById('cookie-preferences-link');
+          if (!el) return;
+          el.addEventListener('click', function(e){
+            e.preventDefault();
+            if (window.OneTrust && typeof window.OneTrust.ToggleInfoDisplay === 'function') {
+              window.OneTrust.ToggleInfoDisplay();
+            } else if (window.Cookiebot && typeof window.Cookiebot.renew === 'function') {
+              window.Cookiebot.renew();
+            } else {
+              alert('Cookie preferences panel is not available.');
+            }
+          });
+        })();
+        </script>
     </footer>
     <script src="/js/links.js"></script>
 </body>

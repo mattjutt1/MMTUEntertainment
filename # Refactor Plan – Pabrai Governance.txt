@@ -1,0 +1,140 @@
+# Refactor Plan – Pabrai Governance Integration (Zero-Mess Mode)
+
+**Purpose:**  
+Integrate Mohnish Pabrai’s investment discipline into the `MMTUEntertainment` repo as **governance code**.  
+North Star: Maximize ARR, conversion, and W4 retention while **capping downside**.  
+Rule: *Heads I Win, Tails I Don’t Lose Much.*
+
+---
+
+## 📚 Repo Context (Canonical)
+
+### Branch Protection – `docs/Branch-Protection.md`
+- Required status checks (smoke job once green).
+- No bypass allowed for collaborators.
+- Strict gating enforced.
+
+### Runbook – Site E2E – `docs/Runbook-Site-E2E.md`
+- Smoke: ≤3 min, Chromium only, GitHub reporter.
+- Full: Chromium/Firefox/WebKit nightly.
+- Branch protection requires smoke job name.
+- Flakes: `test.fixme()` + issue.
+
+### Project Instructions – `docs/Project-Instructions.md`
+- PR smoke fast & reliable.
+- Use `pnpm` + `gh`.
+- Never push to `main`.
+- Prefer atomic, reversible commits.
+- Deliver diffs, PR bodies, commands, summaries.
+
+### Assistant Prompts
+- `Prompt-ClaudeCode.md`: optimize workflows, isolate Playwright config, ≤3 min smoke.
+- `Prompt-ChatGPT-Task.md`: weekly reminder to review nightly failures & flakes.
+
+### Checklists
+- `Checklist-PR-Smoke.md`: confirm ≤3 min, Chromium, flake guards, required check passed.
+- `Checklist-After-Merge.md`: confirm nightly ran, failures triaged, runtime regressions scanned.
+
+### Tool Audit – `docs/COMPREHENSIVE-TOOL-AUDIT.md`
+- pnpm 8.15.0, GitHub CLI 2.76, Playwright, Semgrep, Wrangler, Docker.
+- Revenue tie-ins: Playwright ensures funnel reliability; Semgrep/GitLeaks protect customer data; Cloudflare improves UX.
+- Business targets: LTV:CAC ≥ 3.0, W4 retention ≥ 20%, Gross Margin ≥ 60%.
+
+---
+
+## 📊 Business Metrics Baseline
+- ARR (baseline): [fill with current data]
+- Conversion Rate: [baseline]
+- W4 Retention Target: ≥20%
+- LTV:CAC Target: ≥3.0
+- Gross Margin Target: ≥60%
+
+---
+
+## 🧠 Pabrai Principles Integration
+- **Asymmetric Bets:** PRs/initiatives must state downside cap, upside path (10×), kill rule (≤4 weeks).
+- **Margin of Safety:** Every change must include burn delta and runway impact.
+- **Circle of Competence:** Only work in CI/E2E, Stripe membership, Cloudflare infra, community/forum.
+- **Concentration:** ≤3 active bets at once; others parked.
+- **Low-Hanging Fruit:** Prioritize Stripe membership, community MVP, sales playbook.
+- **Skin in the Game:** Every initiative must have an owner.
+- **Givers First:** Build community goodwill before extracting value.
+
+---
+
+## 📋 Phased Plan
+
+### Phase 0 – Baseline Audit
+- Verify smoke job in branch protection.
+- Ensure CI passing, no flakes unresolved.
+- Inventory orphan files/tests.
+- **Done:** Clean baseline snapshot; orphan report.
+
+### Phase 1 – Governance Refactor
+- Update `.github/pull_request_template.md` with:
+  - *Asymmetric Bet* block
+  - *Financial Safety* block
+- Add `docs/pivot-rules.md`:
+  - ≤3 active bets
+  - 4-week kill/scale cycle
+  - Circle of Competence definition
+- Update `Prompt-ClaudeCode.md` and `Prompt-ChatGPT-Task.md`:
+  - Enforce bet framing, concentration, and kill/scale reviews.
+- **Done:** PR template gates, pivot rules exist, prompts enforce discipline.
+
+### Phase 2 – Operationalization
+- Add `.github/workflows/weekly-market-digest.yml`:
+  - Runs Monday, outputs “decisions-only” digest.
+- Align project board:
+  - 10 columns = action tracks
+  - ≤3 “Active” cards enforced
+- **Done:** Workflow runs clean, board enforced.
+
+### Phase 3 – Validation
+- Open test PR → confirm bet/safety blocks enforced.
+- Run digest workflow → confirm artifact.
+- Run smoke → confirm ≤3m pass.
+- Audit board via CLI → confirm ≤3 active bets.
+- **Done:** Governance proven operational.
+
+### Phase 4 – Extension Gates
+- All new features (Stripe membership, community, sales playbook) must inherit rules.
+- Each framed as an asymmetric bet with owner, downside, upside, kill rule.
+- **Done:** Features automatically comply.
+
+---
+
+## 🧹 Repo Hygiene Protocol
+1. **Detection:** Orphan scan with `scripts/repo-hygiene/audit-orphans.ts`.  
+   Detect files not referenced in:
+   - `package.json` scripts
+   - `.github/workflows/`
+   - imports in code
+
+2. **Classification:**
+   - Keep = actively referenced
+   - Migrate = misplaced
+   - Delete = unused
+
+3. **CI Guard:** Add pre-merge linter (`pnpm -w run lint:orphans`). Fail PR if orphan detected.
+
+4. **Evidence:** Commit repo map delta + add runbook entry.
+
+---
+
+## 📝 Planned Diffs
+
+- **`.github/pull_request_template.md`** → Add Asymmetric Bet + Financial Safety.
+- **`docs/pivot-rules.md`** → Codify concentration, kill/scale, competence.
+- **`.github/workflows/weekly-market-digest.yml`** → Weekly digest artifact.
+- **`Prompt-ClaudeCode.md` & `Prompt-ChatGPT-Task.md`** → Update to enforce Pabrai framing.
+- **`scripts/repo-hygiene/audit-orphans.ts`** → Orphan scan.
+
+---
+
+## 🧪 Validation Commands
+```bash
+pnpm -w run lint:orphans   # Orphans = 0
+pnpm -w run test:e2e:site  # Smoke passes, ≤3m
+pnpm -w run test:e2e:site:full  # Full nightly
+gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")' | wc -l

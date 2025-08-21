@@ -1,69 +1,190 @@
-Last 50 Commits:\n==================================================\n* a3b60e7 (HEAD -> triage/archive-moves-20250819, origin/triage/archive-moves-20250819) docs: dashboard archive analysis - skip due to script references
-* 0836087 (triage/archive-dashboards-20250819) feat(security): add path filters + security baseline workflows
-* 5aeb207 triage(archive): move approved items to archive/2025-08-19/
-* aa0a548 (origin/triage/archive-20250819, triage/archive-20250819) chore(archive): propose candidates (no changes yet)
-* 7fc57f3 (origin/main, main) docs: Repository triage documentation and inventory (#5)
-| * 4567667 (origin/triage/repo-slim-20250819) fix(docs): correct exact job name in ops-runbook
-| * a515a0f docs: Add triage success criteria and phase completion status
-| * 95998ff docs: Complete repo triage documentation phase
-| * 9d29f50 (tag: rollback-pre-triage-20250819, origin/docs/working-notes-20250819, docs/working-notes-20250819) docs: add working-notes vault to capture raw ideas
-| | * b3d5e91 (refs/stash) On ci/site-e2e-hardening: temp: kit.html duplicate script fix
-| |/| 
-| | * 3d364fe index on ci/site-e2e-hardening: e38a6b7 fix(ci): limit Site E2E Smoke tests to chromium browser only
+Last 50 Commits:\n==================================================\n* dc710f8 (HEAD -> docs/fix-broken-links-20250821, origin/docs/fix-broken-links-20250821) fix: remove __dirname from ES module in repo-audit script
+* a24f897 debug: add detailed logging to repo-audit script for CI diagnosis
+* 5a324ac docs: exclude broken driftguard pages link from lychee check
+* eb9b4dc fix(security): add SARIF artifact location fix for Grype scan
+* 32ae47e fix: correct Semgrep severity parameter in workflow
+* 09bb6d1 fix: add proper quoting to shell variables in site-e2e-full workflow
+* 9262bd8 fix: correct actionlint version and semgrep YAML syntax
+* cb789c6 docs: exclude remaining broken links from lychee check
+* 7f51089 docs: add CSpell dictionary terms for API references
+* 29d3de8 docs: add railsserver to CSpell dictionary
+* 73add6d docs: exclude placeholder domain URLs from link checking
+* 4fbaf60 ci: add stack-health smoke test + runbooks + branch protection guide
+* f84b19b docs: add more exclusions for missing files and placeholder URLs
+| * 36d9bc2 (main) research: autonomous system kits (cited report + primitives CSV + franchising) (#12)
+| | * 24258a6 (tools/rag-mcp-20250820) docs: add more exclusions for missing files and placeholder URLs
+| | * 19ec328 (origin/docs/update-branch-protection-20250820, origin/ci/stack-health-smoke-20250820, docs/update-branch-protection-20250820, ci/stack-health-smoke-20250820) docs: sync Branch-Protection.md with exact required checks and merge-queue rules
+| | * f6faffe (origin/archive/remove-obsolete-dirs-20250820, archive/remove-obsolete-dirs-20250820) chore(repo): remove obsolete directories (no references)
+| | * 8ff550b (origin/docs/archive-20250820, docs/archive-20250820) docs(archive): relocate legacy docs/infra templates (preserve history, reduce noise)
+| | * 25db717 (origin/security/quarantine-growth-20250820, security/quarantine-growth-20250820) chore(security): remove sensitive growth artifacts; add history purge + rotation guide (no rewrite)
+| | * 9888055 (origin/hygiene/cleanup-triage-and-backups-20250820, hygiene/cleanup-triage-and-backups-20250820) chore(repo): remove triage scratch + config backups (no code paths)
+| | * 5f3f186 (origin/hygiene/cleanup-ads-20250820, hygiene/cleanup-ads-20250820) feat: Finalize .gitignore (ADS) + no functional changes
 | |/  
-| * e38a6b7 (origin/ci/site-e2e-hardening, ci/site-e2e-hardening) fix(ci): limit Site E2E Smoke tests to chromium browser only
-| * 0b8b922 fix(ci): resolve Site E2E webServer directory and serving issues
-| * b0aa3f8 fix: harden Site E2E CI pipeline
-| * 47ab0a9 chore(site): isolate Playwright & add smoke + full CI (site-only)
-| * 52a2e95 chore(site): isolate Playwright & add smoke + full CI (site-only)
-| * 0452d25 ci(site): isolate and harden E2E tests for revenue funnel
-|/  
-| * 5d313b4 (origin/pivot/cleanup-20250818, pivot/cleanup-20250818) test: Playwright config with webServer from products/site
-| * f2e9cb6 ci(pivot): restore complete workflow (concurrency + dispatch + submodules=false)
-| * 1af4103 chore: remove stale submodule gitlink; ignore _archive/
-| * 19227c3 ci(pivot): finalize workflow (concurrency + submodules=false + dispatch)
-| * a54356b ci(pivot): complete job section; add workflow_dispatch, concurrency, explicit submodules=false
-| * 5bc5aea ci(pivot): add concurrency + narrow triggers; explicit submodules=false
-| * 5c2e1ce pivot-checks: update thresholds & gates
-| * fcda770 chore: drop stale submodule; ignore _archive/
-| * 1989523 ci: trigger Pivot Checks
-| * 3809041 chore: bootstrap missing pivot governance files
-| * 78209d1 (feat/overlay-pro-blitz) feat(power-user): implement production-ready Claude Code setup with critical fixes
-| * 628983d feat(power-user): implement production-ready Claude Code setup with critical fixes
-| * 89dfe4d docs(reality-check): honest assessment for ChatGPT-5 strategic partner
-| * 9f5f8c4 feat(week1): implement ChatGPT-5 strategic priorities
-| * f4db67f feat(strategic): ship pack complete → ChatGPT-5 strategic decision required
-| * a39fa49 feat(marketplace): add Cloudflare Workers webhook handler
-| * 37b0448 feat(ship-pack): complete DriftGuard production deployment pipeline
-| * c488b1c feat(claude-code): complete power-user configuration for DriftGuard sprint
-| * 48660cd (origin/feat/overlay-pro-blitz) feat(research): add comprehensive strategic business analysis documents
-| * 10c9772 feat(ultra-think): complete strategic analysis framework with ChatGPT-5 integration
-| * a3542ac feat(strategic-collaboration): create optimized ChatGPT-5 partnership prompts
-| * 2b8bbe3 chore: update archived site submodule reference
-| * 451e0dc docs: update ChatGPT-5 collaboration status with security audit completion
-| * 333d48b feat(security): complete comprehensive security audit and remediation
-| * 92c4c16 feat(launch-gates): complete enforcement-first revenue optimization system
-| * 8371943 feat: complete 48-hour parallel execution (B+A+C paths)
-| * 4d972c0 (setup/scaffold) feat(gtm): complete 3 micro-steps for revenue optimization
-|/  
-* 3bccc72 (origin/setup/scaffold) feat(audit): add self-serve repository audit workflow
-* 323cafd feat(reports): implement pricing experiments and rush delivery
-* e90f668 chore(scaffold): monorepo, probot stub, overlay studio, reports landers, workflows\n\nCurrent Status:\n====================\nM test-repos/driftguard-test-repo
-?? repo-tree.txt\n\nBranches:\n====================\nci/site-e2e-hardening
+|/|   
+* | 4efd088 docs: fix broken links detected by hardened docs-ci
+* | 3839256 (origin/docs/lychee-hardening-20250820, docs/lychee-hardening-20250820) fix(docs): correct lychee.toml github_token configuration
+* | ad02c08 fix(docs): add remaining missing spell check terms
+* | 0dd4d83 fix(docs): comprehensive cspell dictionary update
+| | * c6a7719 (security/ai-guardrails-workflow-20250820) fix(docs): comprehensive cspell dictionary update
+| | * 1e4b89c (origin/security/ai-guardrails-workflow-20250820) fix(security): implement Grype SARIF post-processing for GitHub Code Scanning compatibility
+| | | * be2f89d (refs/stash) WIP on docs/lychee-hardening-20250820: 9a15cec fix(docs): add missing technical terms to cspell dictionary
+| |_|/| 
+|/| | | 
+| | | * c4d5e3f index on docs/lychee-hardening-20250820: 9a15cec fix(docs): add missing technical terms to cspell dictionary
+| |_|/  
+|/| |   
+* | | 9a15cec fix(docs): add missing technical terms to cspell dictionary
+* | | 48cca17 docs(ci): harden link check (lychee config + ignores + retries); keep gate required
+| |/  
+|/|   
+* | bdd3c54 fix(security): resolve path-to-regexp high severity vulnerability
+* | cfe9bc6 fix(docs): add cspell configuration for technical terms
+* | 8572711 fix(security): adjust Grype severity threshold to high
+| | * 0d01983 (origin/docs/touchups-20250820-fresh, docs/touchups-20250820-fresh) fix(ci): correct lychee-action commit hash
+| | * b0049d4 fix(ci): use lychee-action for reliable link checking
+| | * db8131c fix(ci): improve lychee installation reliability
+| | * 3a87d35 fix(docs): expand cspell dictionary for business methodology terms
+| | * e4c047f fix(docs): add cspell configuration for technical terms
+| | * 68d01df fix(docs): fix docs-checks workflow and add docs README
+| | * 7304118 (origin/legal/privacy-disclosures-20250820, legal/privacy-disclosures-20250820) ci(docs): add docs-checks workflow with cspell and lychee
+| | * 829f587 docs: add README docs link + optional lychee ignore
+| | | * 4173502 (origin/ci/consolidate-workflows-20250820, ci/consolidate-workflows-20250820) ci(docs): pin lychee action to v2.5.0; keep job names and gating unchanged
+| | | * 0cf734a (origin/hygiene/gitignore-and-untrack-20250820, hygiene/gitignore-and-untrack-20250820) chore(repo): add .gitignore and stop tracking generated/log artifacts (dist/, test-results/, .orchestrator/)
+| | | * ba8d465 (origin/site/footer-legal-links-20250820, site/footer-legal-links-20250820) feat(site): add static /privacy page mirroring PRIVACY.md content
+| |_|/  
+|/| |   
+* | | 486f080 feat(site): add footer links for Privacy, Ads & Endorsements, and Cookie Preferences with optional CMP hook
+* | | a57492d docs(legal): add GDPR Art.13 privacy notice + FTC disclosures + engineering hooks
+* | | d1095ff fix(security): correct SARIF file path for Gitleaks upload
+* | | 12deac0 fix(security): remove invalid --severity flag from semgrep ci command
+* | | 9ad897f fix(security): use proper regex for snap files in Gitleaks allowlist\n\nCurrent Status:\n====================\nM README.md
+ M audit-report.json
+ M last-commits.txt
+ M repo-tree.txt
+ M scripts/repo_audit.mjs
+?? "# Refactor Plan \342\200\223 Pabrai Governance.txt"
+?? .env.example
+?? .github/workflows/billing-smoke.yml
+?? .github/workflows/stack-health-check.yml
+?? MMTUEntertainment-sbom_sca.spdx.json
+?? SECURITY-GATES-AUDIT.md
+?? cleanup_plan.md
+?? docker-compose.override.yml
+?? docs/Branch-Protection.md
+?? docs/Checklist-After-Merge.md
+?? docs/Checklist-PR-Smoke.md
+?? docs/Project-Instructions.md
+?? docs/refactor-plan-pabrai.md
+?? docs/security/ssdf-map.md
+?? docs/update-service-health-protection-20250821/
+?? functions/
+?? gitleaks-test.sarif
+?? legal/BILLING.md
+?? products/site/components/
+?? products/site/dist/account.html
+?? products/site/dist/legal/
+?? products/site/pages/account.html
+?? products/site/pages/legal/
+?? products/site/tests/
+?? scripts/test-sarif-fix.py
+?? semgrep-test.sarif
+?? semgrep.sarif
+?? services/
+?? stacks/business-ops/docker-compose.override.yml
+?? test-results/tests-billing-smoke-billin-3f5e8-ckout-posts-correct-payload-chromium/
+?? test-results/tests-billing-smoke-billin-ee88a-hows-Manage-billing-Portal--Mobile-Chrome/
+?? test-results/tests-billing-smoke-billin-ee88a-hows-Manage-billing-Portal--chromium/
+?? test-results/tests-billing-smoke-billin-ee88a-hows-Manage-billing-Portal--firefox/
+?? zammad-official/\n\nBranches:\n====================\narchive/remove-obsolete-dirs-20250820
+  chore/add-security-concurrency
+  chore/site-e2e-smoke-guardrails
+  ci/actionlint-job-gate-20250819
+  ci/add-ci-rationale-comments-20250819
+  ci/consolidate-workflows-20250820
+  ci/docs-linkcheck-20250819
+  ci/job-gating-repo-audit-secret-scan-20250819
+  ci/semgrep-job-gate-20250819
+  ci/site-e2e-hardening
+  ci/stack-health-smoke-20250820
+  docs/archive-20250820
+  docs/diataxis-spine-20250820
+* docs/fix-broken-links-20250821
+  docs/lychee-hardening-20250820
+  docs/revloop-docs-fix-20250819
+  docs/security-triage-20250819
+  docs/touchups-20250820
+  docs/touchups-20250820-fresh
+  docs/update-branch-protection-20250820
   docs/working-notes-20250819
+  experiments/revenue-loops-20250819
   feat/overlay-pro-blitz
+  fix/ci-gitleaks-actionlint-20250819
+  governance/branch-protection-20250820
+  hygiene/cleanup-ads-20250820
+  hygiene/cleanup-triage-and-backups-20250820
+  hygiene/gitignore-and-untrack-20250820
+  legal/privacy-disclosures-20250820
   main
+  obs/andon-metrics-stub-20250819
+  obs/andon-observability-stack-20250819
   pivot/cleanup-20250818
+  sec/gates-20250820
+  security/ai-guardrails-workflow-20250820
+  security/quarantine-growth-20250820
+  security/semgrep-tune-20250819
+  security/semgrep-upgrade-20250819
   setup/scaffold
+  site/footer-legal-links-20250820
+  stack/ops-service-fixes-20250820
+  stack/oss-business-ops-20250819
+  stack/oss-business-ops-20250820
+  stack/zammad-fix-restart-20250820
+  tools/rag-mcp-20250820
   triage/archive-20250819
   triage/archive-dashboards-20250819
-* triage/archive-moves-20250819
+  remotes/origin/archive/remove-obsolete-dirs-20250820
+  remotes/origin/chore/add-security-concurrency
+  remotes/origin/chore/site-e2e-smoke-guardrails
+  remotes/origin/ci/actionlint-job-gate-20250819
+  remotes/origin/ci/add-ci-rationale-comments-20250819
+  remotes/origin/ci/consolidate-workflows-20250820
+  remotes/origin/ci/docs-linkcheck-20250819
+  remotes/origin/ci/job-gating-repo-audit-secret-scan-20250819
+  remotes/origin/ci/semgrep-job-gate-20250819
   remotes/origin/ci/site-e2e-hardening
+  remotes/origin/ci/smoke-job-gating-20250819
+  remotes/origin/ci/stack-health-smoke-20250820
+  remotes/origin/docs/archive-20250820
+  remotes/origin/docs/diataxis-spine-20250820
+  remotes/origin/docs/fix-broken-links-20250821
+  remotes/origin/docs/lychee-hardening-20250820
+  remotes/origin/docs/revloop-docs-fix-20250819
+  remotes/origin/docs/security-triage-20250819
+  remotes/origin/docs/touchups-20250820
+  remotes/origin/docs/touchups-20250820-fresh
+  remotes/origin/docs/update-branch-protection-20250820
   remotes/origin/docs/working-notes-20250819
+  remotes/origin/experiments/revenue-loops-20250819
   remotes/origin/feat/overlay-pro-blitz
+  remotes/origin/fix/ci-gitleaks-actionlint-20250819
+  remotes/origin/governance/branch-protection-20250820
+  remotes/origin/hygiene/cleanup-ads-20250820
+  remotes/origin/hygiene/cleanup-triage-and-backups-20250820
+  remotes/origin/hygiene/gitignore-and-untrack-20250820
+  remotes/origin/legal/privacy-disclosures-20250820
   remotes/origin/main
+  remotes/origin/obs/andon-observability-stack-20250819
   remotes/origin/pivot/cleanup-20250818
+  remotes/origin/research/system-kits-20250819
+  remotes/origin/sec/gates-20250820
+  remotes/origin/security/ai-guardrails-workflow-20250820
+  remotes/origin/security/quarantine-growth-20250820
+  remotes/origin/security/semgrep-tune-20250819
+  remotes/origin/security/semgrep-upgrade-20250819
   remotes/origin/setup/scaffold
+  remotes/origin/site/footer-legal-links-20250820
+  remotes/origin/stack/ops-service-fixes-20250820
+  remotes/origin/stack/zammad-fix-restart-20250820
   remotes/origin/triage/archive-20250819
   remotes/origin/triage/archive-moves-20250819
-  remotes/origin/triage/repo-slim-20250819\n\nGenerated: 2025-08-19T21:38:50.014Z
+  remotes/origin/triage/repo-slim-20250819\n\nGenerated: 2025-08-21T12:32:43.111Z

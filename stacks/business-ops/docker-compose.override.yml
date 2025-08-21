@@ -1,0 +1,193 @@
+# Business-Ops Stack Override - Research-Based Zammad Fix
+# Replaces problematic single-container Zammad with official multi-service setup
+# Based on web research: zammad/zammad-docker-compose:6.5 has entrypoint issues
+
+version: "3.8"
+
+services:
+  # Override the problematic single-container Zammad with multi-service setup
+  zammad:
+    # Disable the original service by setting scale to 0
+    # We'll replace it with the official components below
+    scale: 0
+
+  # Official Zammad Multi-Service Setup
+  # Based on: https://github.com/zammad/zammad-docker-compose
+  zammad-postgresql:
+    image: postgres:17.5-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: zammad_production
+      POSTGRES_USER: zammad
+      POSTGRES_PASSWORD: zammad_secret
+    volumes:
+      - zammad-postgresql-data:/var/lib/postgresql/data
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zammad"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  zammad-memcached:
+    image: memcached:1.6.39-alpine
+    restart: always
+    command: memcached -m 256M
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "11211"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  zammad-redis-new:
+    image: redis:7.4.5-alpine
+    restart: always
+    volumes:
+      - zammad-redis-new-data:/data
+    networks:
+      - business-ops
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  zammad-init:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: on-failure
+    user: 0:0
+    command: ["zammad-init"]
+    environment: &zammad-environment
+      MEMCACHE_SERVERS: zammad-memcached:11211
+      POSTGRESQL_DB: zammad_production
+      POSTGRESQL_HOST: zammad-postgresql
+      POSTGRESQL_USER: zammad
+      POSTGRESQL_PASS: zammad_secret
+      POSTGRESQL_PORT: 5432
+      REDIS_URL: redis://zammad-redis-new:6379
+      ELASTICSEARCH_ENABLED: "false"
+      TZ: UTC
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    networks:
+      - business-ops
+    depends_on:
+      zammad-postgresql:
+        condition: service_healthy
+
+  zammad-railsserver:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: always
+    command: ["zammad-railsserver"]
+    ports:
+      - "8084:3000"  # Expose Rails server directly since it's working
+    environment:
+      <<: *zammad-environment
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    networks:
+      - business-ops
+    depends_on:
+      - zammad-memcached
+      - zammad-postgresql
+      - zammad-redis-new
+      - zammad-init
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/api/v1/getting_started"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  zammad-scheduler:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: always
+    command: ["zammad-scheduler"]
+    environment:
+      <<: *zammad-environment
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    networks:
+      - business-ops
+    depends_on:
+      - zammad-memcached
+      - zammad-postgresql
+      - zammad-redis-new
+      - zammad-init
+
+  zammad-websocket:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: always
+    command: ["zammad-websocket"]
+    environment:
+      <<: *zammad-environment
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    networks:
+      - business-ops
+    depends_on:
+      - zammad-memcached
+      - zammad-postgresql
+      - zammad-redis-new
+      - zammad-init
+
+  zammad-nginx:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: always
+    command: ["zammad-nginx"]
+    ports:
+      - "8082:8080"  # Map to same port as original Zammad
+    environment:
+      <<: *zammad-environment
+      NGINX_PORT: 8080
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    networks:
+      - business-ops
+    depends_on:
+      zammad-railsserver:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/v1/getting_started", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.zammad.rule=Host(`zammad.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.zammad.entrypoints=websecure"
+      - "traefik.http.routers.zammad.tls.certresolver=letsencrypt"
+      - "traefik.http.services.zammad.loadbalancer.server.port=8080"
+      - "traefik.http.routers.zammad-http.rule=Host(`zammad.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.zammad-http.entrypoints=web"
+      - "traefik.http.routers.zammad-http.middlewares=redirect-to-https"
+
+  # Cal.com fix - correct health endpoint + environment
+  calcom:
+    environment:
+      NEXTAUTH_URL: http://localhost:8085
+      NEXTAUTH_SECRET: jIosgz0HGRpmOeDcruLWBo0eXTjOSILo
+      ENCRYPTION_KEY: ygsXwy54CVG90Ha4K1IcTNe5IzmaUog6
+      DATABASE_URL: postgresql://calendso:calendso@calcom-db:5432/calendso
+      NEXT_PUBLIC_WEBAPP_URL: http://localhost:8085
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/auth/setup?step=1').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  zammad-postgresql-data:
+    driver: local
+  zammad-redis-new-data:
+    driver: local
+  zammad-storage:
+    driver: local
