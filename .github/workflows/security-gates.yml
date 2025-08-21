@@ -113,6 +113,43 @@ jobs:
           severity-cutoff: high
           output-format: sarif
           output-file: grype.sarif
+      - name: Fix SARIF artifact locations for GitHub Code Scanning
+        if: always()
+        run: |
+          if [ -f grype.sarif ]; then
+            # Fix empty artifact locations in SARIF file
+            python3 -c "
+          import json
+          import sys
+          
+          try:
+              with open('grype.sarif', 'r') as f:
+                  sarif = json.load(f)
+              
+              # Fix empty artifact locations
+              for run in sarif.get('runs', []):
+                  for result in run.get('results', []):
+                      for location in result.get('locations', []):
+                          physical_loc = location.get('physicalLocation', {})
+                          artifact_loc = physical_loc.get('artifactLocation', {})
+                          
+                          # If uri is empty or missing, set a default value
+                          if not artifact_loc.get('uri', '').strip():
+                              artifact_loc['uri'] = 'dependencies'
+                              physical_loc['artifactLocation'] = artifact_loc
+                              location['physicalLocation'] = physical_loc
+              
+              with open('grype.sarif', 'w') as f:
+                  json.dump(sarif, f, indent=2)
+              
+              print('Fixed SARIF artifact locations')
+          except Exception as e:
+              print(f'Error processing SARIF file: {e}')
+              sys.exit(1)
+          "
+          else
+            echo "No SARIF file found to process"
+          fi
       - name: Upload Grype SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@db69a5182d331d562e511302ae3c9aafd5fada6c # v3
