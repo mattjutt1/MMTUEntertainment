@@ -1,3 +1,4 @@
+---
 paths:
   exclude:
     - node_modules/**
@@ -18,7 +19,8 @@ rules:
       - pattern: eval(...)
 
   - id: js-ts-child-process-exec
-    message: Avoid executing shell commands; use safer spawn APIs and validate inputs.
+    message: >-
+      Avoid executing shell commands; use safer spawn APIs and validate inputs.
     languages: [javascript, typescript]
     severity: ERROR
     patterns:
@@ -35,5 +37,4 @@ rules:
     patterns:
       - pattern: "'http://'+..."
       - pattern: '"http://"+...'
-      - pattern-regex: 'http://[^\s"\']+'
-
+      - pattern-regex: "http://[^\\s\"']+"
