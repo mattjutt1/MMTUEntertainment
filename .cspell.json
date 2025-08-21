@@ -1,0 +1,26 @@
+{
+  "version": "0.2",
+  "gitignore": true,
+  "words": [
+    "MMTU", "mmtu", "mmtuentertainment", "mattjutt",
+    "cloudflare", "cloudflared", "vercel", "supabase",
+    "semgrep", "gitleaks", "actionlint", "huggingface",
+    "posthog", "hubspot", "driftguard", "sonarcloud",
+    "veracode", "codacy", "brevo", "shadcn", "smee",
+    "lychee", "cspell", "gtag", "drwxr", 
+    "scriptable", "laravel", "odoo", "hledger", "beancount",
+    "gantt", "redmine", "mautic", "metabase", "redash",
+    "activepieces", "magento", "pandoc", "upsell", "signups",
+    "signup", "toolset", "runbook", "mindmap", "autoboot",
+    "neuro", "modelcontextprotocol", "ccpa", "inlines"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "test-results/**",
+    "*.lock",
+    "*.snap"
+  ]
+}
