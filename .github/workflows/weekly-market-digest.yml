@@ -11,19 +11,26 @@ jobs:
       - uses: actions/checkout@v4
       - name: Generate decisions digest
         run: |
-          echo "# Weekly Decisions Digest - $(date)" > digest.md
-          echo "## Active Bets Status" >> digest.md
-          gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")' >> digest.md
-          echo "## Completed This Week" >> digest.md
-          gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Done" and .updatedAt > "'$(date -d '7 days ago' -Idate)'")' >> digest.md
-          echo "## Governance Metrics" >> digest.md
-          echo "- Active bet count: $(gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")' | wc -l)" >> digest.md
-          echo "- ≤3 bet compliance: $(if [ $(gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")' | wc -l) -le 3 ]; then echo "✅ PASS"; else echo "❌ FAIL"; fi)" >> digest.md
-          echo "## Weekly Review Actions" >> digest.md
-          echo "- [ ] Review kill/scale signals for each active bet" >> digest.md
-          echo "- [ ] Assess upside evidence and progress metrics" >> digest.md  
-          echo "- [ ] Validate circle of competence alignment" >> digest.md
-          echo "- [ ] Update bet status based on 4-week cycle rules" >> digest.md
+          {
+            echo "# Weekly Decisions Digest - $(date)"
+            echo "## Active Bets Status"
+            gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")'
+            echo "## Completed This Week"
+            gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Done" and .updatedAt > "'"$(date -d '7 days ago' -Idate)"'")'
+            echo "## Governance Metrics"
+            ACTIVE_COUNT=$(gh project view "Business Action Tracks – 2025H2" --json items | jq '.items[] | select(.status=="Active")' | wc -l)
+            echo "- Active bet count: $ACTIVE_COUNT"
+            if [ "$ACTIVE_COUNT" -le 3 ]; then
+              echo "- ≤3 bet compliance: ✅ PASS"
+            else
+              echo "- ≤3 bet compliance: ❌ FAIL"
+            fi
+            echo "## Weekly Review Actions"
+            echo "- [ ] Review kill/scale signals for each active bet"
+            echo "- [ ] Assess upside evidence and progress metrics"
+            echo "- [ ] Validate circle of competence alignment"
+            echo "- [ ] Update bet status based on 4-week cycle rules"
+          } > digest.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload digest

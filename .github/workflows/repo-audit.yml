@@ -85,18 +85,20 @@ jobs:
           
       - name: Display audit summary
         run: |
-          echo "## Repository Audit Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Files:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          head -20 repo-tree.txt >> $GITHUB_STEP_SUMMARY
-          echo "..." >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Audit Results:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
-          cat audit-report.json >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Repository Audit Summary"
+            echo ""
+            echo "### Files:"
+            echo "\`\`\`"
+            head -20 repo-tree.txt
+            echo "..."
+            echo "\`\`\`"
+            echo ""
+            echo "### Audit Results:"
+            echo "\`\`\`json"
+            cat audit-report.json
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
           
       - name: Fail if critical issues found
         run: |
