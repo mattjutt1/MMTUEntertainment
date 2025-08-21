@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execSync } from 'child_process';
-import { writeFileSync, existsSync, statSync, readdirSync } from 'fs';
+import { writeFileSync, existsSync, statSync, readdirSync, readFileSync } from 'fs';
 import { join, relative } from 'path';
 
 const AUDIT_TIMESTAMP = new Date().toISOString();
@@ -118,22 +118,36 @@ function auditRequiredArtifacts() {
   // Determine branch context and requirements - handle CI environment
   let currentBranch = executeCommand('git branch --show-current');
   
-  // Debug: Show all GitHub environment variables
-  console.log('🔧 GitHub Environment Variables:');
-  Object.keys(process.env)
-    .filter(key => key.startsWith('GITHUB_'))
-    .forEach(key => console.log(`🔧   ${key}: ${process.env[key]}`));
-  
   // Fallback for CI environments where branch --show-current might be empty
   if (!currentBranch || currentBranch.startsWith('ERROR:')) {
-    // Try alternative methods to get branch name
     console.log('🔧 Branch detection fallbacks:');
-    console.log(`🔧   GITHUB_HEAD_REF: ${process.env.GITHUB_HEAD_REF}`);
-    console.log(`🔧   GITHUB_REF_NAME: ${process.env.GITHUB_REF_NAME}`);
-    console.log(`🔧   GITHUB_REF: ${process.env.GITHUB_REF}`);
+    console.log(`🔧   GITHUB_HEAD_REF: ${process.env.GITHUB_HEAD_REF || 'undefined'}`);
+    console.log(`🔧   GITHUB_REF_NAME: ${process.env.GITHUB_REF_NAME || 'undefined'}`);
+    console.log(`🔧   GITHUB_REF: ${process.env.GITHUB_REF || 'undefined'}`);
     
-    currentBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || 
-                   executeCommand('git rev-parse --abbrev-ref HEAD') || 'unknown';
+    // For pull requests, get branch name from GitHub event data
+    if (process.env.GITHUB_REF && process.env.GITHUB_REF.startsWith('refs/pull/')) {
+      console.log(`🔧 Detected pull request context`);
+      try {
+        // Read the GitHub event data
+        const eventPath = process.env.GITHUB_EVENT_PATH;
+        if (eventPath && existsSync(eventPath)) {
+          const eventData = JSON.parse(readFileSync(eventPath, 'utf8'));
+          if (eventData.pull_request && eventData.pull_request.head && eventData.pull_request.head.ref) {
+            currentBranch = eventData.pull_request.head.ref;
+            console.log(`🔧 PR head branch from event: ${currentBranch}`);
+          }
+        }
+      } catch (error) {
+        console.log(`🔧 Failed to get branch from event data: ${error.message}`);
+      }
+    }
+    
+    // If still no branch, try other fallbacks
+    if (!currentBranch || currentBranch === 'unknown') {
+      currentBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || 
+                     executeCommand('git rev-parse --abbrev-ref HEAD') || 'unknown';
+    }
   }
   
   const isDocsBranch = currentBranch.includes('docs/') || currentBranch.includes('doc/');
