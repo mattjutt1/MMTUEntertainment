@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run lychee on markdown
-        uses: lycheeverse/lychee-action@v1
+        uses: lycheeverse/lychee-action@v2.5.0
         with:
           args: "--no-progress --require-https --accept 200,999 **/*.md"
         env:
