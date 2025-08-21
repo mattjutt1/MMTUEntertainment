@@ -16,9 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       site_changed: ${{ steps.filter.outputs.site }}
-      landing_changed: ${{ steps.filter.outputs.landing }}
-      pricing_changed: ${{ steps.filter.outputs.pricing }}
-      contact_changed: ${{ steps.filter.outputs.contact }}
+      docs_only: ${{ steps.filter.outputs.docs_only }}
     steps:
       - uses: actions/checkout@v4
       - id: filter
@@ -29,26 +27,19 @@ jobs:
               - 'products/site/**'
               - '.github/workflows/site-e2e-smoke.yml'
               - '!archive/**'
-            landing:
-              - 'products/site/**/index.html'
-              - 'products/site/**/home/**'
-              - 'products/site/**/landing/**'
-              - 'products/site/e2e/revenue-path.spec.ts'
-            pricing:
-              - 'products/site/**/pricing/**'
-              - 'products/site/**/offer/**'
-              - 'products/site/e2e/revenue-funnel.spec.ts'
-            contact:
-              - 'products/site/**/contact/**'
-              - 'products/site/**/terms/**'
-              - 'products/site/**/privacy/**'
+            docs_only:
+              - 'docs/**'
+              - '*.md'
+              - '.cspell.json'
+              - '.lycheeignore'
+              - '.lychee.toml'
 
   smoke:
     name: 'Site E2E Smoke Tests (≤3min)'
     needs: detect
     if: needs.detect.outputs.site_changed == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -67,41 +58,8 @@ jobs:
       - name: Install Playwright browsers (chromium only)
         run: pnpm exec playwright install chromium --with-deps
 
-      # Always run landing smoke (critical path)
-      - name: Run Landing Smoke
-        run: |
-          pnpm exec playwright test \
-            --config products/site/playwright.smoke.ts \
-            --grep "@smoke.*@landing" \
-            --project=chromium \
-            --reporter=github,line \
-            --max-failures=1
-        env:
-          CI: true
-
-      # Run pricing smoke only if pricing paths changed  
-      - name: Run Pricing Smoke
-        if: needs.detect.outputs.pricing_changed == 'true'
-        run: |
-          pnpm exec playwright test \
-            --config products/site/playwright.smoke.ts \
-            --grep "@smoke.*@pricing" \
-            --project=chromium \
-            --reporter=github,line \
-            --max-failures=1
-        env:
-          CI: true
-
-      # Run contact smoke only if contact paths changed
-      - name: Run Contact Smoke
-        if: needs.detect.outputs.contact_changed == 'true'
-        run: |
-          pnpm exec playwright test \
-            --config products/site/playwright.smoke.ts \
-            --grep "@smoke.*@contact" \
-            --project=chromium \
-            --reporter=github,line \
-            --max-failures=1
+      - name: Run Site E2E Smoke Tests
+        run: pnpm test:e2e:site --project=chromium --reporter=line
         env:
           CI: true
 
@@ -118,23 +76,34 @@ jobs:
       - name: Report test summary
         if: always()
         run: |
-          {
-            echo "## 🧪 Site E2E Micro-Smoke Results"
-            echo "- **Runtime Target**: ≤3 minutes"
-            echo "- **Browser**: Chromium only"
-            echo "- **Modules**: Landing always + conditional pricing/contact"
-            if [ "${{ job.status }}" == "success" ]; then
-              echo "- **Status**: ✅ All micro-smokes passed"
-            else
-              echo "- **Status**: ❌ Micro-smokes failed - investigate immediately"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+          echo "## 🧪 Site E2E Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runtime Target**: ≤3 minutes" >> $GITHUB_STEP_SUMMARY
+          echo "- **Browser**: Chromium only" >> $GITHUB_STEP_SUMMARY
+          echo "- **Scope**: Critical revenue funnel paths" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "- **Status**: ✅ All smoke tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status**: ❌ Smoke tests failed - investigate immediately" >> $GITHUB_STEP_SUMMARY
+          fi
 
-  # Optional: explicit no-op job for observability on non-site PRs
+  # No-op job for docs-only PRs (satisfies required check without running E2E)
+  smoke-docs-noop:
+    name: 'Site E2E Smoke Tests (≤3min)'
+    needs: detect
+    if: needs.detect.outputs.docs_only == 'true' && needs.detect.outputs.site_changed != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "✅ Docs-only PR detected; E2E tests not required for documentation changes."
+      
+  # No-op job for other non-site PRs (E2E required but no site changes)
   smoke-noop:
     name: 'Site E2E Smoke Tests (≤3min)'
     needs: detect
-    if: needs.detect.outputs.site_changed != 'true'
+    if: needs.detect.outputs.site_changed != 'true' && needs.detect.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     steps:
-      - run: echo "No site changes detected; skipping smoke tests."
+      - run: |
+          echo "❌ Non-docs PR without site changes detected."
+          echo "E2E tests are required for all PRs except docs-only changes."
+          echo "This PR affects non-site, non-docs files and must include site changes or be docs-only."
+          exit 1
