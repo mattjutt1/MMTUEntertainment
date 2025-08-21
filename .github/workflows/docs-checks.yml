@@ -9,12 +9,6 @@ on:
       - ".lychee.toml"
       - ".github/workflows/docs-checks.yml"
   merge_group:
-    paths:
-      - "**/*.md"
-      - "docs/**"
-      - ".lycheeignore"
-      - ".lychee.toml"
-      - ".github/workflows/docs-checks.yml"
 
 concurrency:
   group: docs-ci-${{ github.ref }}
