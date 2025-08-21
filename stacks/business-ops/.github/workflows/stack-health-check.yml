@@ -1,0 +1,165 @@
+name: Stack Health Smoke Check
+
+on:
+  pull_request:
+    paths:
+      - 'stacks/business-ops/docker-compose*.yml'
+      - 'stacks/business-ops/.env*'
+      - '.github/workflows/stack-health-check.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'stacks/business-ops/docker-compose*.yml'
+      - 'stacks/business-ops/.env*'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours for monitoring
+
+defaults:
+  run:
+    working-directory: stacks/business-ops
+
+jobs:
+  stack-health:
+    name: Services Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        compose-profile: [core]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Create environment file
+        run: |
+          cp .env.example .env
+          # Override with CI-specific settings
+          sed -i 's/DOMAIN=localhost/DOMAIN=ci.localhost/' .env
+          sed -i 's/COMPOSE_PROFILES=core/COMPOSE_PROFILES=${{ matrix.compose-profile }}/' .env
+      
+      - name: Start Business-Ops Stack
+        run: |
+          echo "Starting stack with profile: ${{ matrix.compose-profile }}"
+          docker compose --profile ${{ matrix.compose-profile }} up -d
+          echo "Waiting for services to initialize..."
+          sleep 30
+      
+      - name: Wait for database initialization
+        run: |
+          echo "Checking database health..."
+          timeout 180 bash -c 'until docker compose exec -T calcom-db pg_isready -U calendso; do sleep 5; done'
+          timeout 180 bash -c 'until docker compose exec -T zammad-postgresql pg_isready -U zammad; do sleep 5; done'
+      
+      - name: Wait for service startup
+        run: |
+          echo "Waiting for application services..."
+          sleep 60  # Allow Cal.com and Zammad to fully initialize
+      
+      - name: Health Check - Cal.com
+        run: |
+          echo "Testing Cal.com health endpoint..."
+          
+          # Retry logic for Cal.com startup (Best Practice: Mitigates flakiness)
+          cal_status=""
+          for i in {1..12}; do
+            cal_status=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8085/auth/setup?step=1" 2>/dev/null || echo "000")
+            if [ "$cal_status" = "200" ]; then
+              echo "✅ Cal.com health check passed (attempt $i/12, status: $cal_status)"
+              break
+            else
+              echo "⏳ Cal.com attempt $i/12 failed (status: $cal_status)"
+              if [ $i -eq 12 ]; then
+                echo "❌ Cal.com health check failed after 12 attempts"
+                echo "📋 Container logs for debugging:"
+                docker compose logs calcom --tail=20
+                exit 1
+              fi
+              sleep 15
+            fi
+          done
+      
+      - name: Health Check - Zammad Multi-Service
+        run: |
+          echo "Testing Zammad multi-service health..."
+          
+          # Check if all Zammad services are running (Best Practice: Validate dependencies)
+          echo "📋 Validating Zammad service containers:"
+          docker compose ps zammad-postgresql zammad-memcached zammad-redis-new
+          
+          # Get Rails server IP and test directly
+          RAILS_IP=$(docker inspect business-ops_zammad-railsserver_1 | jq -r '.[0].NetworkSettings.Networks."business-ops-network".IPAddress' 2>/dev/null || echo "")
+          echo "Testing Zammad Rails server at IP: $RAILS_IP"
+          
+          # Retry logic for Zammad Rails startup (Best Practice: Handles slow Rails boot)
+          zammad_success=false
+          for i in {1..8}; do
+            if [ -n "$RAILS_IP" ] && [ "$RAILS_IP" != "null" ]; then
+              response=$(curl -s --max-time 10 "http://$RAILS_IP:3000/api/v1/getting_started" 2>/dev/null || echo "")
+              if echo "$response" | jq -e '.setup_done != null' > /dev/null 2>&1; then
+                echo "✅ Zammad Rails server health check passed (attempt $i/8)"
+                zammad_success=true
+                break
+              fi
+            fi
+            echo "⏳ Zammad Rails attempt $i/8 failed"
+            if [ $i -eq 8 ]; then
+              echo "❌ Zammad Rails health check failed after 8 attempts"
+              echo "📋 Container logs for debugging:"
+              docker compose logs zammad-railsserver --tail=20
+              docker compose logs zammad-postgresql --tail=10
+              exit 1
+            fi
+            sleep 20
+          done
+      
+      - name: Detailed Service Status
+        if: always()
+        run: |
+          echo "=== FINAL SERVICE STATUS ==="
+          docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
+          
+          echo -e "\n=== HEALTH ENDPOINT RESPONSES ==="
+          echo "Cal.com (8085):"
+          curl -s --max-time 5 "http://localhost:8085/auth/setup?step=1" | head -1 || echo "Failed"
+          
+          echo -e "\nZammad Rails API:"
+          RAILS_IP=$(docker inspect business-ops_zammad-railsserver_1 | jq -r '.[0].NetworkSettings.Networks."business-ops-network".IPAddress' 2>/dev/null || echo "container_not_found")
+          if [ "$RAILS_IP" != "container_not_found" ] && [ "$RAILS_IP" != "null" ]; then
+            curl -s --max-time 5 "http://$RAILS_IP:3000/api/v1/getting_started" || echo "Failed"
+          else
+            echo "Rails container not accessible"
+          fi
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          echo "Cleaning up containers..."
+          docker compose --profile ${{ matrix.compose-profile }} down -v --remove-orphans
+          docker system prune -f
+
+  # Additional job to validate against required endpoints list
+  endpoint-validation:
+    name: Validate Required Endpoints
+    runs-on: ubuntu-latest
+    needs: stack-health
+    if: success()
+    
+    steps:
+      - name: Validate endpoint requirements
+        run: |
+          echo "✅ Stack Health Check completed successfully"
+          echo "Required endpoints validated:"
+          echo "  - Cal.com: http://localhost:8085/auth/setup?step=1 → 200 OK"
+          echo "  - Zammad: Rails API /api/v1/getting_started → JSON response"
+          echo ""
+          echo "🛡️ Branch protection criteria met:"
+          echo "  - Core services startup successful"
+          echo "  - Health endpoints responding correctly"
+          echo "  - Multi-service architecture validated"
