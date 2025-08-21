@@ -76,15 +76,17 @@ jobs:
       - name: Report test summary
         if: always()
         run: |
-          echo "## 🧪 Site E2E Smoke Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Runtime Target**: ≤3 minutes" >> $GITHUB_STEP_SUMMARY
-          echo "- **Browser**: Chromium only" >> $GITHUB_STEP_SUMMARY
-          echo "- **Scope**: Critical revenue funnel paths" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "- **Status**: ✅ All smoke tests passed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- **Status**: ❌ Smoke tests failed - investigate immediately" >> $GITHUB_STEP_SUMMARY
-          fi
+          {
+            echo "## 🧪 Site E2E Smoke Test Results"
+            echo "- **Runtime Target**: ≤3 minutes"
+            echo "- **Browser**: Chromium only"
+            echo "- **Scope**: Critical revenue funnel paths"
+            if [ "${{ job.status }}" == "success" ]; then
+              echo "- **Status**: ✅ All smoke tests passed"
+            else
+              echo "- **Status**: ❌ Smoke tests failed - investigate immediately"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # No-op job for docs-only PRs (satisfies required check without running E2E)
   smoke-docs-noop:
