@@ -35,7 +35,7 @@ jobs:
     needs: detect
     if: needs.detect.outputs.site_changed == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 6
 
     steps:
       - name: Checkout
@@ -55,7 +55,12 @@ jobs:
         run: pnpm exec playwright install chromium --with-deps
 
       - name: Run Site E2E Smoke Tests
-        run: pnpm test:e2e:site --project=chromium --reporter=line
+        run: |
+          pnpm test:e2e:site \
+            --project=chromium \
+            --reporter=github,line \
+            --timeout=30000 \
+            --max-failures=1
         env:
           CI: true
 
