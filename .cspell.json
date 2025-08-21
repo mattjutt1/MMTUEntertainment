@@ -32,7 +32,7 @@
     "Eliyahu", "Goldratt", "Kaplan", "Drucker's", "Doerr", "kpis",
     "Investopedia", "Axelos", "Synder", "Leapsome", "Diátaxis",
     "CALENDSO", "NEXTAUTH", "tulpn", "isready", "Mbps", "calcom",
-    "SSDF", "Syft", "railsserver", "Xperts", "APISIX", "Defynd", "Pabrai", "undoable"
+    "SSDF", "Syft", "railsserver", "Xperts", "APISIX", "Defynd", "Pabrai", "undoable", "lockfiles", "operationalization"
   ],
   "ignorePaths": [
     "node_modules/**",
