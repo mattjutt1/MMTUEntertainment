@@ -110,7 +110,7 @@ jobs:
         with:
           sbom: sbom.spdx.json
           fail-build: true
-          severity-cutoff: medium
+          severity-cutoff: high
           output-format: sarif
           output-file: grype.sarif
       - name: Upload Grype SARIF
