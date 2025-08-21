@@ -152,13 +152,14 @@ function auditRequiredArtifacts() {
   
   const isDocsBranch = currentBranch.includes('docs/') || currentBranch.includes('doc/');
   const isMainBranch = currentBranch === 'main' || currentBranch === 'master';
+  const isSecurityBranch = currentBranch.includes('fix/') || currentBranch.includes('security/') || currentBranch.includes('gitleaks') || currentBranch.includes('semgrep');
   
   console.log(`🔧 Current branch: ${currentBranch}`);
-  console.log(`🔧 Branch type: ${isDocsBranch ? 'docs' : isMainBranch ? 'main' : 'feature'}`);
+  console.log(`🔧 Branch type: ${isDocsBranch ? 'docs' : isMainBranch ? 'main' : isSecurityBranch ? 'security-fix' : 'feature'}`);
   
   // Use appropriate artifact requirements based on branch
-  const REQUIRED_ARTIFACTS = isDocsBranch ? BASE_ARTIFACTS : [...BASE_ARTIFACTS, ...FULL_ARTIFACTS];
-  const REQUIRED_APPS = isDocsBranch ? [] : EXPECTED_APPS; // No apps required for docs branches
+  const REQUIRED_ARTIFACTS = (isDocsBranch || isSecurityBranch) ? BASE_ARTIFACTS : [...BASE_ARTIFACTS, ...FULL_ARTIFACTS];
+  const REQUIRED_APPS = (isDocsBranch || isSecurityBranch) ? [] : EXPECTED_APPS; // No apps required for docs/security branches
   
   console.log(`🔧 Expecting ${REQUIRED_ARTIFACTS.length} artifacts and ${REQUIRED_APPS.length} apps for this branch type`);
   
@@ -182,7 +183,8 @@ function auditRequiredArtifacts() {
       current_branch: currentBranch,
       is_docs_branch: isDocsBranch,
       is_main_branch: isMainBranch,
-      requirements_applied: isDocsBranch ? 'docs-minimal' : 'full'
+      is_security_branch: isSecurityBranch,
+      requirements_applied: (isDocsBranch || isSecurityBranch) ? 'minimal' : 'full'
     }
   };
   
