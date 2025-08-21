@@ -6,3 +6,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: zricethezav/gitleaks-action@v2.3.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
