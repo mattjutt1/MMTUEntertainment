@@ -39,7 +39,7 @@ jobs:
     needs: detect
     if: needs.detect.outputs.site_changed == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 3
 
     steps:
       - name: Checkout
