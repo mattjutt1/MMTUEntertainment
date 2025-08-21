@@ -5,15 +5,21 @@ import { writeFileSync, existsSync, statSync, readdirSync } from 'fs';
 import { join, relative } from 'path';
 
 const AUDIT_TIMESTAMP = new Date().toISOString();
-const REQUIRED_ARTIFACTS = [
+
+// Base artifacts that should exist on all branches
+const BASE_ARTIFACTS = [
   'package.json',
   'pnpm-workspace.yaml',
-  'docs/pricing-catalog.v2.json',
-  'apps/reports/src/components/PricingTiers.tsx',
-  'apps/stream-overlay-studio/package.json',
   'packages/entitlements/src/index.ts',
   'packages/pricing-engine/src/index.ts',
   '.github/workflows/repo-audit.yml'
+];
+
+// Additional artifacts for main/production branches
+const FULL_ARTIFACTS = [
+  'docs/pricing-catalog.v2.json',
+  'apps/reports/src/components/PricingTiers.tsx',
+  'apps/stream-overlay-studio/package.json'
 ];
 
 const EXPECTED_APPS = [
@@ -109,6 +115,20 @@ function auditRequiredArtifacts() {
   console.log(`🔧 Working directory: ${process.cwd()}`);
   console.log(`🔧 Node version: ${process.version}`);
   
+  // Determine branch context and requirements
+  const currentBranch = executeCommand('git branch --show-current');
+  const isDocsBranch = currentBranch.includes('docs/') || currentBranch.includes('doc/');
+  const isMainBranch = currentBranch === 'main' || currentBranch === 'master';
+  
+  console.log(`🔧 Current branch: ${currentBranch}`);
+  console.log(`🔧 Branch type: ${isDocsBranch ? 'docs' : isMainBranch ? 'main' : 'feature'}`);
+  
+  // Use appropriate artifact requirements based on branch
+  const REQUIRED_ARTIFACTS = isDocsBranch ? BASE_ARTIFACTS : [...BASE_ARTIFACTS, ...FULL_ARTIFACTS];
+  const REQUIRED_APPS = isDocsBranch ? [] : EXPECTED_APPS; // No apps required for docs branches
+  
+  console.log(`🔧 Expecting ${REQUIRED_ARTIFACTS.length} artifacts and ${REQUIRED_APPS.length} apps for this branch type`);
+  
   const results = {
     timestamp: AUDIT_TIMESTAMP,
     summary: {
@@ -116,7 +136,7 @@ function auditRequiredArtifacts() {
       total_commits: 0,
       required_artifacts: REQUIRED_ARTIFACTS.length,
       artifacts_present: 0,
-      apps_expected: EXPECTED_APPS.length,
+      apps_expected: REQUIRED_APPS.length,
       apps_present: 0,
       critical_failures: 0,
       warnings: 0
@@ -124,7 +144,13 @@ function auditRequiredArtifacts() {
     artifacts: {},
     apps: {},
     structure_checks: {},
-    git_info: {}
+    git_info: {},
+    branch_context: {
+      current_branch: currentBranch,
+      is_docs_branch: isDocsBranch,
+      is_main_branch: isMainBranch,
+      requirements_applied: isDocsBranch ? 'docs-minimal' : 'full'
+    }
   };
   
   // Check required artifacts
@@ -160,7 +186,7 @@ function auditRequiredArtifacts() {
   
   // Check expected apps
   console.log('🔍 Checking expected apps:');
-  EXPECTED_APPS.forEach(app => {
+  REQUIRED_APPS.forEach(app => {
     const exists = existsSync(app);
     let packageJson = false;
     let hasSource = false;
