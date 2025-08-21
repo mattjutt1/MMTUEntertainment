@@ -120,7 +120,7 @@ jobs:
         run: |
           semgrep scan \
             --config=p/owasp-top-ten --config=p/nodejs --config=p/typescript --config=p/react \
-            --severity=high --severity=critical \
+            --severity=ERROR \
             --baseline-commit "$BASELINE" \
             --error .
         env:
