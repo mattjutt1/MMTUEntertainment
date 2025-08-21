@@ -106,6 +106,9 @@ function generateCommitHistory() {
 
 function auditRequiredArtifacts() {
   console.log('🔍 Auditing required artifacts...');
+  console.log(`🔧 Working directory: ${process.cwd()}`);
+  console.log(`🔧 Script directory: ${__dirname || 'N/A'}`);
+  console.log(`🔧 Node version: ${process.version}`);
   
   const results = {
     timestamp: AUDIT_TIMESTAMP,
@@ -126,21 +129,25 @@ function auditRequiredArtifacts() {
   };
   
   // Check required artifacts
+  console.log('🔍 Checking required artifacts:');
   REQUIRED_ARTIFACTS.forEach(artifact => {
     const exists = existsSync(artifact);
     let size = 0;
     let type = 'file';
     
     if (exists) {
+      console.log(`  ✅ ${artifact}`);
       try {
         const stats = statSync(artifact);
         size = stats.size;
         type = stats.isDirectory() ? 'directory' : 'file';
         results.summary.artifacts_present++;
       } catch (err) {
+        console.log(`  ⚠️ ${artifact} (stat error: ${err.message})`);
         exists = false;
       }
     } else {
+      console.log(`  ❌ ${artifact} (not found)`);
       results.summary.critical_failures++;
     }
     
@@ -153,12 +160,14 @@ function auditRequiredArtifacts() {
   });
   
   // Check expected apps
+  console.log('🔍 Checking expected apps:');
   EXPECTED_APPS.forEach(app => {
     const exists = existsSync(app);
     let packageJson = false;
     let hasSource = false;
     
     if (exists) {
+      console.log(`  ✅ ${app}`);
       results.summary.apps_present++;
       packageJson = existsSync(join(app, 'package.json'));
       
@@ -170,6 +179,7 @@ function auditRequiredArtifacts() {
         // Ignore
       }
     } else {
+      console.log(`  ❌ ${app} (not found)`);
       results.summary.warnings++;
     }
     
