@@ -9,6 +9,8 @@ paths:
     - '**/*.test.*'
     - '**/__tests__/**'
     - '**/*.spec.*'
+    - 'test-repos/**'
+    - 'scripts/repo_audit.mjs'
 
 rules:
   - id: js-ts-avoid-eval
