@@ -1,9 +1,0 @@
-{
-  "form_endpoint": "TODO_FORMS_URL",
-  "email_field": "email",
-  "success_message": "Thanks! We'll be in touch soon.",
-  "providers": {
-    "formspree": "TODO_FORMSPREE_ENDPOINT",
-    "mailchimp": "TODO_MAILCHIMP_ENDPOINT"
-  }
-}

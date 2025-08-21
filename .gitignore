@@ -1,6 +1,27 @@
-/apps/
-!/apps/revloop/
-node_modules/
-.env
+## Build / coverage / test artifacts
+dist/
+build/
+coverage/
+test-results/
+.orchestrator/
+.wrangler/tmp/
+
+## Logs
+*.log
+*.log.*
+
+## OS / editor noise
 .DS_Store
-.orchestrator/*
+Thumbs.db
+
+## Local env files (scope to dev hosts only)
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+## Quarantined secrets (local only; not tracked)
+ops/secrets/**
+
+## Windows alt-streams copied from screenshots
+*.Zone.Identifier
