@@ -12,7 +12,14 @@
     "gantt", "redmine", "mautic", "metabase", "redash",
     "activepieces", "magento", "pandoc", "upsell", "signups",
     "signup", "toolset", "runbook", "mindmap", "autoboot",
-    "neuro", "modelcontextprotocol", "ccpa", "inlines"
+    "neuro", "modelcontextprotocol", "ccpa", "inlines",
+    "PDCA", "PDSA", "pdsa", "CAPA", "DMAIC", "POOGI", "ITIL", "ITSM",
+    "Jidoka", "jidoka", "Takt", "takt", "Kaizen", "kaizen", "Andon", "andon",
+    "heijunka", "henkey", "ruleset", "conv", "neuromap", "runbooks",
+    "Diátaxis", "SARIF", "CODEOWNERS", "Upselling", "callouts",
+    "Luca", "Pacioli", "Pacioli's", "Sakichi", "Kiichiro", "codifiable",
+    "Shewhart", "Eliyahu", "Goldratt", "Kaplan", "Drucker's", "Doerr",
+    "Investopedia", "Axelos", "Synder", "Leapsome", "kpis"
   ],
   "ignorePaths": [
     "node_modules/**",
