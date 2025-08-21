@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   full-e2e:
-    name: 'Site E2E Full Suite (${{ inputs.browsers || "all" }} browsers)'
+    name: 'Site E2E Full Suite (${{ inputs.browsers || ''all'' }} browsers)'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
