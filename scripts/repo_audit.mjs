@@ -115,8 +115,16 @@ function auditRequiredArtifacts() {
   console.log(`🔧 Working directory: ${process.cwd()}`);
   console.log(`🔧 Node version: ${process.version}`);
   
-  // Determine branch context and requirements
-  const currentBranch = executeCommand('git branch --show-current');
+  // Determine branch context and requirements - handle CI environment
+  let currentBranch = executeCommand('git branch --show-current');
+  
+  // Fallback for CI environments where branch --show-current might be empty
+  if (!currentBranch || currentBranch.startsWith('ERROR:')) {
+    // Try alternative methods to get branch name
+    currentBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || 
+                   executeCommand('git rev-parse --abbrev-ref HEAD') || 'unknown';
+  }
+  
   const isDocsBranch = currentBranch.includes('docs/') || currentBranch.includes('doc/');
   const isMainBranch = currentBranch === 'main' || currentBranch === 'master';
   
