@@ -23,13 +23,13 @@ const config: PlaywrightTestConfig = {
     },
   ],
   
-  // Use much faster webServer for smoke tests - no build required
+  // Fast webServer for smoke tests - quick build + serve
   webServer: {
-    // Skip build for speed - assume site is already built or use simple health check
-    command: `echo "Smoke test mode - assuming site is available" && exit 0`,
-    url: base.webServer?.url || 'http://localhost:4173',
-    reuseExistingServer: true,
-    timeout: 5_000, // Much faster startup
+    // Quick build + serve for smoke tests  
+    command: `node build.js && npx serve dist -p 4173`,
+    url: 'http://localhost:4173',
+    reuseExistingServer: !process.env.CI,
+    timeout: 60_000, // Allow time for build but faster than full
     cwd: '.'
   },
   
