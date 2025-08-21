@@ -12,7 +12,16 @@
     "gantt", "redmine", "mautic", "metabase", "redash",
     "activepieces", "magento", "pandoc", "upsell", "signups",
     "signup", "toolset", "runbook", "mindmap", "autoboot",
-    "neuro", "modelcontextprotocol", "ccpa", "inlines"
+    "neuro", "modelcontextprotocol", "ccpa", "inlines",
+    "MTTA", "MTTR", "revloop", "weco", "andon", "Andon", "lookback",
+    "Jidoka", "jidoka", "Airtable", "airtable", "AIRTABLE", 
+    "Keycloak", "keycloak", "Automations", "automations",
+    "Documenso", "documenso", "Docu", "Listmonk", "listmonk",
+    "invoiceninja", "openproject", "outlinewiki", "nextcloud",
+    "erpnext", "JDBC", "Mgmt", "henkey", "hightemp", "mkummer",
+    "awkoy", "felores", "distrihub", "creds", "shionhonda",
+    "mysite", "myfile", "knadh", "amaboh", "mcpservers",
+    "atlasfutures", "korotovsky"
   ],
   "ignorePaths": [
     "node_modules/**",
