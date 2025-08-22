@@ -33,7 +33,8 @@
     "Investopedia", "Axelos", "Synder", "Leapsome", "Diátaxis",
     "CALENDSO", "NEXTAUTH", "tulpn", "isready", "Mbps", "calcom",
     "SSDF", "Syft", "railsserver", "Xperts", "APISIX", "Defynd", "Pabrai", "undoable", "lockfiles", "operationalization",
-    "negotiables", "runlog", "Nygard", "MADR", "Bunnyshell"
+    "negotiables", "runlog", "Nygard", "MADR", "Bunnyshell",
+    "resl", "oneline", "Pabrai's", "Operationalization", "Idate", "SDLC", "Grype", "grype", "pabrai", "toggleable"
   ],
   // Infrastructure retrigger - gitleaks scans passed but infrastructure failed
   "ignorePaths": [

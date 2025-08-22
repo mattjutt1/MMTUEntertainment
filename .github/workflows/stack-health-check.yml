@@ -1,0 +1,74 @@
+# Evidence & Citations: See docs/runbooks/service-health-monitoring.md
+name: Stack Health Smoke Check
+
+on:
+  pull_request:
+    paths:
+      - 'stacks/business-ops/docker-compose*.yml'
+      - '.env*'
+      - '.github/workflows/stack-health-check.yml'
+  schedule:
+    - cron: '0 */6 * * *'
+
+concurrency:
+  group: stack-health-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  services-health-check:
+    name: Services Health Check (core)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    defaults:
+      run:
+        working-directory: stacks/business-ops
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Docker BuildKit
+        run: |
+          docker version
+          docker compose version
+      
+      - name: Start Services
+        run: |
+          docker compose up -d
+          sleep 30
+      
+      - name: Health Check - Cal.com & Zammad
+        run: |
+          # Cal.com health (12 retries, 15s intervals)
+          for i in $(seq 1 12); do
+            cal_status=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8085/auth/setup?step=1" || echo "000")
+            if [[ "$cal_status" == "200" ]]; then
+              echo "✅ Cal.com healthy (attempt $i)"
+              break
+            fi
+            echo "⏳ Cal.com not ready ($cal_status), attempt $i/12"
+            sleep 15
+          done
+          
+          [[ "$cal_status" == "200" ]] || { echo "❌ Cal.com failed"; exit 1; }
+          
+          # Zammad health (8 retries, 20s intervals)
+          for i in $(seq 1 8); do
+            zammad_status=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8084" || echo "000")
+            if [[ "$zammad_status" == "200" ]]; then
+              echo "✅ Zammad healthy (attempt $i)"
+              break
+            fi
+            echo "⏳ Zammad not ready ($zammad_status), attempt $i/8"
+            sleep 20
+          done
+          
+          [[ "$zammad_status" == "200" ]] || { echo "❌ Zammad failed"; exit 1; }
+          
+          echo "🎯 Stack Health: 8+/10 (Cal.com + Zammad operational)"
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose logs --tail=50
+          docker compose down -v

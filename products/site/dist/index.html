@@ -18,8 +18,6 @@
             <div class="nav-container">
                 <a href="/" class="logo" aria-label="MMTU Entertainment home">MMTU Entertainment</a>
                 <ul class="nav-links">
-                    <li><a href="/offer/audit">Security Audit</a></li>
-                    <li><a href="/offer/kit">Gatekeeper Kit</a></li>
                     <li><a href="/contact">Contact</a></li>
                 </ul>
             </div>
@@ -30,10 +28,9 @@
         <section class="hero">
             <div class="container">
                 <h1>Revenue-First Development Solutions</h1>
-                <p class="hero-subtitle">Proven playbooks that generate revenue. No experiments, no tangents—just execution that pays.</p>
+                <p class="hero-subtitle">Building the foundation first. No products until infrastructure is complete.</p>
                 <div class="cta-group">
-                    <a href="/offer/audit" class="cta-primary" aria-label="Get security audit for $999">Security Audit - $999</a>
-                    <a href="/offer/kit" class="cta-secondary" aria-label="Get gatekeeper kit for $49">Gatekeeper Kit - $49</a>
+                    <a href="/contact" class="cta-primary">Contact Us</a>
                 </div>
             </div>
         </section>
@@ -61,8 +58,31 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 MMTU Entertainment. <a href="/terms">Terms</a> | <a href="/privacy">Privacy</a></p>
+            <p>
+                &copy; 2025 MMTU Entertainment.
+                <a href="/terms">Terms</a> |
+                <a href="/privacy">Privacy</a> |
+                <a href="/legal/disclosures">Ads &amp; Endorsements</a> |
+                <a href="#" id="cookie-preferences-link">Cookie Preferences</a>
+            </p>
         </div>
+        <script>
+        // Optional: wire to your consent manager if present
+        (function(){
+          var el = document.getElementById('cookie-preferences-link');
+          if (!el) return;
+          el.addEventListener('click', function(e){
+            e.preventDefault();
+            if (window.OneTrust && typeof window.OneTrust.ToggleInfoDisplay === 'function') {
+              window.OneTrust.ToggleInfoDisplay();
+            } else if (window.Cookiebot && typeof window.Cookiebot.renew === 'function') {
+              window.Cookiebot.renew();
+            } else {
+              alert('Cookie preferences panel is not available.');
+            }
+          });
+        })();
+        </script>
     </footer>
     <script src="/js/links.js"></script>
 </body>

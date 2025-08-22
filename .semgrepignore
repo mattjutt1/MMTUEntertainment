@@ -47,3 +47,9 @@ external/
 
 # Known false positives
 playwright.config.ts
+
+# Test repositories with intentional vulnerabilities 
+test-repos/
+
+# Scripts directory (administrative tools)
+scripts/

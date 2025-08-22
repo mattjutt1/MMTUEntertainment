@@ -1,0 +1,36 @@
+
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "mission:lint",
+      "type": "shell",
+      "problemMatcher": [],
+      "linux": {
+        "command": "bash",
+        "args": [
+          "-lc",
+          "grep -q '''We build software that fixes what truly hurts—so real people win.''' README.md && grep -q '''We build software that fixes what truly hurts—so real people win.''' docs/Project-Instructions.md"
+        ]
+      },
+      "osx": {
+        "command": "bash",
+        "args": [
+          "-lc",
+          "grep -q '''We build software that fixes what truly hurts—so real people win.''' README.md && grep -q '''We build software that fixes what truly hurts—so real people win.''' docs/Project-Instructions.md"
+        ]
+      },
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-Command",
+          "$ErrorActionPreference='''Stop'''; $m='''We build software that fixes what truly hurts—so real people win.'''; " +
+          "if ( (Select-String -Path '''README.md''' -Pattern $m -Quiet) -and (Select-String -Path '''docs/Project-Instructions.md''' -Pattern $m -Quiet) ) { exit 0 } else { Write-Error '''Mission string missing in README.md or docs/Project-Instructions.md'''; exit 1 }"
+        ]
+      }
+    }
+  ]
+}

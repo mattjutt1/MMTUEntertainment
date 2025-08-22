@@ -1,0 +1,123 @@
+version: "3.9"
+services:
+  calcom:
+    env_file:
+      - ops/env/.env.cal  # create locally from .env.cal.example
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/auth/setup?step=1').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+
+  # Zammad Multi-Service Setup (Official Docker Compose)
+  zammad-postgresql:
+    image: postgres:17.5-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: zammad_production
+      POSTGRES_USER: zammad
+      POSTGRES_PASSWORD: zammad_secret
+    volumes:
+      - zammad-postgresql-data:/var/lib/postgresql/data
+
+  zammad-memcached:
+    image: memcached:1.6.39-alpine
+    restart: always
+    command: memcached -m 256M
+
+  zammad-redis:
+    image: redis:7.4.5-alpine
+    restart: always
+    volumes:
+      - zammad-redis-data:/data
+
+  zammad-init:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: on-failure
+    user: 0:0
+    command: ["zammad-init"]
+    environment: &zammad-environment
+      MEMCACHE_SERVERS: zammad-memcached:11211
+      POSTGRESQL_DB: zammad_production
+      POSTGRESQL_HOST: zammad-postgresql
+      POSTGRESQL_USER: zammad
+      POSTGRESQL_PASS: zammad_secret
+      POSTGRESQL_PORT: 5432
+      REDIS_URL: redis://zammad-redis:6379
+      ELASTICSEARCH_ENABLED: "false"
+      TZ: UTC
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    depends_on:
+      - zammad-postgresql
+
+  zammad-railsserver:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: always
+    command: ["zammad-railsserver"]
+    environment:
+      <<: *zammad-environment
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    depends_on:
+      - zammad-memcached
+      - zammad-postgresql
+      - zammad-redis
+      - zammad-init
+
+  zammad-scheduler:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: always
+    command: ["zammad-scheduler"]
+    environment:
+      <<: *zammad-environment
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    depends_on:
+      - zammad-memcached
+      - zammad-postgresql
+      - zammad-redis
+      - zammad-init
+
+  zammad-websocket:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: always
+    command: ["zammad-websocket"]
+    environment:
+      <<: *zammad-environment
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    depends_on:
+      - zammad-memcached
+      - zammad-postgresql
+      - zammad-redis
+      - zammad-init
+
+  zammad-nginx:
+    image: ghcr.io/zammad/zammad:6.5.1
+    restart: always
+    command: ["zammad-nginx"]
+    ports:
+      - "8084:8080"
+    environment:
+      <<: *zammad-environment
+      NGINX_PORT: 8080
+    volumes:
+      - zammad-storage:/opt/zammad/storage
+    depends_on:
+      - zammad-railsserver
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/v1/getting_started"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  zammad-postgresql-data:
+    driver: local
+  zammad-redis-data:
+    driver: local
+  zammad-storage:
+    driver: local
