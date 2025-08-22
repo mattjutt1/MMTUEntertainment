@@ -21,6 +21,18 @@ python3 scripts/triage.py front-desk/intake.md front-desk/triage.md front-desk/l
 python3 scripts/verify_log.py front-desk/log.jsonl   # stop if chain broken
 echo "[front-desk] log verified"
 
+# Git integrity and snapshot
+if command -v git &> /dev/null && [ -d .git ]; then
+    echo "[front-desk] creating git snapshot..."
+    git add front-desk/log.jsonl front-desk/triage.md
+    git commit -m "front-desk: daily snapshot $(date -u +%Y-%m-%d)" || true
+    echo "[front-desk] verifying git repository integrity..."
+    git fsck --full --strict
+    echo "[front-desk] git integrity verified"
+else
+    echo "[front-desk] warning: no git repository found, skipping integrity check"
+fi
+
 now=$(date +%s); left=$((deadline-now))
 [ $left -lt 0 ] && left=0
 echo "Close-out: choose ONE item to do now (<= $left sec)."

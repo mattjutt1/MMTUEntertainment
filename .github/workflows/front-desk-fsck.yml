@@ -1,0 +1,55 @@
+name: Front Desk FSCK
+on: 
+  workflow_dispatch:
+  push:
+    paths:
+      - 'front-desk/log.jsonl'
+      - 'scripts/verify_log.py'
+      - 'scripts/triage.py'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Verify log integrity
+        run: python3 scripts/verify_log.py front-desk/log.jsonl
+        
+      - name: Generate integrity report
+        run: |
+          echo "# Front Desk Integrity Report" > fsck-report.txt
+          echo "**Generated:** $(date -u)" >> fsck-report.txt
+          echo "**Commit:** ${{ github.sha }}" >> fsck-report.txt
+          echo "" >> fsck-report.txt
+          echo "## Verification Results" >> fsck-report.txt
+          python3 scripts/verify_log.py front-desk/log.jsonl >> fsck-report.txt 2>&1
+          echo "" >> fsck-report.txt
+          echo "## Log Statistics" >> fsck-report.txt
+          if [ -f front-desk/log.jsonl ]; then
+            echo "- **Total entries:** $(wc -l < front-desk/log.jsonl)" >> fsck-report.txt
+            echo "- **File size:** $(stat -f%z front-desk/log.jsonl 2>/dev/null || stat -c%s front-desk/log.jsonl) bytes" >> fsck-report.txt
+            echo "- **Latest entry:** $(tail -1 front-desk/log.jsonl | jq -r .ts 2>/dev/null || echo 'N/A')" >> fsck-report.txt
+          else
+            echo "- **Status:** No log file found" >> fsck-report.txt
+          fi
+          
+      - name: Upload integrity report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: front-desk-integrity-report
+          path: fsck-report.txt
+          retention-days: 30
+          
+      - name: Check for Git repository integrity
+        run: |
+          echo "## Git Repository Integrity" >> fsck-report.txt
+          git fsck --full --strict >> fsck-report.txt 2>&1 || echo "Git fsck found issues" >> fsck-report.txt
