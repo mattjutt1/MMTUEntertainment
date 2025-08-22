@@ -24,12 +24,6 @@ def main(path):
                 entry = json.loads(line)
             except Exception as e:
                 print(f"ERROR line {i}: not JSON ({e})"); return 1
-            # Skip comment lines
-            if "_comment" in entry:
-                continue
-            # Skip marriage protection events (different format)
-            if entry.get("module") == "marriage_protection":
-                continue
             if "hash" not in entry or "prev_hash" not in entry:
                 print(f"ERROR line {i}: missing hash/prev_hash"); return 1
             if entry.get("prev_hash") != (prev or ""):
