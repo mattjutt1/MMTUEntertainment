@@ -135,11 +135,11 @@ test.describe('Revenue Path E2E Tests @smoke @landing', () => {
     
     // Navigate to Contact (only available navigation in foundation mode)
     await page.click('a[href="/contact"]');
-    await expect(page.url()).toContain('/contact');
+    expect(page.url()).toContain('/contact');
     
     // Navigate back to home
     await page.click('a[href="/"]');
-    await expect(page.url()).not.toContain('/contact');
+    expect(page.url()).not.toContain('/contact');
     
     // Verify no product navigation exists (foundation first)
     await expect(page.locator('a[href="/offer/audit"]')).toHaveCount(0);
