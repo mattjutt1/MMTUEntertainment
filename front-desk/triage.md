@@ -30,3 +30,13 @@
 | T-0028 | improve accessibility contrast | open |  | general |
 | T-0029 | resolve SSL certificate warning | open |  | general |
 | T-0030 | debug newsletter signup form | open |  | general |
+| T-0031 | fix homepage link | open |  | general |
+| T-0032 | update contact form validation | open |  | general |
+| T-0033 | repair footer navigation | open |  | general |
+| T-0034 | optimize image loading speed | open |  | general |
+| T-0035 | add mobile menu toggle | open |  | general |
+| T-0036 | fix broken search functionality | open |  | general |
+| T-0037 | update privacy policy page | open |  | general |
+| T-0038 | improve accessibility contrast | open |  | general |
+| T-0039 | resolve SSL certificate warning | open |  | general |
+| T-0040 | debug newsletter signup form | open |  | general |

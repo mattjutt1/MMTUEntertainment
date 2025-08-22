@@ -37,6 +37,6 @@
 {"hash":"6020ee71c79becb122468137f345e578e83969b286fe47893f42860b67525898","id":"T-0040","note":"debug newsletter signup form","prev_hash":"e8b3212a51a2896cb9551aee5821d35a273ee7052c3db2708f5199d2ab1f1224","src":"intake","status":"open","ts":"2025-08-22T22:01:42Z","type":"triage"}
 {"timestamp":"2025-08-22T22:02:46Z","module":"marriage_protection","action":"idle_detected","seconds_today":0,"task_ref":"T-0040","data":{"seconds":0},"source":"marriage_protection"}
 {"timestamp":"2025-08-22T22:03:07Z","module":"marriage_protection","action":"daemon_stopped","seconds_today":0,"task_ref":"T-0040","data":{"pid":219312},"source":"marriage_protection"}
-{"timestamp":"2025-08-22T22:10:38Z","module":"marriage_protection","action":"daemon_start_requested","seconds_today":0,"task_ref":"T-0040","data":{"pid":233289}},"source":"marriage_protection"}
-{"timestamp":"2025-08-22T22:10:38Z","module":"marriage_protection","action":"daemon_started","seconds_today":0,"task_ref":"T-0040","data":{"initial_seconds":0}},"source":"marriage_protection"}
-{"timestamp":"2025-08-22T22:10:43Z","module":"marriage_protection","action":"daemon_stopped","seconds_today":0,"task_ref":"T-0040","data":{"pid":233289}},"source":"marriage_protection"}
+{"timestamp":"2025-08-22T22:10:38Z","module":"marriage_protection","action":"daemon_start_requested","seconds_today":0,"task_ref":"T-0040","data":{"pid":233289},"source":"marriage_protection"}
+{"timestamp":"2025-08-22T22:10:38Z","module":"marriage_protection","action":"daemon_started","seconds_today":0,"task_ref":"T-0040","data":{"initial_seconds":0},"source":"marriage_protection"}
+{"timestamp":"2025-08-22T22:10:43Z","module":"marriage_protection","action":"daemon_stopped","seconds_today":0,"task_ref":"T-0040","data":{"pid":233289},"source":"marriage_protection"}
