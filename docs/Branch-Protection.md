@@ -1,13 +1,24 @@
 # Branch Protection - MMTUEntertainment
 
-## Service Health Workflow Integration
+## Required CI Checks
 
-### Required Status Check
+### Service Health Workflow Integration
+
+**Status Check Name**: 
 ```
 Stack Health Check / Services Health Check (core)
 ```
 
 **Purpose**: Validates Business-Ops Stack health (Cal.com + Zammad) before merging infrastructure changes.
+
+### Site E2E Smoke Tests
+
+**Status Check Name**:
+```
+Site E2E Smoke Tests (≤3min)
+```
+
+**Purpose**: Validates critical revenue funnel paths and site functionality before merging. Runs Playwright tests with quarantine support for known brittle tests.
 
 **Evidence & Citations**: See `docs/best-practices/smoke-testing-references.md`
 
@@ -27,6 +38,7 @@ Navigate to: `Repository → Settings → Branches → Add rule`
   - ✅ **Require branches to be up to date before merging**
   - ✅ **Status checks that are required:**
     - `Stack Health Check / Services Health Check (core)`
+    - `Site E2E Smoke Tests (≤3min)`
 
 ### 3. Recommended Settings
 - ✅ **Require conversation resolution before merging**
