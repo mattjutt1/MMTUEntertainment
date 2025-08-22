@@ -1,0 +1,15 @@
+start_at_utc: "2025-08-22T19:47:00Z"
+scope_version: "v0.0"
+constraints:
+  budget_usd_per_month: 0
+  operator_count: 1
+  daily_time_cap_minutes: 60
+module_order:
+  - front-desk   # capture ideas/requests
+  - customers    # reply/close-the-loop
+  - reliability  # simple uptime probe
+success_gate_day_14:
+  front-desk_min_notes: 10
+  customers_min_rescues: 5
+  artifacts_exist: true
+irreversibility: "This file defines the beginning. It never moves or is renamed."
