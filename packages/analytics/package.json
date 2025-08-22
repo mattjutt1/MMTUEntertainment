@@ -1,0 +1,11 @@
+{
+  "name": "@mmtu/analytics",
+  "version": "1.0.0",
+  "description": "PII-safe analytics integration with PostHog",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

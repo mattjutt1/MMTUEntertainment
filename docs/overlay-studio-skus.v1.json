@@ -1,0 +1,66 @@
+{
+  "overlay_studio": {
+    "pro": {
+      "experiment_config": {
+        "type": "multi_arm_bandit",
+        "active": true,
+        "variants": {
+          "pro_9": {
+            "price": 900,
+            "display_price": "$9",
+            "billing": "monthly",
+            "name": "Pro Pass",
+            "weight": 0.5,
+            "headline": "Go live in minutes. Look pro forever.",
+            "subheading": "Pro unlocks export-ready 4K/SVG overlays, one-click scenes, and new seasonal drops every week—so you ship more and fiddle less.",
+            "cta_text": "Start a 3-day Pro Pass — $1",
+            "cta_subtext": "auto-rolls to $9/mo"
+          },
+          "pro_19": {
+            "price": 1900,
+            "display_price": "$19",
+            "billing": "monthly",
+            "name": "Studio Pro",
+            "weight": 0.5,
+            "headline": "Creator-grade? Nah. Studio-grade.",
+            "subheading": "Designed for teams, agencies, and serious creators. SVG masters, 4K renders, and exclusive pro-only template packs.",
+            "cta_text": "Upgrade to Pro — $19/mo",
+            "cta_subtext": "Includes commercial license + pack-of-the-month"
+          }
+        },
+        "features": [
+          "SVG & 4K PNG exports",
+          "Premium template library (12+ templates)",
+          "Vector format support",
+          "PSD file exports",
+          "High-resolution (1440p & 4K)",
+          "Priority support",
+          "Commercial license"
+        ],
+        "analytics_events": {
+          "variant_assigned": "overlay_pro_variant_assigned",
+          "upgrade_view": "overlay_pro_upgrade_view",
+          "upgrade_click": "overlay_pro_upgrade_click",
+          "purchase_success": "overlay_pro_purchase_success"
+        }
+      }
+    },
+    "seasonal_packs": {
+      "valorant_pack": {
+        "price": 500,
+        "name": "Valorant Pro Pack",
+        "templates": ["valorant_classic", "valorant_neon", "valorant_tactical"]
+      },
+      "cozy_pack": {
+        "price": 500,
+        "name": "Cozy Streamer Pack", 
+        "templates": ["cozy_indie", "cozy_reading", "cozy_coffee"]
+      },
+      "retro_pack": {
+        "price": 500,
+        "name": "Retro Pixel Pack",
+        "templates": ["retro_pixel", "retro_arcade", "retro_8bit"]
+      }
+    }
+  }
+}

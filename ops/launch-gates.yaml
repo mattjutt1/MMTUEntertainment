@@ -1,0 +1,87 @@
+# Launch Gates Configuration
+# Experiment promotion criteria with statistical validation
+
+experiments:
+  post_purchase_bundle_v1:
+    name: "Security→Compliance Bundle Upsell"
+    description: "5-report bundle ($199, save $46) post-purchase upsell"
+    ramp: [25, 50, 100]
+    
+    promotion_criteria:
+      stage_25_to_50:
+        min_sample: 200
+        min_time_hours: 48
+        metrics:
+          attach_rate_min: 3.0  # percentage
+          refund_delta_max: 0.5  # percentage points
+      
+      stage_50_to_100:
+        min_sample: 500
+        min_time_days: 7
+        metrics:
+          attach_rate_min: 3.0  # percentage
+          refund_delta_max: 0.5  # percentage points
+    
+    stop_loss:
+      sample_threshold: 500
+      attach_rate_min: 2.0  # kill experiment if below this
+      action: "set_to_zero"
+
+  overlay_pricing_ab_v1:
+    name: "Overlay Studio Pricing A/B Test"
+    description: "$19 control vs $9 variant vs $19 no-promo holdout"
+    arms:
+      - name: "$19_control"
+        allocation: 45
+      - name: "$9_variant" 
+        allocation: 45
+      - name: "$19_no_promo_holdout"
+        allocation: 10
+    
+    min_read_criteria:
+      visitors_per_arm: 1000
+      purchases_per_arm: 50
+    
+    kill_criteria:
+      variant_rpv_threshold: 0.85  # Kill $9 if RPV < 85% of $19
+    
+    followup_criteria:
+      rpv_range: [0.95, 1.05]  # If $9 is 95-105% of $19 RPV
+      downstream_attach_lift: true  # AND lifts downstream attach
+      next_test: "$14_mid"  # Schedule mid-point test
+
+  driftguard_marketplace_v1:
+    name: "DriftGuard GitHub Marketplace Launch"
+    description: "GitHub App marketplace discovery → install → first_run funnel"
+    
+    promotion_criteria:
+      install_rate_min: 10.0  # percentage of views
+      first_run_completion_min: 60.0  # percentage of installs
+    
+    retention_tracking:
+      d1_retention: true
+      d7_retention: true
+      required_for_promotion: "d7_retention"
+
+# Global configuration
+global:
+  default_decision: "DENY"  # When analytics are degraded/missing
+  runlog_path: ".orchestrator/runlog.jsonl"
+  
+  freeze_rules:
+    # When gate is evaluating, freeze merges touching same funnel
+    enabled: true
+    affected_paths:
+      - "/packages/feature-flags/**"
+      - "/apps/*/src/components/bundle/**"
+      - "/apps/*/src/components/pricing/**"
+      - "/apps/*/src/lib/marketplace/**"
+
+  required_labels:
+    - "ramp-change"  # Required for any flag/ops edits
+  
+  review_requirements:
+    codeowners_approval: true
+    paths_requiring_review:
+      - "/ops/**"
+      - "/packages/feature-flags/**"

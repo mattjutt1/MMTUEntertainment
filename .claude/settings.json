@@ -6,7 +6,10 @@
     "mcp:cf-docs:*": "allow",
     "mcp:cf-observability:*": "allow",
     "mcp:cf-bindings:read*": "allow",
-    "mcp:cf-bindings:write*": "ask"
+    "mcp:cf-bindings:write*": "ask",
+    "mcp:semgrep-security:*": "allow"
   },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["semgrep-security"],
   "ui": { "showArtifactsByDefault": true }
 }

@@ -1,0 +1,127 @@
+{
+  "audit_timestamp": "2025-08-14T05:57:00Z",
+  "tools": [
+    {
+      "name": "node",
+      "kind": "runtime",
+      "version": "v24.4.1",
+      "entrypoint": "/home/linuxbrew/.linuxbrew/bin/node",
+      "scopes": ["javascript", "typescript", "build"],
+      "secrets_required": [],
+      "notes": "JavaScript runtime for all apps"
+    },
+    {
+      "name": "pnpm", 
+      "kind": "package_manager",
+      "version": "8.15.0",
+      "entrypoint": "/home/linuxbrew/.linuxbrew/bin/pnpm",
+      "scopes": ["dependencies", "monorepo", "build"],
+      "secrets_required": ["NPM_TOKEN"],
+      "notes": "Monorepo package manager with workspace support"
+    },
+    {
+      "name": "jq",
+      "kind": "utility",
+      "version": "1.7",
+      "entrypoint": "/usr/bin/jq",
+      "scopes": ["json", "parsing", "data_transform"],
+      "secrets_required": [],
+      "notes": "JSON processor for config manipulation"
+    },
+    {
+      "name": "gh",
+      "kind": "cli",
+      "version": "2.76.2",
+      "entrypoint": "/usr/bin/gh", 
+      "scopes": ["github", "api", "workflows", "releases"],
+      "secrets_required": ["GITHUB_TOKEN"],
+      "notes": "GitHub CLI for API operations and workflow management"
+    },
+    {
+      "name": "git",
+      "kind": "vcs",
+      "version": "2.43.0",
+      "entrypoint": "/usr/bin/git",
+      "scopes": ["version_control", "collaboration"],
+      "secrets_required": [],
+      "notes": "Version control system"
+    },
+    {
+      "name": "semgrep",
+      "kind": "security",
+      "version": "1.131.0",
+      "entrypoint": "/home/matt/.local/bin/semgrep",
+      "scopes": ["static_analysis", "security", "code_quality"],
+      "secrets_required": ["SEMGREP_APP_TOKEN"],
+      "notes": "Static analysis security scanner with rules for JS/TS/Python"
+    },
+    {
+      "name": "gitleaks",
+      "kind": "security",
+      "version": "8.28.0",
+      "entrypoint": "/home/matt/.local/bin/gitleaks",
+      "scopes": ["secrets_detection", "security"],
+      "secrets_required": [],
+      "notes": "Git secrets scanner for credential leak detection"
+    },
+    {
+      "name": "actionlint",
+      "kind": "ci_cd",
+      "version": "1.7.7",
+      "entrypoint": "/home/matt/.local/bin/actionlint",
+      "scopes": ["github_actions", "workflow_validation"],
+      "secrets_required": [],
+      "notes": "GitHub Actions workflow syntax checker and best practices validator"
+    },
+    {
+      "name": "wrangler",
+      "kind": "deployment", 
+      "version": "4.29.1",
+      "entrypoint": "/home/matt/.npm-global/bin/wrangler",
+      "scopes": ["cloudflare", "workers", "pages", "deployment"],
+      "secrets_required": ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"],
+      "notes": "Cloudflare Workers/Pages CLI for serverless deployment"
+    },
+    {
+      "name": "vercel",
+      "kind": "deployment",
+      "version": "44.6.5", 
+      "entrypoint": "/home/matt/.npm-global/bin/vercel",
+      "scopes": ["deployment", "serverless", "frontend"],
+      "secrets_required": ["VERCEL_TOKEN"],
+      "notes": "Vercel CLI for frontend deployment and serverless functions"
+    }
+  ],
+  "missing_tools": [
+    {
+      "name": "codeql",
+      "kind": "security",
+      "status": "missing",
+      "notes": "GitHub CodeQL for semantic code analysis - use via Actions"
+    },
+    {
+      "name": "syft",
+      "kind": "security", 
+      "status": "missing",
+      "notes": "SBOM generation tool - can use anchore/sbom-action in workflows"
+    },
+    {
+      "name": "stripe",
+      "kind": "payments",
+      "status": "missing", 
+      "notes": "Stripe CLI for webhook testing - optional for current workflow"
+    }
+  ],
+  "workflow_checks": [
+    "actionlint",
+    "semgrep", 
+    "gitleaks",
+    "repo-audit"
+  ],
+  "missing_checks": [
+    "codeql",
+    "dependency-review",
+    "sbom",
+    "scorecard"
+  ]
+}

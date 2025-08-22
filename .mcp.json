@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "semgrep-security": {
+      "command": "semgrep-mcp",
+      "args": []
+    }
+  }
+}

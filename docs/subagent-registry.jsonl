@@ -1,0 +1,56 @@
+{"agent":"Claude","role":"Lead Dev","skills":["React/TS","Node.js","pnpm","CI/CD","Security","Git"],"ops":["shipping","infra","quality-gates"],"SLA":"10m loops","tools":["node","pnpm","gh","git","semgrep","gitleaks","actionlint","wrangler","vercel"]}
+{"agent":"ChatGPT-5","role":"Lead Planner","skills":["specs","pricing","GTM","copy","strategy"],"ops":["copy","experiments","business-decisions"],"SLA":"instant decisions","tools":["strategic-analysis","market-research","copywriting"]}
+{"agent":"Repo-Audit","role":"CI bot","skills":["tree/log audit","file enumeration","git history"],"ops":["evidence","transparency"],"trigger":"push/pr","tools":["git","bash","jq"]}
+{"agent":"Quality-Gate","role":"CI bot","skills":["lint","leaks","semgrep","actionlint"],"ops":["gate","security-validation"],"trigger":"pr","tools":["semgrep","gitleaks","actionlint","pnpm"]}
+{"agent":"GitHub-Actions","role":"CI/CD","skills":["workflows","automation","checks"],"ops":["build","test","deploy","security"],"trigger":"push/pr","tools":["gh","git","node","pnpm"]}
+{"agent":"Stripe","role":"Payments","skills":["checkout","webhooks","billing"],"ops":["revenue","subscriptions"],"SLA":"200ms edge","tools":["stripe-api"]}
+{"agent":"PostHog","role":"Experiments","skills":["MAB","flags","analytics","funnels"],"ops":["measure","optimize","feature-flags"],"tools":["posthog-api","event-tracking"]}
+{"agent":"HubSpot","role":"CRM","skills":["lead score","pipeline","contact-mgmt"],"ops":["sales-assist","qualification","nurture"],"tools":["hubspot-api","calendly-api"]}
+{"agent":"Cloudflare","role":"Infrastructure","skills":["Workers","Pages","DNS","CDN"],"ops":["deploy","edge-computing","performance"],"tools":["wrangler","cloudflare-api"]}
+{"agent":"Vercel","role":"Frontend Deploy","skills":["serverless","edge","frontend"],"ops":["deploy","preview","performance"],"tools":["vercel","git-integration"]}
+
+SKILLS MATRIX:
+
+Task Type -> Best Agent/Tools (Primary -> Secondary -> Fallback)
+
+Code Development:
+- React/TypeScript -> Claude (node,pnpm,gh) -> GitHub-Actions (build/test)
+- CI/CD Pipeline -> GitHub-Actions (workflows) -> Claude (manual setup)
+- Monorepo Management -> Claude (pnpm,workspaces) -> GitHub-Actions (automation)
+
+Security & Quality:
+- Static Analysis -> Quality-Gate (semgrep) -> Claude (manual review)
+- Secret Detection -> Quality-Gate (gitleaks) -> GitHub-Actions (workflow)
+- Workflow Validation -> Quality-Gate (actionlint) -> Claude (manual)
+- Code Review -> GitHub-Actions (automated) -> Claude (manual review)
+
+Analytics & Experiments:
+- A/B Testing -> PostHog (experiments) -> Claude (manual implementation)
+- Feature Flags -> PostHog (flags) -> Claude (config-based)
+- Conversion Tracking -> PostHog (analytics) -> Claude (custom events)
+- Funnel Analysis -> PostHog (funnels) -> ChatGPT-5 (interpretation)
+
+Business Operations:
+- Lead Scoring -> HubSpot (crm) -> Claude (algorithm implementation)
+- Payment Processing -> Stripe (api) -> Claude (integration)
+- Content/Copy -> ChatGPT-5 (strategy) -> Claude (technical implementation)
+- Pricing Strategy -> ChatGPT-5 (business) -> PostHog (validation)
+
+Infrastructure:
+- Frontend Deploy -> Cloudflare (pages) -> Vercel (backup)
+- Serverless Functions -> Cloudflare (workers) -> Vercel (functions)
+- CDN/Performance -> Cloudflare (edge) -> Claude (optimization)
+- DNS/Domains -> Cloudflare (dns) -> Claude (manual config)
+
+Quality Gates:
+- Pre-commit -> Claude (local) -> GitHub-Actions (hooks)
+- Pre-merge -> Quality-Gate (automated) -> Claude (override)
+- Pre-deploy -> GitHub-Actions (workflow) -> Claude (manual deploy)
+- Post-deploy -> Repo-Audit (verification) -> Claude (validation)
+
+Selection Criteria:
+1. Existing Integration (prefer already-wired tools)
+2. Security Surface (minimize secrets/permissions)  
+3. Performance (fastest execution time)
+4. Reliability (proven track record)
+5. Maintenance (lowest ongoing overhead)

@@ -1,0 +1,2193 @@
+{
+  "config": {
+    "configFile": "/home/matt/MMTUEntertainment/playwright.config.ts",
+    "rootDir": "/home/matt/MMTUEntertainment/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/home/matt/MMTUEntertainment/tests/global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "github",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/matt/MMTUEntertainment/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/matt/MMTUEntertainment/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/bundle-upsell.spec.ts",
+          "**/pricing-experiment.spec.ts",
+          "**/feature-flags.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/matt/MMTUEntertainment/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/matt/MMTUEntertainment/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/bundle-upsell.spec.ts",
+          "**/pricing-experiment.spec.ts",
+          "**/feature-flags.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/matt/MMTUEntertainment/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/home/matt/MMTUEntertainment/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/bundle-upsell.spec.ts",
+          "**/pricing-experiment.spec.ts",
+          "**/feature-flags.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/matt/MMTUEntertainment/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/home/matt/MMTUEntertainment/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/bundle-upsell.spec.ts",
+          "**/pricing-experiment.spec.ts",
+          "**/feature-flags.spec.ts"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/matt/MMTUEntertainment/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/home/matt/MMTUEntertainment/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/bundle-upsell.spec.ts",
+          "**/pricing-experiment.spec.ts",
+          "**/feature-flags.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.54.2",
+    "workers": 8,
+    "webServer": {
+      "command": "pnpm dev --filter=stream-overlay-studio",
+      "url": "http://localhost:3000/health",
+      "reuseExistingServer": true,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "bundle-upsell.spec.ts",
+      "file": "bundle-upsell.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Bundle Upsell Flow",
+          "file": "bundle-upsell.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "shows bundle upsell when flag enabled at 100%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-a3b548f5262a457edbb3",
+              "file": "bundle-upsell.spec.ts",
+              "line": 22,
+              "column": 7
+            },
+            {
+              "title": "hides bundle upsell when flag disabled at 0%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-e3704eae66c2643abd2f",
+              "file": "bundle-upsell.spec.ts",
+              "line": 50,
+              "column": 7
+            },
+            {
+              "title": "completes bundle purchase flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-411ee6b2c3cb380c9a4d",
+              "file": "bundle-upsell.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "tracks bundle offer dismissal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-dcab9ff90d278a3ccbcf",
+              "file": "bundle-upsell.spec.ts",
+              "line": 97,
+              "column": 7
+            },
+            {
+              "title": "persistent flag assignment across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-7f06a26aeb64912cf051",
+              "file": "bundle-upsell.spec.ts",
+              "line": 122,
+              "column": 7
+            },
+            {
+              "title": "timer countdown functionality",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-17ea65eb56dd40dd0965",
+              "file": "bundle-upsell.spec.ts",
+              "line": 144,
+              "column": 7
+            },
+            {
+              "title": "bundle metrics calculation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-7ad8486fc3157c4993fc",
+              "file": "bundle-upsell.spec.ts",
+              "line": 167,
+              "column": 7
+            },
+            {
+              "title": "shows bundle upsell when flag enabled at 100%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-1282b28354143a7398b4",
+              "file": "bundle-upsell.spec.ts",
+              "line": 22,
+              "column": 7
+            },
+            {
+              "title": "hides bundle upsell when flag disabled at 0%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-001c63592753ba39a8c7",
+              "file": "bundle-upsell.spec.ts",
+              "line": 50,
+              "column": 7
+            },
+            {
+              "title": "completes bundle purchase flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-7beb21f2ed36d50d646e",
+              "file": "bundle-upsell.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "tracks bundle offer dismissal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-51933d528aaa928999c5",
+              "file": "bundle-upsell.spec.ts",
+              "line": 97,
+              "column": 7
+            },
+            {
+              "title": "persistent flag assignment across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-277d7ee4441dccee0b09",
+              "file": "bundle-upsell.spec.ts",
+              "line": 122,
+              "column": 7
+            },
+            {
+              "title": "timer countdown functionality",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-dbd92ce4b616dbd3fb55",
+              "file": "bundle-upsell.spec.ts",
+              "line": 144,
+              "column": 7
+            },
+            {
+              "title": "bundle metrics calculation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-8b6424fc8af337441bf9",
+              "file": "bundle-upsell.spec.ts",
+              "line": 167,
+              "column": 7
+            },
+            {
+              "title": "shows bundle upsell when flag enabled at 100%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-0b83590d2ee2aa10e15e",
+              "file": "bundle-upsell.spec.ts",
+              "line": 22,
+              "column": 7
+            },
+            {
+              "title": "hides bundle upsell when flag disabled at 0%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-cbac978322af44c8ebfe",
+              "file": "bundle-upsell.spec.ts",
+              "line": 50,
+              "column": 7
+            },
+            {
+              "title": "completes bundle purchase flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-53a556ec7b08ab937574",
+              "file": "bundle-upsell.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "tracks bundle offer dismissal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-ddaec6de41422b0ea495",
+              "file": "bundle-upsell.spec.ts",
+              "line": 97,
+              "column": 7
+            },
+            {
+              "title": "persistent flag assignment across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-763dbd8be62d0c9e9a5b",
+              "file": "bundle-upsell.spec.ts",
+              "line": 122,
+              "column": 7
+            },
+            {
+              "title": "timer countdown functionality",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-a86b7db8196fc9ec172e",
+              "file": "bundle-upsell.spec.ts",
+              "line": 144,
+              "column": 7
+            },
+            {
+              "title": "bundle metrics calculation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-198cbe4a14e774145b68",
+              "file": "bundle-upsell.spec.ts",
+              "line": 167,
+              "column": 7
+            },
+            {
+              "title": "shows bundle upsell when flag enabled at 100%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-dc50ac433aadff1dbb98",
+              "file": "bundle-upsell.spec.ts",
+              "line": 22,
+              "column": 7
+            },
+            {
+              "title": "hides bundle upsell when flag disabled at 0%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-4e3659203031f95350ce",
+              "file": "bundle-upsell.spec.ts",
+              "line": 50,
+              "column": 7
+            },
+            {
+              "title": "completes bundle purchase flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-184b71eaf521b91fbef9",
+              "file": "bundle-upsell.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "tracks bundle offer dismissal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-53c3e8bb51b21df4f872",
+              "file": "bundle-upsell.spec.ts",
+              "line": 97,
+              "column": 7
+            },
+            {
+              "title": "persistent flag assignment across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-8b59da6b4f814e4e1ee9",
+              "file": "bundle-upsell.spec.ts",
+              "line": 122,
+              "column": 7
+            },
+            {
+              "title": "timer countdown functionality",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-7ef82b0ad2e897cd55be",
+              "file": "bundle-upsell.spec.ts",
+              "line": 144,
+              "column": 7
+            },
+            {
+              "title": "bundle metrics calculation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-6d57cb87da4458eda493",
+              "file": "bundle-upsell.spec.ts",
+              "line": 167,
+              "column": 7
+            },
+            {
+              "title": "shows bundle upsell when flag enabled at 100%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-12f421f4845e8ccd8820",
+              "file": "bundle-upsell.spec.ts",
+              "line": 22,
+              "column": 7
+            },
+            {
+              "title": "hides bundle upsell when flag disabled at 0%",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-cdcd707efb055fbb9220",
+              "file": "bundle-upsell.spec.ts",
+              "line": 50,
+              "column": 7
+            },
+            {
+              "title": "completes bundle purchase flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-ebac4f37bd21914adea0",
+              "file": "bundle-upsell.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "tracks bundle offer dismissal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-8677b15348a87d2e617e",
+              "file": "bundle-upsell.spec.ts",
+              "line": 97,
+              "column": 7
+            },
+            {
+              "title": "persistent flag assignment across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-3ae0b0eb9573c7d2d628",
+              "file": "bundle-upsell.spec.ts",
+              "line": 122,
+              "column": 7
+            },
+            {
+              "title": "timer countdown functionality",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-a77054686f7e4ce4668f",
+              "file": "bundle-upsell.spec.ts",
+              "line": 144,
+              "column": 7
+            },
+            {
+              "title": "bundle metrics calculation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-ae4bc8c61712b59cb971",
+              "file": "bundle-upsell.spec.ts",
+              "line": 167,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Pricing Experiment Arms",
+          "file": "bundle-upsell.spec.ts",
+          "line": 195,
+          "column": 6,
+          "specs": [
+            {
+              "title": "$19 control arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-6ddcd6193f4d15518ae8",
+              "file": "bundle-upsell.spec.ts",
+              "line": 197,
+              "column": 7
+            },
+            {
+              "title": "$9 variant arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-ea5b427b49d23da26fe0",
+              "file": "bundle-upsell.spec.ts",
+              "line": 224,
+              "column": 7
+            },
+            {
+              "title": "checkout flow tracks conversion by arm",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-ff70759effc7c293b76b",
+              "file": "bundle-upsell.spec.ts",
+              "line": 247,
+              "column": 7
+            },
+            {
+              "title": "$19 control arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-9c2c406073da45a74157",
+              "file": "bundle-upsell.spec.ts",
+              "line": 197,
+              "column": 7
+            },
+            {
+              "title": "$9 variant arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-1d75620b80056007ef78",
+              "file": "bundle-upsell.spec.ts",
+              "line": 224,
+              "column": 7
+            },
+            {
+              "title": "checkout flow tracks conversion by arm",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-6eff35b15561e329a7af",
+              "file": "bundle-upsell.spec.ts",
+              "line": 247,
+              "column": 7
+            },
+            {
+              "title": "$19 control arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-3a722c4ea718fa75541a",
+              "file": "bundle-upsell.spec.ts",
+              "line": 197,
+              "column": 7
+            },
+            {
+              "title": "$9 variant arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-506402da8e84fed7a52b",
+              "file": "bundle-upsell.spec.ts",
+              "line": 224,
+              "column": 7
+            },
+            {
+              "title": "checkout flow tracks conversion by arm",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-9eabf9a26e61b3250922",
+              "file": "bundle-upsell.spec.ts",
+              "line": 247,
+              "column": 7
+            },
+            {
+              "title": "$19 control arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-1b3083b1580156fb28f5",
+              "file": "bundle-upsell.spec.ts",
+              "line": 197,
+              "column": 7
+            },
+            {
+              "title": "$9 variant arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-bccbea387347fab0753f",
+              "file": "bundle-upsell.spec.ts",
+              "line": 224,
+              "column": 7
+            },
+            {
+              "title": "checkout flow tracks conversion by arm",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-8783a3f36fdff789a4d2",
+              "file": "bundle-upsell.spec.ts",
+              "line": 247,
+              "column": 7
+            },
+            {
+              "title": "$19 control arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-7632a72be76d3aa1b03a",
+              "file": "bundle-upsell.spec.ts",
+              "line": 197,
+              "column": 7
+            },
+            {
+              "title": "$9 variant arm displays correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-cbc4fc5b372280a6a0a8",
+              "file": "bundle-upsell.spec.ts",
+              "line": 224,
+              "column": 7
+            },
+            {
+              "title": "checkout flow tracks conversion by arm",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-3c5f6b62906a9af0f24d",
+              "file": "bundle-upsell.spec.ts",
+              "line": 247,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Authenticated User Flows",
+          "file": "bundle-upsell.spec.ts",
+          "line": 270,
+          "column": 6,
+          "specs": [
+            {
+              "title": "bundle upsell for authenticated premium user",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-37b67cb1ed6b55a2523a",
+              "file": "bundle-upsell.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "pricing experiment respects user tier",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-6a1c872ef5cb64a15bab",
+              "file": "bundle-upsell.spec.ts",
+              "line": 290,
+              "column": 7
+            },
+            {
+              "title": "bundle upsell for authenticated premium user",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-24183bfc975331c7b1d7",
+              "file": "bundle-upsell.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "pricing experiment respects user tier",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-e41ec8aef336621d2cc4",
+              "file": "bundle-upsell.spec.ts",
+              "line": 290,
+              "column": 7
+            },
+            {
+              "title": "bundle upsell for authenticated premium user",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-d2c5466109b328a70e34",
+              "file": "bundle-upsell.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "pricing experiment respects user tier",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-aa3a117e4e7fe87ba02b",
+              "file": "bundle-upsell.spec.ts",
+              "line": 290,
+              "column": 7
+            },
+            {
+              "title": "bundle upsell for authenticated premium user",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-e645925654f85ec864aa",
+              "file": "bundle-upsell.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "pricing experiment respects user tier",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-5f6c07b6970ac5f562b1",
+              "file": "bundle-upsell.spec.ts",
+              "line": 290,
+              "column": 7
+            },
+            {
+              "title": "bundle upsell for authenticated premium user",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-d84d57e310f9eda04a2b",
+              "file": "bundle-upsell.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "pricing experiment respects user tier",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "af64d36f319abb6ac1c9-3f5b59d0403b674053b5",
+              "file": "bundle-upsell.spec.ts",
+              "line": 290,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "feature-flags.spec.ts",
+      "file": "feature-flags.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Feature Flag System",
+          "file": "feature-flags.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "deterministic bucketing works consistently",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-46278310b8c3d15788ea",
+              "file": "feature-flags.spec.ts",
+              "line": 40,
+              "column": 7
+            },
+            {
+              "title": "flag percentage controls user inclusion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-6e6dd758b324b2e24d63",
+              "file": "feature-flags.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "fallback flags work when Supabase unavailable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-b6b59859478baec9810c",
+              "file": "feature-flags.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "flag updates propagate via realtime",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-18d70a8fe32eb4656846",
+              "file": "feature-flags.spec.ts",
+              "line": 143,
+              "column": 7
+            },
+            {
+              "title": "flag client handles connection errors gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-e6604637a1d8fffd847a",
+              "file": "feature-flags.spec.ts",
+              "line": 182,
+              "column": 7
+            },
+            {
+              "title": "flag client respects rate limiting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-11b8be7872ffcd23d0b0",
+              "file": "feature-flags.spec.ts",
+              "line": 225,
+              "column": 7
+            },
+            {
+              "title": "flag persistence across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-b8c75b399d6788ca93bd",
+              "file": "feature-flags.spec.ts",
+              "line": 253,
+              "column": 7
+            },
+            {
+              "title": "flag analytics integration works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-4f953a23fd3ddfb81767",
+              "file": "feature-flags.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "deterministic bucketing works consistently",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-30366674b3dc57292b2a",
+              "file": "feature-flags.spec.ts",
+              "line": 40,
+              "column": 7
+            },
+            {
+              "title": "flag percentage controls user inclusion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-6f3869357c04a9256254",
+              "file": "feature-flags.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "fallback flags work when Supabase unavailable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-17dceea326525cd8c5c7",
+              "file": "feature-flags.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "flag updates propagate via realtime",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-c0d53bf9a188882c683c",
+              "file": "feature-flags.spec.ts",
+              "line": 143,
+              "column": 7
+            },
+            {
+              "title": "flag client handles connection errors gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-3eb7210e122577f56f36",
+              "file": "feature-flags.spec.ts",
+              "line": 182,
+              "column": 7
+            },
+            {
+              "title": "flag client respects rate limiting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-97fcc1ee21366b3836f3",
+              "file": "feature-flags.spec.ts",
+              "line": 225,
+              "column": 7
+            },
+            {
+              "title": "flag persistence across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-c4f13d29b7638d58157c",
+              "file": "feature-flags.spec.ts",
+              "line": 253,
+              "column": 7
+            },
+            {
+              "title": "flag analytics integration works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-727c4cf98c780c0137a6",
+              "file": "feature-flags.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "deterministic bucketing works consistently",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-5d6ce00543fc1095906f",
+              "file": "feature-flags.spec.ts",
+              "line": 40,
+              "column": 7
+            },
+            {
+              "title": "flag percentage controls user inclusion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-9e7019f1c9bbaa453838",
+              "file": "feature-flags.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "fallback flags work when Supabase unavailable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-12b38ce47d243f140231",
+              "file": "feature-flags.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "flag updates propagate via realtime",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-8502ed338548cc9d5bd7",
+              "file": "feature-flags.spec.ts",
+              "line": 143,
+              "column": 7
+            },
+            {
+              "title": "flag client handles connection errors gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-05e984bf503302c0579a",
+              "file": "feature-flags.spec.ts",
+              "line": 182,
+              "column": 7
+            },
+            {
+              "title": "flag client respects rate limiting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-536b7dae99223b38f642",
+              "file": "feature-flags.spec.ts",
+              "line": 225,
+              "column": 7
+            },
+            {
+              "title": "flag persistence across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-c7378606cfa42e4b951a",
+              "file": "feature-flags.spec.ts",
+              "line": 253,
+              "column": 7
+            },
+            {
+              "title": "flag analytics integration works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-da09d0eae70b9338595c",
+              "file": "feature-flags.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "deterministic bucketing works consistently",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-815b7e4e9ee5de8e09e8",
+              "file": "feature-flags.spec.ts",
+              "line": 40,
+              "column": 7
+            },
+            {
+              "title": "flag percentage controls user inclusion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-f2c086a3e78ef3a3f291",
+              "file": "feature-flags.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "fallback flags work when Supabase unavailable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-a360cb0262b79d041ad8",
+              "file": "feature-flags.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "flag updates propagate via realtime",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-6d4c5515903c3f1a552d",
+              "file": "feature-flags.spec.ts",
+              "line": 143,
+              "column": 7
+            },
+            {
+              "title": "flag client handles connection errors gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-79e25ad4876bca625db2",
+              "file": "feature-flags.spec.ts",
+              "line": 182,
+              "column": 7
+            },
+            {
+              "title": "flag client respects rate limiting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-9f0473bc650e4c042c7d",
+              "file": "feature-flags.spec.ts",
+              "line": 225,
+              "column": 7
+            },
+            {
+              "title": "flag persistence across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-c9418f55fb59f587b401",
+              "file": "feature-flags.spec.ts",
+              "line": 253,
+              "column": 7
+            },
+            {
+              "title": "flag analytics integration works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-8bdd4ec3eb91fa2a131c",
+              "file": "feature-flags.spec.ts",
+              "line": 275,
+              "column": 7
+            },
+            {
+              "title": "deterministic bucketing works consistently",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-95f599a1a66e5dd2f477",
+              "file": "feature-flags.spec.ts",
+              "line": 40,
+              "column": 7
+            },
+            {
+              "title": "flag percentage controls user inclusion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-d9979fc89d5e6bc25063",
+              "file": "feature-flags.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "fallback flags work when Supabase unavailable",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-7d211d704d7456014cca",
+              "file": "feature-flags.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "flag updates propagate via realtime",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-844ffd9d0064e51183ba",
+              "file": "feature-flags.spec.ts",
+              "line": 143,
+              "column": 7
+            },
+            {
+              "title": "flag client handles connection errors gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-879f7ca5a154d8518010",
+              "file": "feature-flags.spec.ts",
+              "line": 182,
+              "column": 7
+            },
+            {
+              "title": "flag client respects rate limiting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-b4cc26ded9a5356265e1",
+              "file": "feature-flags.spec.ts",
+              "line": 225,
+              "column": 7
+            },
+            {
+              "title": "flag persistence across page reloads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-124ff37fafaf58f4bf83",
+              "file": "feature-flags.spec.ts",
+              "line": 253,
+              "column": 7
+            },
+            {
+              "title": "flag analytics integration works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "c159506463f0a6ad0041-669993c860a6b5eff69b",
+              "file": "feature-flags.spec.ts",
+              "line": 275,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-08-14T20:05:10.091Z",
+    "duration": 158.6590000000001,
+    "expected": 0,
+    "skipped": 100,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

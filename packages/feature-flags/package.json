@@ -1,0 +1,16 @@
+{
+  "name": "@mmtu/feature-flags",
+  "version": "1.0.0",
+  "description": "Feature flags with Supabase and gatekeeper enforcement",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "node test.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

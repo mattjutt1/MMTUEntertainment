@@ -1,0 +1,18 @@
+# CODEOWNERS - Launch Gates Review Requirements
+# Lines starting with '#' are comments.
+# Each line is a file pattern followed by one or more owners.
+
+# Ops configuration requires review
+/ops/** @mmtu-leads
+
+# Feature flags require review  
+/packages/feature-flags/** @mmtu-leads
+
+# Gatekeeper system changes
+/scripts/gatekeeper.* @mmtu-leads
+
+# CI/CD workflows
+/.github/workflows/ @mmtu-leads
+
+# Global configuration
+/*.env* @mmtu-leads

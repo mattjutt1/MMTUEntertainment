@@ -1,0 +1,170 @@
+name: Launch Gates Enforcement
+
+on:
+  pull_request:
+    paths:
+      - 'ops/**'
+      - 'packages/feature-flags/**'
+      - '*.env*'
+      - '.env*'
+    types: [opened, synchronize, labeled, unlabeled]
+
+jobs:
+  check-ramp-label:
+    name: Require ramp-change label
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.head.ref, 'ramp') || contains(github.event.pull_request.title, 'ramp') || contains(github.event.pull_request.title, 'flag')
+    steps:
+      - name: Check for ramp-change label
+        run: |
+          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'ramp-change') }}" != "true" ]]; then
+            echo "❌ Missing required 'ramp-change' label for ramp/flag changes"
+            exit 1
+          fi
+          echo "✅ ramp-change label found"
+
+  gatekeeper-enforcement:
+    name: Gatekeeper Evaluation
+    runs-on: ubuntu-latest
+    needs: [check-ramp-label]
+    if: always() && (needs.check-ramp-label.result == 'success' || needs.check-ramp-label.result == 'skipped')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          npm install js-yaml
+          npm install --save-dev @types/js-yaml
+      
+      - name: Make gatekeeper executable
+        run: chmod +x scripts/gatekeeper.ts
+      
+      - name: Check for experiment changes
+        id: experiment-changes
+        run: |
+          # Check if ops/launch-gates.yaml was modified
+          if git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | grep -q "ops/launch-gates.yaml"; then
+            echo "experiment_changes=true" >> $GITHUB_OUTPUT
+            echo "📊 Experiment configuration changes detected"
+          else
+            echo "experiment_changes=false" >> $GITHUB_OUTPUT
+            echo "No experiment configuration changes"
+          fi
+      
+      - name: Extract experiment details
+        id: extract-details
+        if: steps.experiment-changes.outputs.experiment_changes == 'true'
+        run: |
+          # Parse PR title/body for experiment name and target percentage
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+          
+          # Look for patterns like "bundle 25→50" or "pricing to 100"
+          if echo "$PR_TITLE $PR_BODY" | grep -qi "bundle.*→.*50\|bundle.*to.*50"; then
+            echo "exp_name=post_purchase_bundle_v1" >> $GITHUB_OUTPUT
+            echo "target_pct=50" >> $GITHUB_OUTPUT
+          elif echo "$PR_TITLE $PR_BODY" | grep -qi "bundle.*→.*100\|bundle.*to.*100"; then
+            echo "exp_name=post_purchase_bundle_v1" >> $GITHUB_OUTPUT
+            echo "target_pct=100" >> $GITHUB_OUTPUT
+          elif echo "$PR_TITLE $PR_BODY" | grep -qi "pricing\|overlay"; then
+            echo "exp_name=overlay_pricing_ab_v1" >> $GITHUB_OUTPUT
+            echo "target_pct=50" >> $GITHUB_OUTPUT
+          elif echo "$PR_TITLE $PR_BODY" | grep -qi "marketplace\|driftguard"; then
+            echo "exp_name=driftguard_marketplace_v1" >> $GITHUB_OUTPUT  
+            echo "target_pct=100" >> $GITHUB_OUTPUT
+          else
+            echo "exp_name=unknown" >> $GITHUB_OUTPUT
+            echo "target_pct=0" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run Gatekeeper evaluation
+        id: gatekeeper-eval
+        if: steps.experiment-changes.outputs.experiment_changes == 'true' && steps.extract-details.outputs.exp_name != 'unknown'
+        run: |
+          echo "🚦 Running Gatekeeper evaluation..."
+          
+          # Run gatekeeper with extracted parameters
+          if npx ts-node scripts/gatekeeper.ts --exp "${{ steps.extract-details.outputs.exp_name }}" --to "${{ steps.extract-details.outputs.target_pct }}"; then
+            echo "decision=ALLOW" >> $GITHUB_OUTPUT
+            echo "✅ ALLOW: Gatekeeper approved experiment promotion"
+          else
+            echo "decision=DENY" >> $GITHUB_OUTPUT
+            echo "❌ DENY: Gatekeeper blocked experiment promotion"
+            exit 1
+          fi
+      
+      - name: Post Gatekeeper decision comment
+        if: steps.experiment-changes.outputs.experiment_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const decision = "${{ steps.gatekeeper-eval.outputs.decision || 'DENY' }}";
+            const expName = "${{ steps.extract-details.outputs.exp_name }}";
+            const targetPct = "${{ steps.extract-details.outputs.target_pct }}";
+            
+            const emoji = decision === 'ALLOW' ? '✅' : '❌';
+            const status = decision === 'ALLOW' ? 'APPROVED' : 'BLOCKED';
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🚦 Gatekeeper Decision: ${emoji} ${status}
+
+**Experiment**: \`${expName}\`
+**Target**: ${targetPct}%
+**Decision**: **${decision}**
+
+${decision === 'ALLOW' 
+  ? '✅ All statistical criteria met. Promotion approved.'
+  : '❌ Criteria not met. Check metrics and try again later.'
+}
+
+View detailed reasoning in [runlog](./.orchestrator/runlog.jsonl).`
+            });
+      
+      - name: Upload runlog artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gatekeeper-runlog
+          path: .orchestrator/runlog.jsonl
+          retention-days: 30
+
+  security-checks:
+    name: Security & Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+  enforce-freeze:
+    name: Enforce Freeze Rules  
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'gate-evaluating')
+    steps:
+      - name: Block merge during evaluation
+        run: |
+          echo "🚧 FREEZE: Gate is currently evaluating"
+          echo "This PR touches files affected by an active gate evaluation"
+          echo "Wait for Gatekeeper ALLOW before merging"
+          exit 1
