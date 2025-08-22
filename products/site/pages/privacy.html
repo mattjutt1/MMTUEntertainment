@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Notice | MMTU Entertainment</title>
+  <meta name="description" content="How MMTU collects and uses your personal data (GDPR Art. 13).">
+  <meta property="og:title" content="Privacy Notice">
+  <meta property="og:description" content="How MMTU collects and uses your personal data.">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://www.mmtuentertainment.com/privacy">
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <header>
+    <nav aria-label="Main navigation">
+      <div class="nav-container">
+        <a href="/" class="logo" aria-label="MMTU Entertainment home">MMTU Entertainment</a>
+        <ul class="nav-links">
+          <li><a href="/offer/97">$97 Scan</a></li>
+          <li><a href="/offer/297">$297 Audit</a></li>
+          <li><a href="/offer/997">$997 Complete</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="content">
+      <div class="container">
+        <h1>Privacy Notice (Minimal Starter)</h1>
+        <p><em>Last updated: 2025‑08‑20</em></p>
+        <p>This notice explains how we collect and use your personal data when you use our sites, apps, and services. It implements the information items required by GDPR Article 13 and similar laws. [Not legal advice.]</p>
+
+        <h2>Who we are (Controller)</h2>
+        <p><strong>Controller:</strong> MMTU Entertainment, LLC<br><strong>Email:</strong> privacy@mmtuentertainment.com<br><strong>Address:</strong> [Insert]<br><strong>EU representative (if applicable):</strong> [Insert or “Not applicable”]<br><strong>Data Protection Officer (if applicable):</strong> [Insert DPO email]</p>
+
+        <h2>What we collect &amp; why</h2>
+        <ul>
+          <li><strong>Account &amp; contact data:</strong> create account, support, service notices. Bases: contract; legitimate interests; consent for marketing.</li>
+          <li><strong>Usage &amp; device data (limited):</strong> security/crash analytics, improve features. Bases: legitimate interests; consent for non‑essential analytics.</li>
+          <li><strong>Purchase &amp; billing data:</strong> payments/tax/audit. Bases: contract; legal obligation.</li>
+          <li><strong>Marketing preferences:</strong> honor choices. Bases: consent; legitimate interests to record choices.</li>
+        </ul>
+        <p>Where we rely on <strong>legitimate interests</strong>, we balance our interests against your rights; details available on request.</p>
+
+        <h2>Recipients &amp; transfers</h2>
+        <p>Processors (hosting, analytics, email, payments) under contract; legal/compliance when required. International transfers use safeguards (e.g., EU SCCs). Current processors/safeguards: <code>/legal/subprocessors</code>.</p>
+
+        <h2>Storage periods</h2>
+        <ul>
+          <li>Account data: account lifetime + 90 days (backups)</li>
+          <li>Billing/tax: 7 years</li>
+          <li>Logs/security: 30–180 days, longer if under investigation</li>
+        </ul>
+
+        <h2>Your rights</h2>
+        <p>Access, correct, delete, restrict, object, export; withdraw consent anytime. Use <code>/privacy/requests</code> or email <strong>privacy@mmtuentertainment.com</strong>. You can complain to a supervisory authority.</p>
+
+        <h2>Is data required?</h2>
+        <p>Some data is required for account creation/purchase; without it, features may not work.</p>
+
+        <h2>Automated decisions</h2>
+        <p>We do not make automated decisions with legal/similar effects. If that changes, we’ll describe the logic/effects here.</p>
+
+        <h2>Cookies &amp; analytics</h2>
+        <p>Essential cookies only by default; non‑essential analytics/ads load after consent. Manage via <em>Cookie Preferences</em> in the footer.</p>
+
+        <h2>Contact</h2>
+        <p>privacy@mmtuentertainment.com</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>
+        &copy; 2025 MMTU Entertainment.
+        <a href="/terms">Terms</a> |
+        <a href="/privacy" aria-current="page">Privacy</a> |
+        <a href="/legal/disclosures">Ads &amp; Endorsements</a> |
+        <a href="#" id="cookie-preferences-link">Cookie Preferences</a>
+      </p>
+    </div>
+    <script>
+    (function(){
+      var el = document.getElementById('cookie-preferences-link');
+      if (!el) return;
+      el.addEventListener('click', function(e){
+        e.preventDefault();
+        if (window.OneTrust && typeof window.OneTrust.ToggleInfoDisplay === 'function') {
+          window.OneTrust.ToggleInfoDisplay();
+        } else if (window.Cookiebot && typeof window.Cookiebot.renew === 'function') {
+          window.Cookiebot.renew();
+        } else {
+          alert('Cookie preferences panel is not available.');
+        }
+      });
+    })();
+    </script>
+  </footer>
+</body>
+</html>
