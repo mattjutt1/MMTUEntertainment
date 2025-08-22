@@ -33,11 +33,16 @@ jobs:
               - '.cspell.json'
               - '.lycheeignore'
               - '.lychee.toml'
+      
+      - name: Debug filters
+        run: |
+          echo "site: ${{ steps.filter.outputs.site }}"
+          echo "docs_only: ${{ steps.filter.outputs.docs_only }}"
 
   smoke:
     name: 'Site E2E Smoke Tests (≤3min)'
     needs: detect
-    if: needs.detect.outputs.site_changed == 'true'
+    if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 3
 
