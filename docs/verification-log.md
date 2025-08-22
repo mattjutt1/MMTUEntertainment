@@ -1,1 +1,2 @@
 - Fri Aug 22 05:52:26 UTC 2025 Mixed PR verification (site+docs)
+- Fri Aug 22 07:05:00 UTC 2025 FINAL docs-only verification (all fixes applied)
