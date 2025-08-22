@@ -1,20 +1,10 @@
-{"ts":"2025-08-22T19:47:30Z","note_id":1,"status":"triaged","action":"fix-login-bug","raw":"Fix the login bug on production site"}
-{"ts":"2025-08-22T19:47:31Z","note_id":2,"status":"triaged","action":"call-customer-refund","raw":"Call back customer about refund request"}
-{"ts":"2025-08-22T19:47:32Z","note_id":3,"status":"triaged","action":"research-pricing","raw":"Research competitive pricing for Q1"}
-{"ts":"2025-08-22T19:47:33Z","note_id":4,"status":"triaged","action":"renew-ssl-cert","raw":"Update SSL certificate before expiry"}
-{"ts":"2025-08-22T19:47:34Z","note_id":5,"status":"triaged","action":"review-dependabot","raw":"Review and merge dependabot PRs"}
-{"ts":"2025-08-22T19:47:35Z","note_id":6,"status":"pending","action":null,"raw":"Set up monitoring for API endpoints"}
-{"ts":"2025-08-22T19:47:36Z","note_id":7,"status":"pending","action":null,"raw":"Document the deployment process"}
-{"ts":"2025-08-22T19:47:37Z","note_id":8,"status":"pending","action":null,"raw":"Schedule team retrospective meeting"}
-{"ts":"2025-08-22T19:47:38Z","note_id":9,"status":"pending","action":null,"raw":"Investigate slow database queries"}
-{"ts":"2025-08-22T19:47:39Z","note_id":10,"status":"pending","action":null,"raw":"Create backup strategy for user data"}
-{"ts": "2025-08-22T19:52:05.365401Z", "note_id": 11, "status": "triaged", "action": "fix-the-login-bug-on-productio", "raw": "Fix the login bug on production site", "priority": "high", "due": "24h"}
-{"ts": "2025-08-22T19:52:05.365507Z", "note_id": 12, "status": "triaged", "action": "call-back-customer-about-refun", "raw": "Call back customer about refund request", "priority": "urgent", "due": "12h"}
-{"ts": "2025-08-22T19:52:05.365569Z", "note_id": 13, "status": "triaged", "action": "research-competitive-pricing-f", "raw": "Research competitive pricing for Q1", "priority": "low", "due": "7d"}
-{"ts": "2025-08-22T19:52:05.365627Z", "note_id": 14, "status": "triaged", "action": "update-ssl-certificate-before-", "raw": "Update SSL certificate before expiry", "priority": "medium", "due": "48h"}
-{"ts": "2025-08-22T19:52:05.365679Z", "note_id": 15, "status": "triaged", "action": "review-and-merge-dependabot-pr", "raw": "Review and merge dependabot PRs", "priority": "medium", "due": "48h"}
-{"ts": "2025-08-22T19:52:05.365730Z", "note_id": 16, "status": "triaged", "action": "set-up-monitoring-for-api-endp", "raw": "Set up monitoring for API endpoints", "priority": "medium", "due": "48h"}
-{"ts": "2025-08-22T19:52:05.365779Z", "note_id": 17, "status": "triaged", "action": "document-the-deployment-proces", "raw": "Document the deployment process", "priority": "low", "due": "7d"}
-{"ts": "2025-08-22T19:52:05.365827Z", "note_id": 18, "status": "triaged", "action": "schedule-team-retrospective-me", "raw": "Schedule team retrospective meeting", "priority": "medium", "due": "48h"}
-{"ts": "2025-08-22T19:52:05.365875Z", "note_id": 19, "status": "triaged", "action": "investigate-slow-database-quer", "raw": "Investigate slow database queries", "priority": "medium", "due": "48h"}
-{"ts": "2025-08-22T19:52:05.365923Z", "note_id": 20, "status": "triaged", "action": "create-backup-strategy-for-use", "raw": "Create backup strategy for user data", "priority": "medium", "due": "48h"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0001", "status": "open", "src": "intake", "note": "fix homepage link"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0002", "status": "open", "src": "intake", "note": "update contact form validation"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0003", "status": "open", "src": "intake", "note": "repair footer navigation"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0004", "status": "open", "src": "intake", "note": "optimize image loading speed"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0005", "status": "open", "src": "intake", "note": "add mobile menu toggle"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0006", "status": "open", "src": "intake", "note": "fix broken search functionality"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0007", "status": "open", "src": "intake", "note": "update privacy policy page"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0008", "status": "open", "src": "intake", "note": "improve accessibility contrast"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0009", "status": "open", "src": "intake", "note": "resolve SSL certificate warning"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0010", "status": "open", "src": "intake", "note": "debug newsletter signup form"}
