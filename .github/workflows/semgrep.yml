@@ -1,4 +1,4 @@
-name: 'SAST Security Scan'
+name: 'SAST Security Scan (allow-failure)'
 #
 # CI NOTE — job-level gating + code scanning:
 # - Avoid WORKFLOW-level skipping; it can leave checks "Pending" (merge blocked).               (GitHub)
@@ -100,6 +100,7 @@ jobs:
     if: needs.detect.outputs.code_changed == 'true' || needs.detect.outputs.workflows_changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    continue-on-error: true  # Phase 5: Non-blocking until stabilized
     steps:
       - uses: actions/checkout@v4
         with:

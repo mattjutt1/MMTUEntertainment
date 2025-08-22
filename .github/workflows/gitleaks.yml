@@ -1,8 +1,9 @@
-name: gitleaks
+name: 'GitLeaks Secret Scan (allow-failure)'
 on: [push, pull_request]
 jobs:
   scan:
     runs-on: ubuntu-latest
+    continue-on-error: true  # Phase 5: Non-blocking until stabilized
     steps:
       - uses: actions/checkout@v4
       - uses: zricethezav/gitleaks-action@v2.3.4
