@@ -40,3 +40,13 @@
 | T-0038 | improve accessibility contrast | open |  | general |
 | T-0039 | resolve SSL certificate warning | open |  | general |
 | T-0040 | debug newsletter signup form | open |  | general |
+| T-0041 | fix homepage link | open |  | general |
+| T-0042 | update contact form validation | open |  | general |
+| T-0043 | repair footer navigation | open |  | general |
+| T-0044 | optimize image loading speed | open |  | general |
+| T-0045 | add mobile menu toggle | open |  | general |
+| T-0046 | fix broken search functionality | open |  | general |
+| T-0047 | update privacy policy page | open |  | general |
+| T-0048 | improve accessibility contrast | open |  | general |
+| T-0049 | resolve SSL certificate warning | open |  | general |
+| T-0050 | debug newsletter signup form | open |  | general |
