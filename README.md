@@ -31,6 +31,7 @@ Simple inbox that turns raw notes into next actions with proof.
 1. **Add ideas** to `front-desk/intake.md` (one per line)
 2. **Run triage**: `python scripts/triage.py`
 3. **Check report**: `reports/week-01.md`
+4. **When stuck**: `./scripts/doubt_reset.sh`
 
 #### Files
 

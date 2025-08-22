@@ -101,8 +101,17 @@ case "$1" in
     comply)
         check_compliance
         ;;
+    doubt)
+        # Quick doubt check
+        echo "Checking doubt events..."
+        DOUBT_COUNT=$(grep -c "doubt_cleared" front-desk/log.jsonl 2>/dev/null || echo 0)
+        echo "Doubt events today: $DOUBT_COUNT"
+        if [ "$DOUBT_COUNT" -gt 3 ]; then
+            echo "⚠️  HIGH DOUBT - Take a break"
+        fi
+        ;;
     *)
-        echo "Usage: $0 {start|decide|revert|check|comply} [file]"
+        echo "Usage: $0 {start|decide|revert|check|comply|doubt} [file]"
         echo ""
         echo "Commands:"
         echo "  start <intake|triage|log|report> - Start 25min session"
@@ -110,6 +119,7 @@ case "$1" in
         echo "  revert <file>                     - Create revert point"
         echo "  check                             - Verify rule compliance"
         echo "  comply                            - Show violation count"
+        echo "  doubt                             - Check doubt frequency"
         exit 1
         ;;
 esac
