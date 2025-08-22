@@ -42,37 +42,53 @@ jobs:
   smoke:
     name: 'Site E2E Smoke Tests (≤3min)'
     needs: detect
-    if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 3
-
     steps:
+      - name: Docs-only noop
+        if: needs.detect.outputs.docs_only == 'true' && needs.detect.outputs.site_changed != 'true'
+        run: echo "✅ Docs-only PR detected; E2E tests not required for documentation changes."
+
+      - name: Non-site changes check
+        if: needs.detect.outputs.site_changed != 'true' && needs.detect.outputs.docs_only != 'true'
+        run: |
+          echo "❌ Non-docs PR without site changes detected."
+          echo "E2E tests are required for all PRs except docs-only changes."
+          echo "This PR affects non-site, non-docs files and must include site changes or be docs-only."
+          exit 1
+
       - name: Checkout
+        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
         uses: actions/checkout@v4
         with:
           submodules: false
 
       - name: Setup PNPM
+        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
         run: |
           corepack enable
           corepack use pnpm@10
 
       - name: Install workspace deps
+        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers (chromium only)
+        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
         run: pnpm exec playwright install chromium --with-deps
 
       - name: Build site
+        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
         run: cd products/site && node build.js
 
       - name: Run Site E2E Smoke Tests
+        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
         run: pnpm test:e2e:site:smoke
         env:
           CI: true
 
       - name: Upload test results
-        if: failure() || success()
+        if: (failure() || success()) && needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: site-e2e-smoke-results-${{ github.run_id }}
@@ -82,7 +98,7 @@ jobs:
           retention-days: 7
 
       - name: Report test summary
-        if: always()
+        if: always() && needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
         run: |
           {
             echo "## 🧪 Site E2E Smoke Test Results"
@@ -95,25 +111,3 @@ jobs:
               echo "- **Status**: ❌ Smoke tests failed - investigate immediately"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-
-  # No-op job for docs-only PRs (satisfies required check without running E2E)
-  smoke-docs-noop:
-    name: 'Site E2E Smoke Tests (≤3min)'
-    needs: detect
-    if: needs.detect.outputs.docs_only == 'true' && needs.detect.outputs.site_changed != 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "✅ Docs-only PR detected; E2E tests not required for documentation changes."
-      
-  # No-op job for other non-site PRs (E2E required but no site changes)
-  smoke-noop:
-    name: 'Site E2E Smoke Tests (≤3min)'
-    needs: detect
-    if: needs.detect.outputs.site_changed != 'true' && needs.detect.outputs.docs_only != 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo "❌ Non-docs PR without site changes detected."
-          echo "E2E tests are required for all PRs except docs-only changes."
-          echo "This PR affects non-site, non-docs files and must include site changes or be docs-only."
-          exit 1
