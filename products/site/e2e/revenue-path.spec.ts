@@ -155,8 +155,8 @@ test.describe('Revenue Path E2E Tests @smoke @landing', () => {
     
     // Test Privacy page
     await page.goto('/privacy');
-    await expect(page).toHaveTitle(/Privacy Policy/);
-    await expect(page.locator('h1')).toContainText('Privacy Policy');
+    await expect(page).toHaveTitle(/Privacy Notice/);
+    await expect(page.locator('h1')).toContainText('Privacy Notice');
     await expect(page.locator('text=Information We Collect')).toBeVisible();
     
     // Verify privacy email link works
