@@ -62,7 +62,7 @@ jobs:
         run: cd products/site && node build.js
 
       - name: Run Site E2E Smoke Tests
-        run: pnpm test:e2e:site --project=chromium
+        run: pnpm test:e2e:site:smoke
         env:
           CI: true
 
