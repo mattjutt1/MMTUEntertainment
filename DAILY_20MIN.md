@@ -22,7 +22,9 @@ New feature idea from shower thought
 
 ### 05:00-12:00 | TRIAGE (Convert 3+ to actions)
 
-For each new line in intake.md, add to `front-desk/triage.md`:
+**Option A - Interactive**: Run `python scripts/triage_interactive.py` (prompts you for each decision)
+
+**Option B - Manual**: For each new line in intake.md, add to `front-desk/triage.md`:
 
 ```
 2025-08-23 | note_id=21 | action: investigate-broken-thing | due: 24h | priority: high

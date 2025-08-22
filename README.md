@@ -29,7 +29,9 @@ Simple inbox that turns raw notes into next actions with proof.
 #### Quick Start
 
 1. **Add ideas** to `front-desk/intake.md` (one per line)
-2. **Run triage**: `python scripts/triage.py`
+2. **Triage items**:
+   - Interactive: `python scripts/triage_interactive.py` (prompts for each decision)
+   - Automatic: `python scripts/triage.py` (uses heuristics)
 3. **Check report**: `reports/week-01.md`
 4. **When stuck**: `./scripts/doubt_reset.sh`
 
@@ -38,7 +40,8 @@ Simple inbox that turns raw notes into next actions with proof.
 - `front-desk/intake.md` - Drop raw ideas here
 - `front-desk/triage.md` - Actionable items with due dates
 - `front-desk/log.jsonl` - Append-only audit trail
-- `scripts/triage.py` - Processes intake → triage → log
+- `scripts/triage.py` - Auto-processes intake → triage → log
+- `scripts/triage_interactive.py` - Interactive prompting for each item
 
 #### Manual Mode (no Python)
 
