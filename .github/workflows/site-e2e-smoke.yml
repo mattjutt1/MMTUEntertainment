@@ -17,6 +17,7 @@ jobs:
     outputs:
       site_changed: ${{ steps.filter.outputs.site }}
       docs_only: ${{ steps.filter.outputs.docs_only }}
+      is_docs_only_pr: ${{ steps.logic.outputs.is_docs_only_pr }}
     steps:
       - uses: actions/checkout@v4
       - id: filter
@@ -26,10 +27,6 @@ jobs:
             site:
               - 'products/site/**'
               - '.github/workflows/site-e2e-smoke.yml'
-              - '!docs/**'
-              - '!README.md'
-              - '!CHANGELOG.md'
-              - '!archive/**'
             docs_only:
               - 'docs/**'
               - 'README.md'
@@ -37,11 +34,26 @@ jobs:
               - '.cspell.json'
               - '.lycheeignore'
               - '.lychee.toml'
+            any_changes:
+              - '**'
       
       - name: Debug filters
         run: |
           echo "site: ${{ steps.filter.outputs.site }}"
           echo "docs_only: ${{ steps.filter.outputs.docs_only }}"
+          echo "any_changes: ${{ steps.filter.outputs.any_changes }}"
+          
+      - name: Compute docs-only logic
+        id: logic
+        run: |
+          # True docs-only PR: docs_only=true AND site=false
+          if [[ "${{ steps.filter.outputs.docs_only }}" == "true" && "${{ steps.filter.outputs.site }}" == "false" ]]; then
+            echo "is_docs_only_pr=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Detected true docs-only PR"
+          else
+            echo "is_docs_only_pr=false" >> "$GITHUB_OUTPUT"
+            echo "📝 Detected site or mixed-change PR"
+          fi
 
   smoke:
     name: 'Site E2E Smoke Tests (≤3min)'
@@ -50,11 +62,11 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Docs-only noop
-        if: needs.detect.outputs.docs_only == 'true' && needs.detect.outputs.site_changed != 'true'
+        if: needs.detect.outputs.is_docs_only_pr == 'true'
         run: echo "✅ Docs-only PR detected; E2E tests not required for documentation changes."
 
       - name: Non-site changes check
-        if: needs.detect.outputs.site_changed != 'true' && needs.detect.outputs.docs_only != 'true'
+        if: needs.detect.outputs.site_changed != 'true' && needs.detect.outputs.is_docs_only_pr != 'true'
         run: |
           echo "❌ Non-docs PR without site changes detected."
           echo "E2E tests are required for all PRs except docs-only changes."
