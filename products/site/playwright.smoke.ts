@@ -7,7 +7,12 @@ const config: PlaywrightTestConfig = {
   retries: 0,
   timeout: 15_000, // Reduced from 30s to 15s
   expect: { timeout: 3_000 },
-  reporter: [['github'], ['line']],
+  reporter: [
+    ['github'], 
+    ['line'],
+    ['junit', { outputFile: 'products/site/test-results/junit.xml' }],
+    ['html', { outputFolder: 'products/site/playwright-report', open: 'never' }]
+  ],
   
   // Force Chromium-only; disable heavy artifacts
   projects: [

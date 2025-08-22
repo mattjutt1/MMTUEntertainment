@@ -493,6 +493,13 @@ curl api.com | jq '.results' # Process API responses
 
 ---
 
+## 📝 Prompts
+
+- **Claude Code Orchestration:** `/docs/prompts/claude-code-orchestration.md`
+  - Opus=planner, Sonnet=executor, MCP/IDE integrated.
+
+---
+
 ## 📞 Support & Documentation
 
 - **Individual tool docs**: `/docs/mcp/[tool]-setup.md`

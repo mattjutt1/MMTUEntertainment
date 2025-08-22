@@ -107,7 +107,7 @@ test.describe('Revenue Path E2E Tests @smoke @landing', () => {
 
   // Quarantined: content regression shows $999 product on Contact page.
   // TODO(#ISSUE_CONTACT_PAGE_CONTENT): Re-enable once Contact page no longer renders product pricing blocks.
-  test.fixme('Contact page has working email links @smoke @contact', async ({ page }) => {
+  test('Contact page has working email links @smoke @contact @quarantine', async ({ page }) => {
     await page.goto('/contact');
     
     // Check page loads
@@ -135,11 +135,11 @@ test.describe('Revenue Path E2E Tests @smoke @landing', () => {
     
     // Navigate to Contact (only available navigation in foundation mode)
     await page.click('a[href="/contact"]');
-    await expect(page.url()).toContain('/contact');
+    expect(page.url()).toContain('/contact');
     
     // Navigate back to home
     await page.click('a[href="/"]');
-    await expect(page.url()).not.toContain('/contact');
+    expect(page.url()).not.toContain('/contact');
     
     // Verify no product navigation exists (foundation first)
     await expect(page.locator('a[href="/offer/audit"]')).toHaveCount(0);
@@ -189,7 +189,7 @@ test.describe('Revenue Path E2E Tests @smoke @landing', () => {
 
   // Quarantined: expected CTA missing; likely content/aria-label drift.
   // TODO(#ISSUE_SEO_A11Y_CTA): Restore when 'Get security audit' link regains a stable selector or aria-label.
-  test.fixme('SEO and accessibility basics', async ({ page }) => {
+  test('SEO and accessibility basics @smoke @landing @quarantine', async ({ page }) => {
     await page.goto('/');
     
     // Check meta tags

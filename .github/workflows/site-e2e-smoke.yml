@@ -62,18 +62,18 @@ jobs:
         run: cd products/site && node build.js
 
       - name: Run Site E2E Smoke Tests
-        run: pnpm test:e2e:site --project=chromium --reporter=line
+        run: pnpm test:e2e:site:smoke
         env:
           CI: true
 
       - name: Upload test results
-        if: failure()
+        if: failure() || success()
         uses: actions/upload-artifact@v4
         with:
           name: site-e2e-smoke-results-${{ github.run_id }}
           path: |
-            products/site/test-results/
-            products/site/playwright-report/
+            products/site/test-results/**
+            products/site/playwright-report/**
           retention-days: 7
 
       - name: Report test summary
