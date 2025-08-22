@@ -31,12 +31,39 @@ def append_atomic(path, line_bytes):
         f.flush()
         os.fsync(f.fileno())
 
+def process_from_logs(log_path):
+    """Process unassociated work bursts from marriage protection logs"""
+    if not os.path.exists(log_path):
+        return []
+    
+    work_sessions = []
+    with open(log_path, 'r') as f:
+        for line in f:
+            if line.strip() and not line.startswith('{"_comment"'):
+                try:
+                    entry = json.loads(line)
+                    if (entry.get("module") == "marriage_protection" and 
+                        entry.get("action") in ["daemon_started", "daemon_stopped"] and
+                        entry.get("task_ref") is None):
+                        work_sessions.append(f"work session {entry.get('timestamp', '')[:10]} - {entry.get('seconds_today', 0)/3600:.1f}h")
+                except json.JSONDecodeError:
+                    continue
+    
+    return work_sessions
+
 def main():
-    if len(sys.argv) != 4:
-        print("Usage: triage.py intake.md triage.md log.jsonl")
+    # Check for --from-logs flag
+    from_logs = False
+    args = sys.argv[1:]
+    if "--from-logs" in args:
+        from_logs = True
+        args.remove("--from-logs")
+    
+    if len(args) != 3:
+        print("Usage: triage.py [--from-logs] intake.md triage.md log.jsonl")
         sys.exit(1)
     
-    intake, triage, log = map(pathlib.Path, sys.argv[1:4])
+    intake, triage, log = map(pathlib.Path, args)
 
     # 1) load current max ID
     maxid = 0
@@ -52,6 +79,11 @@ def main():
     
     raw = intake.read_text().splitlines()
     new_items = [l.strip("- [ ]").strip() for l in raw if l.startswith("- [ ]")]
+
+    # Add work sessions from logs if requested
+    if from_logs:
+        work_sessions = process_from_logs(str(log))
+        new_items.extend(work_sessions)
 
     if not new_items:
         print("triaged: 0 (no unchecked items)")
