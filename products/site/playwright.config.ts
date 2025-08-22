@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// Mixed-change verification: 2025-08-22T05:51:00Z
 const PORT = Number(process.env.PORT ?? 4173);
 const BASE = `http://localhost:${PORT}`;
 
