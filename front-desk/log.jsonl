@@ -1,10 +1,10 @@
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0001", "status": "open", "src": "intake", "note": "fix homepage link"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0002", "status": "open", "src": "intake", "note": "update contact form validation"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0003", "status": "open", "src": "intake", "note": "repair footer navigation"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0004", "status": "open", "src": "intake", "note": "optimize image loading speed"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0005", "status": "open", "src": "intake", "note": "add mobile menu toggle"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0006", "status": "open", "src": "intake", "note": "fix broken search functionality"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0007", "status": "open", "src": "intake", "note": "update privacy policy page"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0008", "status": "open", "src": "intake", "note": "improve accessibility contrast"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0009", "status": "open", "src": "intake", "note": "resolve SSL certificate warning"}
-{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0010", "status": "open", "src": "intake", "note": "debug newsletter signup form"}
+{"hash":"b327be290700014fcdb529e7e6816f569e134a99c87d2ab94f91a8cd55955f7e","id":"T-0011","note":"fix homepage link","prev_hash":"","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"a2510c4a69324401f3b406a7f15fa2669739bbdf4761fb8b635de8ab3eade62f","id":"T-0012","note":"update contact form validation","prev_hash":"b327be290700014fcdb529e7e6816f569e134a99c87d2ab94f91a8cd55955f7e","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"ba33adb18b23bc0fcad18b58aaaaa4b2f9485cf8f0d0bf2ef4ee3252a90b7f6e","id":"T-0013","note":"repair footer navigation","prev_hash":"a2510c4a69324401f3b406a7f15fa2669739bbdf4761fb8b635de8ab3eade62f","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"725100633c6d574a292715cfe7010179221963055bbf8a06007c1bd506cab6d5","id":"T-0014","note":"optimize image loading speed","prev_hash":"ba33adb18b23bc0fcad18b58aaaaa4b2f9485cf8f0d0bf2ef4ee3252a90b7f6e","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"cbdf7316db75d63172e6d027f83670bfa036ed85af4a4ce396a5df6673025f10","id":"T-0015","note":"add mobile menu toggle","prev_hash":"725100633c6d574a292715cfe7010179221963055bbf8a06007c1bd506cab6d5","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"a617472ff51c4b7b1182fecc63fe554d231b685038930e25e79579be1622b864","id":"T-0016","note":"fix broken search functionality","prev_hash":"cbdf7316db75d63172e6d027f83670bfa036ed85af4a4ce396a5df6673025f10","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"bdf33e221aabdc6f7b47bb30b9b75a1ab73553ecd0b80fb8325f9284df19b6ae","id":"T-0017","note":"update privacy policy page","prev_hash":"a617472ff51c4b7b1182fecc63fe554d231b685038930e25e79579be1622b864","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"8ec702be099213d16ab8617788edabe9f2b4ae35bccfefecad6949d3e08e15fb","id":"T-0018","note":"improve accessibility contrast","prev_hash":"bdf33e221aabdc6f7b47bb30b9b75a1ab73553ecd0b80fb8325f9284df19b6ae","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"cc08c49921f03308f8411e4110a802ab4d13693aafff96349cb82249707fc9fa","id":"T-0019","note":"resolve SSL certificate warning","prev_hash":"8ec702be099213d16ab8617788edabe9f2b4ae35bccfefecad6949d3e08e15fb","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
+{"hash":"20a208fdbeeca5f6a2e2d9431b5fcac44706c904bbe1eacad5ac6f9bc4d85e4d","id":"T-0020","note":"debug newsletter signup form","prev_hash":"cc08c49921f03308f8411e4110a802ab4d13693aafff96349cb82249707fc9fa","src":"intake","status":"open","ts":"2025-08-22T21:05:10Z","type":"triage"}
