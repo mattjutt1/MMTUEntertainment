@@ -178,6 +178,30 @@ grep -r "@quarantine" products/site/e2e/
 3. **Admin action**: Temporary protection disable
 4. **Re-enable**: Restore protection after emergency merge
 
+## CI Path Selection Truth Table
+
+Based on verification PRs #67, #68, #69 (2025-08-22):
+
+| Change Type       | Workflow Path     | Required Job Outcome | E2E Steps | Runtime | Evidence |
+|-------------------|-------------------|----------------------|-----------|---------|----------|
+| Docs-only         | full execution    | SUCCESS              | ✅        | ~56s    | PR #67, Run 17149212755 |
+| Site-only         | full execution    | SUCCESS              | ✅        | ~58s    | PR #68, Run 17149330238 |
+| Mixed (site+docs) | full execution    | SUCCESS              | ✅        | ~1m55s  | PR #69, Run 17149404841 |
+
+### Key Findings
+
+**✅ Critical Fix Verified**: Mixed changes (site+docs) now properly trigger E2E tests after PR #54 logic fix. This resolves the critical branch protection issue where mixed PRs were incorrectly skipping E2E validation.
+
+**⚠️ Path Optimization**: All change types currently trigger full E2E execution due to path filter behavior. While docs-only optimization is not active, this ensures comprehensive testing and maintains branch protection integrity.
+
+**🔒 Branch Protection Status**: All required checks show SUCCESS (never SKIPPED), ensuring merge protection is enforced correctly.
+
+### Verification Results
+- **All PRs**: Required check "Site E2E Smoke Tests (≤3min)" = SUCCESS
+- **All PRs**: Runtime within ≤3min target
+- **Critical**: Mixed changes execute E2E tests (previously broken)
+- **Performance**: Tests complete efficiently with quarantine strategy
+
 ---
 
 **Integration**: This runbook supports the Service Health Workflow (Cal.com + Zammad) and Site E2E gates maintaining 8+/10 operational health while enabling confident development velocity.
