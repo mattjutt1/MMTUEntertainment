@@ -196,12 +196,13 @@ test.describe('Revenue Path E2E Tests @smoke @landing', () => {
     // Check accessibility labels
     await expect(page.locator('nav[aria-label="Main navigation"]')).toBeVisible();
     
-    // Check CTA accessibility
-    const auditCTA = page.locator('a[aria-label*="Get security audit"]');
-    const kitCTA = page.locator('a[aria-label*="Get gatekeeper kit"]');
+    // Check foundation-first CTA accessibility (contact only)
+    const contactCTA = page.locator('a[href="/contact"]').first();
+    await expect(contactCTA).toBeVisible();
     
-    await expect(auditCTA).toBeVisible();
-    await expect(kitCTA).toBeVisible();
+    // Verify no product CTAs exist (foundation first)
+    await expect(page.locator('a[aria-label*="Get security audit"]')).toHaveCount(0);
+    await expect(page.locator('a[aria-label*="Get gatekeeper kit"]')).toHaveCount(0);
   });
 
 });
