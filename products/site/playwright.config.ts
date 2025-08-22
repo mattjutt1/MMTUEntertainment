@@ -9,7 +9,11 @@ export default defineConfig({
 
   timeout: 30_000,
   fullyParallel: false,
-  reporter: [['github'], ['line']],
+  reporter: [
+    ['line'],
+    ['junit', { outputFile: 'products/site/test-results/junit.xml' }],
+    ['html', { outputFolder: 'products/site/playwright-report', open: 'never' }]
+  ],
 
   use: {
     baseURL: BASE,
@@ -28,10 +32,30 @@ export default defineConfig({
   },
 
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit',   use: { ...devices['Desktop Safari'] } },
-    { name: 'Mobile Chrome', use: { ...devices['Pixel 7'] } },
-    { name: 'Mobile Safari', use: { ...devices['iPhone 14'] } },
+    { 
+      name: 'chromium', 
+      use: { ...devices['Desktop Chrome'] },
+      grepInvert: process.env.CI ? /@quarantine/ : undefined,
+    },
+    { 
+      name: 'firefox',  
+      use: { ...devices['Desktop Firefox'] },
+      grepInvert: process.env.CI ? /@quarantine/ : undefined,
+    },
+    { 
+      name: 'webkit',   
+      use: { ...devices['Desktop Safari'] },
+      grepInvert: process.env.CI ? /@quarantine/ : undefined,
+    },
+    { 
+      name: 'Mobile Chrome', 
+      use: { ...devices['Pixel 7'] },
+      grepInvert: process.env.CI ? /@quarantine/ : undefined,
+    },
+    { 
+      name: 'Mobile Safari', 
+      use: { ...devices['iPhone 14'] },
+      grepInvert: process.env.CI ? /@quarantine/ : undefined,
+    },
   ],
 });
