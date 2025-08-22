@@ -26,6 +26,9 @@ jobs:
             site:
               - 'products/site/**'
               - '.github/workflows/site-e2e-smoke.yml'
+              - '!docs/**'
+              - '!README.md'
+              - '!CHANGELOG.md'
               - '!archive/**'
             docs_only:
               - 'docs/**'
