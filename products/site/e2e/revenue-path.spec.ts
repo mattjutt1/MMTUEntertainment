@@ -16,7 +16,7 @@ test.describe('Revenue Path E2E Tests @smoke @landing', () => {
     await page.goto('/');
     
     // Check page loads successfully
-    await expect(page).toHaveTitle(/INTENTIONAL_FAILURE_FOR_GATE_TEST/);
+    await expect(page).toHaveTitle(/MMTU Entertainment/);
     
     // Verify main value proposition
     await expect(page.locator('h1')).toContainText('Revenue-First Development Solutions');
