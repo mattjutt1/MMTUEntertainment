@@ -18,9 +18,17 @@ Stack Health Check / Services Health Check (core)
 Site E2E Smoke Tests (≤3min)
 ```
 
-**Purpose**: Validates critical revenue funnel paths and site functionality before merging. Runs Playwright tests with quarantine support for known brittle tests.
+**Purpose**: Validates critical revenue funnel paths and site functionality before merging. Uses optimized smoke configuration with Chromium-only testing, 15s test timeouts, and quarantine support for brittle tests.
 
-**Evidence & Citations**: See `docs/best-practices/smoke-testing-references.md`
+**Configuration**:
+- **Workflow**: `.github/workflows/site-e2e-smoke.yml`
+- **Playwright Config**: `products/site/playwright.smoke.ts`
+- **Command**: `pnpm test:e2e:site:smoke --grep @smoke`
+- **Timeout**: 3 minutes (job-level hard limit)
+- **Browser**: Chromium only for speed
+- **Artifacts**: JUnit XML + HTML report (7-day retention)
+
+**Evidence & Citations**: See `docs/Runbook-Site-E2E.md` for detailed configuration
 
 ## GitHub Configuration
 
