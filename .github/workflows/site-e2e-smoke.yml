@@ -29,7 +29,8 @@ jobs:
               - '!archive/**'
             docs_only:
               - 'docs/**'
-              - '*.md'
+              - 'README.md'
+              - 'CHANGELOG.md'
               - '.cspell.json'
               - '.lycheeignore'
               - '.lychee.toml'
