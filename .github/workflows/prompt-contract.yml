@@ -1,0 +1,11 @@
+name: Prompt Contract Lint
+on: [pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate prompt contract
+        run: |
+          grep -q "Handoff Block" docs/prompts/claude-code-orchestration.md
+          echo "✅ Handoff markers present"
