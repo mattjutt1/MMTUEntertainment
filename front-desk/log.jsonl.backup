@@ -1,0 +1,10 @@
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0001", "status": "open", "src": "intake", "note": "fix homepage link"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0002", "status": "open", "src": "intake", "note": "update contact form validation"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0003", "status": "open", "src": "intake", "note": "repair footer navigation"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0004", "status": "open", "src": "intake", "note": "optimize image loading speed"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0005", "status": "open", "src": "intake", "note": "add mobile menu toggle"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0006", "status": "open", "src": "intake", "note": "fix broken search functionality"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0007", "status": "open", "src": "intake", "note": "update privacy policy page"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0008", "status": "open", "src": "intake", "note": "improve accessibility contrast"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0009", "status": "open", "src": "intake", "note": "resolve SSL certificate warning"}
+{"ts": "2025-08-22T20:26:17Z", "type": "triage", "id": "T-0010", "status": "open", "src": "intake", "note": "debug newsletter signup form"}
