@@ -58,37 +58,37 @@ jobs:
           exit 1
 
       - name: Checkout
-        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
+        if: needs.detect.outputs.site_changed == 'true'
         uses: actions/checkout@v4
         with:
           submodules: false
 
       - name: Setup PNPM
-        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
+        if: needs.detect.outputs.site_changed == 'true'
         run: |
           corepack enable
           corepack use pnpm@10
 
       - name: Install workspace deps
-        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
+        if: needs.detect.outputs.site_changed == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers (chromium only)
-        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
+        if: needs.detect.outputs.site_changed == 'true'
         run: pnpm exec playwright install chromium --with-deps
 
       - name: Build site
-        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
+        if: needs.detect.outputs.site_changed == 'true'
         run: cd products/site && node build.js
 
       - name: Run Site E2E Smoke Tests
-        if: needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
+        if: needs.detect.outputs.site_changed == 'true'
         run: pnpm test:e2e:site:smoke
         env:
           CI: true
 
       - name: Upload test results
-        if: (failure() || success()) && needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
+        if: (failure() || success()) && needs.detect.outputs.site_changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: site-e2e-smoke-results-${{ github.run_id }}
@@ -98,7 +98,7 @@ jobs:
           retention-days: 7
 
       - name: Report test summary
-        if: always() && needs.detect.outputs.site_changed == 'true' && needs.detect.outputs.docs_only != 'true'
+        if: always() && needs.detect.outputs.site_changed == 'true'
         run: |
           {
             echo "## 🧪 Site E2E Smoke Test Results"
