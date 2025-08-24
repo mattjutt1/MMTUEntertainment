@@ -1,0 +1,21 @@
+name: webhook-smoke
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/test-webhook.sh"
+      - "docs/front-desk/**"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run n8n webhook smoke
+        env:
+          N8N_WEBHOOK_PROD_URL: ${{ secrets.N8N_WEBHOOK_PROD_URL }}
+          N8N_WEBHOOK_SECRET: ${{ secrets.N8N_WEBHOOK_SECRET }}
+        run: bash scripts/test-webhook.sh | tee /dev/stderr
