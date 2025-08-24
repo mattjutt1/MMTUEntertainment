@@ -1,0 +1,33 @@
+name: schema-smoke
+on:
+  pull_request:
+    paths:
+      - "schemas/**"
+      - "data/front-desk/**"
+      - "tests/schema/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "yarn.lock"
+      - "package-lock.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install & run schema tests (auto-detect package manager)
+        run: |
+          if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i && pnpm run test:schema; \
+          elif [ -f yarn.lock ]; then corepack enable yarn && yarn install --frozen-lockfile && yarn run test:schema; \
+          else npm ci && npm run test:schema; fi
