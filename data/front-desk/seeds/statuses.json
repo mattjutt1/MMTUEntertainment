@@ -1,0 +1,32 @@
+[
+  {
+    "id": "NEW",
+    "name": "New",
+    "description": "Newly created ticket awaiting initial review",
+    "order": 1
+  },
+  {
+    "id": "OPEN",
+    "name": "Open", 
+    "description": "Ticket is open and being worked on",
+    "order": 2
+  },
+  {
+    "id": "IN_PROGRESS",
+    "name": "In Progress",
+    "description": "Actively being worked on by an agent",
+    "order": 3
+  },
+  {
+    "id": "RESOLVED",
+    "name": "Resolved",
+    "description": "Issue has been resolved, awaiting customer confirmation",
+    "order": 4
+  },
+  {
+    "id": "CLOSED",
+    "name": "Closed",
+    "description": "Ticket is closed and no further action required",
+    "order": 5
+  }
+]

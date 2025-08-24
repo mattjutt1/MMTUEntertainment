@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mmtu.entertainment/schemas/frontdesk-event.schema.json",
+  "title": "Front Desk Event",
+  "description": "Core event structure for Front Desk system",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "ulid",
+      "description": "ULID identifier for the event"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp when event was created"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["zammad", "freescout", "manual"],
+      "description": "Source system that generated this event"
+    },
+    "contact": {
+      "$ref": "contact.schema.json",
+      "description": "Contact information associated with this event"
+    },
+    "status": {
+      "type": "string",
+      "description": "Current status of the event (validated against seed data)"
+    },
+    "priority": {
+      "type": "string", 
+      "description": "Priority level (validated against seed data)"
+    },
+    "correlation_id": {
+      "type": "string",
+      "description": "Optional correlation ID for tracking related events"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of tags for categorization"
+    },
+    "category": {
+      "type": "string",
+      "description": "Event category"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Additional event-specific data"
+    }
+  },
+  "required": ["id", "ts", "source", "contact", "status", "priority"],
+  "additionalProperties": false
+}

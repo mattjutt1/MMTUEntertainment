@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Agent",
+    "description": "Front-line support agent",
+    "permissions": [
+      "ticket:read",
+      "ticket:update", 
+      "ticket:comment",
+      "contact:read",
+      "contact:update",
+      "category:read",
+      "priority:read"
+    ]
+  },
+  {
+    "name": "Supervisor", 
+    "description": "Team supervisor with escalation privileges",
+    "permissions": [
+      "ticket:read",
+      "ticket:update",
+      "ticket:comment",
+      "ticket:assign",
+      "ticket:escalate",
+      "contact:read", 
+      "contact:update",
+      "contact:create",
+      "category:read",
+      "priority:read",
+      "priority:update",
+      "agent:read",
+      "reports:basic"
+    ]
+  },
+  {
+    "name": "Admin",
+    "description": "System administrator with full access",
+    "permissions": [
+      "ticket:*",
+      "contact:*",
+      "category:*", 
+      "priority:*",
+      "sla:*",
+      "agent:*",
+      "role:*",
+      "system:*",
+      "reports:*",
+      "audit:read"
+    ]
+  }
+]

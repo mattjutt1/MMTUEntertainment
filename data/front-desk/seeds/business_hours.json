@@ -1,0 +1,13 @@
+{
+  "timezone": "America/New_York",
+  "weekly": {
+    "mon": [["09:00", "17:00"]],
+    "tue": [["09:00", "17:00"]],
+    "wed": [["09:00", "17:00"]],
+    "thu": [["09:00", "17:00"]],
+    "fri": [["09:00", "17:00"]],
+    "sat": [],
+    "sun": []
+  },
+  "holidays_ics_url": "https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics"
+}

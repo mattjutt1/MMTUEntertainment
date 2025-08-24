@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mmtu.entertainment/schemas/contact.schema.json",
+  "title": "Contact",
+  "description": "Contact information with international standards",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "ulid",
+      "description": "ULID identifier for the contact"
+    },
+    "name": {
+      "type": "string",
+      "description": "Contact's full name"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Contact's email address"
+    },
+    "phone": {
+      "type": "string",
+      "format": "e164",
+      "description": "Phone number in E.164 format (e.g., +14155551234)"
+    },
+    "language": {
+      "type": "string",
+      "format": "bcp47",
+      "description": "Language preference in BCP-47 format (e.g., en-US)"
+    },
+    "timezone": {
+      "type": "string",
+      "format": "timezone",
+      "description": "IANA timezone identifier (e.g., America/New_York)"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp when contact was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp when contact was last updated"
+    }
+  },
+  "required": ["id", "name", "email"],
+  "additionalProperties": false
+}
