@@ -1,0 +1,13 @@
+{
+  "actor": "user:john.doe@example.com",
+  "action": "ticket:create",
+  "object": "ticket:01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "outcome": "success",
+  "correlation_id": "req_123456789",
+  "ts": "2025-08-24T16:42:00.000Z",
+  "context": {
+    "user_agent": "Mozilla/5.0...",
+    "ip_address": "192.168.1.100",
+    "session_id": "sess_abc123"
+  }
+}

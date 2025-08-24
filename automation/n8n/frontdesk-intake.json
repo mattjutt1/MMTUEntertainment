@@ -1,0 +1,138 @@
+{
+  "name": "Front Desk Intake",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "frontdesk/intake",
+        "authentication": "headerAuth",
+        "headerAuth": {
+          "name": "x-signature",
+          "value": "={{ $env.N8N_WEBHOOK_SECRET }}"
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-intake",
+      "name": "Webhook - Front Desk Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "frontdesk-intake-webhook",
+      "notes": "IMPORTANT: After importing this flow:\n1. Set N8N_WEBHOOK_SECRET in your n8n environment variables\n2. After activation, use the PRODUCTION URL (not Test URL)\n3. The Production URL format: https://[your-domain].app.n8n.cloud/webhook/[webhook-id]/frontdesk/intake"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Normalize incoming helpdesk data to Front Desk schema\nconst src = $headers[\"x-frontdesk-source\"] || \"manual\";\nconst body = $json || {};\n\nreturn [{\n  json: {\n    source: src,\n    subject: body.subject || body.title || \"(no subject)\",\n    body: body.body || body.text || body.description || \"\",\n    contact: {\n      email: body.contact?.email || body.customer?.email || body.email || \"\",\n      phone: body.contact?.phone || body.customer?.phone || body.phone || \"\",\n      language: body.contact?.language || body.language || \"en-US\",\n      timezone: body.contact?.timezone || body.timezone || \"America/New_York\",\n      name: body.contact?.name || body.customer?.name || body.name || \"\"\n    },\n    tags: body.tags || [],\n    priority: body.priority || \"P3\",\n    status: body.status || \"NEW\",\n    category: body.category || body.type || \"\",\n    correlation_id: body.correlation_id || body.ticket_id || \"\",\n    // Let ingest service fill id/ts if not provided\n    id: body.id || undefined,\n    ts: body.ts || undefined\n  }\n}];"
+      },
+      "id": "normalize-data",
+      "name": "Normalize Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "notes": "Maps various helpdesk formats to our Front Desk schema:\n- Handles Zammad, FreeScout, and manual formats\n- Normalizes field names (e.g., customer → contact)\n- Sets defaults for required fields\n- Preserves optional fields if present"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.INGEST_BASE_URL }}/ingest/frontdesk",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "jsonParameters": false,
+        "options": {
+          "bodyContentType": "json"
+        },
+        "bodyParametersJson": "={{ JSON.stringify($json) }}",
+        "headerParametersJson": "{\n  \"content-type\": \"application/json\",\n  \"x-frontdesk-source\": \"{{ $('Webhook - Front Desk Intake').item.headers['x-frontdesk-source'] || 'n8n' }}\"\n}"
+      },
+      "id": "http-ingest",
+      "name": "HTTP Request - Send to Ingest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300],
+      "continueOnFail": true,
+      "notes": "Forwards normalized data to ingest service:\n- Set INGEST_BASE_URL in n8n environment variables\n- Expects ingest to return { id: \"01...\" } on success\n- Continue on fail enabled for initial testing"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ \n  // If ingest returned an ID, include it\n  const ingestResponse = $('HTTP Request - Send to Ingest').item.json;\n  const normalizedData = $('Normalize Data').item.json;\n  \n  JSON.stringify({\n    id: ingestResponse?.id || normalizedData.id,\n    status: ingestResponse ? 'ingested' : 'normalized',\n    source: normalizedData.source,\n    subject: normalizedData.subject,\n    contact: normalizedData.contact,\n    priority: normalizedData.priority,\n    timestamp: new Date().toISOString()\n  })\n}}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "content-type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "notes": "Returns normalized data to caller:\n- Includes ingest ID if available\n- Falls back to normalized data if ingest fails\n- Always returns 200 to prevent helpdesk retries"
+    }
+  ],
+  "connections": {
+    "Webhook - Front Desk Intake": {
+      "main": [
+        [
+          {
+            "node": "Normalize Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Send to Ingest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Send to Ingest": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "01J5ZR8K1HNMVK0JQYXG2P3D4C",
+  "id": "frontdesk-intake-flow",
+  "meta": {
+    "instanceId": "mmtuentertainment"
+  },
+  "tags": [
+    {
+      "id": "frontdesk",
+      "name": "Front Desk"
+    },
+    {
+      "id": "webhooks",
+      "name": "Webhooks"
+    },
+    {
+      "id": "intake",
+      "name": "Intake"
+    }
+  ],
+  "notes": "# Front Desk Intake Webhook Flow\n\nThis flow receives helpdesk events and forwards them to our ingest service.\n\n## Setup Instructions\n\n1. **Environment Variables** (set in n8n):\n   - `N8N_WEBHOOK_SECRET`: Shared secret for webhook authentication\n   - `INGEST_BASE_URL`: Base URL of your ingest service (e.g., https://your-ingest.example.com)\n\n2. **After Import**:\n   - Review and adjust the webhook path if needed\n   - Activate the workflow\n   - Copy the **PRODUCTION** webhook URL (not the test URL)\n\n3. **Configure Your Helpdesk**:\n   - URL: The production webhook URL from step 2\n   - Headers:\n     - `x-signature`: Your N8N_WEBHOOK_SECRET value\n     - `x-frontdesk-source`: 'zammad' or 'freescout'\n   - Events: Ticket created, updated\n   - Enable retries: Yes\n\n## Data Flow\n\n1. Helpdesk sends webhook → n8n Webhook node\n2. Normalize Data function → maps to Front Desk schema\n3. HTTP Request → forwards to ingest service\n4. Respond to Webhook → returns status to helpdesk\n\n## Testing\n\nUse the test script: `scripts/test-webhook.sh`"
+}

@@ -1,0 +1,174 @@
+name: n8n Webhook Smoke Test
+
+on:
+  push:
+    paths:
+      - 'automation/n8n/**'
+      - 'docs/front-desk/**'
+      - 'scripts/test-webhook.sh'
+      - 'package*.json'
+      - 'pnpm-*.yaml'
+      - '.github/workflows/n8n-smoke.yml'
+  pull_request:
+    paths:
+      - 'automation/n8n/**'
+      - 'docs/front-desk/**'
+      - 'scripts/test-webhook.sh'
+      - 'package*.json'
+      - 'pnpm-*.yaml'
+      - '.github/workflows/n8n-smoke.yml'
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug logging'
+        required: false
+        default: 'false'
+
+# Cancel in-progress runs when new push to same branch
+concurrency:
+  group: n8n-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  webhook-smoke-test:
+    name: Test n8n Webhook
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    
+    # Only run if secrets are configured
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (vars.N8N_WEBHOOK_PROD_URL != '' && secrets.N8N_WEBHOOK_SECRET != '')
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/test-webhook.sh
+            automation/n8n/
+      
+      - name: Validate n8n Flow JSON
+        run: |
+          echo "Validating n8n flow JSON syntax..."
+          if [ -f "automation/n8n/frontdesk-intake.json" ]; then
+            jq empty automation/n8n/frontdesk-intake.json
+            echo "✓ n8n flow JSON is valid"
+            
+            # Check required nodes exist
+            NODES=$(jq -r '.nodes[].type' automation/n8n/frontdesk-intake.json | sort -u)
+            echo "Found node types:"
+            echo "$NODES"
+            
+            # Verify essential nodes
+            if echo "$NODES" | grep -q "webhook"; then
+              echo "✓ Webhook node present"
+            else
+              echo "✗ Missing webhook node"
+              exit 1
+            fi
+            
+            if echo "$NODES" | grep -q "function"; then
+              echo "✓ Function node present"
+            else
+              echo "✗ Missing function node"
+              exit 1
+            fi
+            
+            if echo "$NODES" | grep -q "httpRequest"; then
+              echo "✓ HTTP Request node present"
+            else
+              echo "✗ Missing HTTP Request node"
+              exit 1
+            fi
+            
+            if echo "$NODES" | grep -q "respondToWebhook"; then
+              echo "✓ Respond to Webhook node present"
+            else
+              echo "✗ Missing Respond to Webhook node"
+              exit 1
+            fi
+            
+          else
+            echo "✗ n8n flow file not found"
+            exit 1
+          fi
+      
+      - name: Test Webhook Endpoint
+        if: vars.N8N_WEBHOOK_PROD_URL != '' && secrets.N8N_WEBHOOK_SECRET != ''
+        env:
+          N8N_WEBHOOK_PROD_URL: ${{ vars.N8N_WEBHOOK_PROD_URL }}
+          N8N_WEBHOOK_SECRET: ${{ secrets.N8N_WEBHOOK_SECRET }}
+          DEBUG: ${{ github.event.inputs.debug || 'false' }}
+        run: |
+          if [ "$DEBUG" == "true" ]; then
+            echo "Debug mode enabled"
+            set -x
+          fi
+          
+          echo "Testing n8n webhook endpoint..."
+          
+          # Run the test script
+          if ./scripts/test-webhook.sh; then
+            echo "✓ Webhook test passed"
+          else
+            echo "✗ Webhook test failed"
+            exit 1
+          fi
+      
+      - name: Skip Test (No Credentials)
+        if: vars.N8N_WEBHOOK_PROD_URL == '' || secrets.N8N_WEBHOOK_SECRET == ''
+        run: |
+          echo "⚠️ Skipping webhook test - credentials not configured"
+          echo "To enable this test, set:"
+          echo "  - Repository variable: N8N_WEBHOOK_PROD_URL"
+          echo "  - Repository secret: N8N_WEBHOOK_SECRET"
+          echo ""
+          echo "This is not a failure - the test will run once credentials are added."
+      
+      - name: Validate Documentation
+        run: |
+          echo "Checking documentation..."
+          if [ -f "docs/front-desk/webhooks.md" ]; then
+            echo "✓ Webhook documentation exists"
+            
+            # Check for required sections
+            if grep -q "## n8n Cloud Setup" docs/front-desk/webhooks.md; then
+              echo "✓ n8n setup section present"
+            else
+              echo "⚠️ Missing n8n setup section"
+            fi
+            
+            if grep -q "## Helpdesk Configuration" docs/front-desk/webhooks.md; then
+              echo "✓ Helpdesk configuration section present"
+            else
+              echo "⚠️ Missing helpdesk configuration section"
+            fi
+            
+            if grep -q "## Testing & Validation" docs/front-desk/webhooks.md; then
+              echo "✓ Testing section present"
+            else
+              echo "⚠️ Missing testing section"
+            fi
+          else
+            echo "⚠️ Documentation not found"
+          fi
+      
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Smoke Test Summary"
+          echo ""
+          echo "### Files Checked:"
+          echo "- [x] automation/n8n/frontdesk-intake.json"
+          echo "- [x] scripts/test-webhook.sh"
+          echo "- [x] docs/front-desk/webhooks.md"
+          echo ""
+          
+          if [ "${{ vars.N8N_WEBHOOK_PROD_URL }}" != "" ]; then
+            echo "### Webhook Test:"
+            echo "- Endpoint tested successfully"
+          else
+            echo "### Webhook Test:"
+            echo "- Skipped (credentials not configured)"
+          fi

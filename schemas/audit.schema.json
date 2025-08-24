@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mmtu.entertainment/schemas/audit.schema.json",
+  "title": "Audit Event",
+  "description": "OWASP-compliant audit trail event",
+  "type": "object",
+  "properties": {
+    "actor": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "object"}
+      ],
+      "description": "Who performed the action (user ID, system name, etc.)"
+    },
+    "action": {
+      "type": "string",
+      "description": "What action was performed"
+    },
+    "object": {
+      "type": "string", 
+      "description": "What was acted upon (resource, entity, etc.)"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure"],
+      "description": "Result of the action"
+    },
+    "correlation_id": {
+      "type": "string",
+      "description": "Correlation ID for tracking related events"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp when action occurred"
+    },
+    "context": {
+      "type": "object",
+      "description": "Additional contextual information",
+      "additionalProperties": true
+    }
+  },
+  "required": ["actor", "action", "object", "outcome", "correlation_id", "ts"],
+  "additionalProperties": false
+}

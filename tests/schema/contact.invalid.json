@@ -1,0 +1,52 @@
+[
+  {
+    "name": "invalid_e164_phone",
+    "data": {
+      "id": "01ARZ3NDEKTSV4RRFFQ69G5FB1",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "phone": "415-555-1234",
+      "language": "en-US",
+      "timezone": "America/New_York"
+    }
+  },
+  {
+    "name": "invalid_bcp47_language",
+    "data": {
+      "id": "01ARZ3NDEKTSV4RRFFQ69G5FB1",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "phone": "+14155551234",
+      "language": "invalid-lang-tag",
+      "timezone": "America/New_York"
+    }
+  },
+  {
+    "name": "invalid_iana_timezone",
+    "data": {
+      "id": "01ARZ3NDEKTSV4RRFFQ69G5FB1",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "phone": "+14155551234",
+      "language": "en-US",
+      "timezone": "Invalid/Timezone"
+    }
+  },
+  {
+    "name": "invalid_email",
+    "data": {
+      "id": "01ARZ3NDEKTSV4RRFFQ69G5FB1",
+      "name": "John Doe",
+      "email": "invalid-email-format",
+      "phone": "+14155551234",
+      "language": "en-US",
+      "timezone": "America/New_York"
+    }
+  },
+  {
+    "name": "missing_required_fields",
+    "data": {
+      "phone": "+14155551234"
+    }
+  }
+]
