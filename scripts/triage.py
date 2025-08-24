@@ -9,53 +9,62 @@ def canon(obj):
 def digest(obj):
     return hashlib.sha256(canon(obj)).hexdigest()
 
-def append_atomic(path, data):
-    """Atomically append to file"""
-    with open(path, "ab") as f:
-        f.write(data + b"\n")
-
-def load_last_hash(log):
-    """Get the most recent hash from the log"""
-    if not log.exists():
+def last_hash(path):
+    if not os.path.exists(path):
         return ""
-    
-    # Read backwards through the file to find last triage entry
-    with open(log, "rb") as f:
-        # Go to end of file
-        f.seek(0, 2)
-        position = f.tell()
-        line = ""
-        
-        while position >= 0:
-            f.seek(position)
-            next_char = f.read(1)
-            if next_char == b"\n":
+    prev = ""
+    with open(path, "rb") as f:
+        for line in f:
+            if line.strip():
                 try:
                     entry = json.loads(line)
-                    # Skip marriage protection events, find last triage entry
-                    if entry.get("type") == "triage" and "hash" in entry:
-                        return entry["hash"]
-                except:
+                    if "hash" in entry:
+                        prev = entry["hash"]
+                except Exception:
                     pass
-                line = ""
-            else:
-                line = next_char.decode("utf-8", errors="ignore") + line
-            position -= 1
+    return prev
+
+def append_atomic(path, line_bytes):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "ab") as f:
+        f.write(line_bytes + b"\n")
+        f.flush()
+        os.fsync(f.fileno())
+
+def process_from_logs(log_path):
+    """Process unassociated work bursts from marriage protection logs"""
+    if not os.path.exists(log_path):
+        return []
     
-    return ""
+    work_sessions = []
+    with open(log_path, 'r') as f:
+        for line in f:
+            if line.strip() and not line.startswith('{"_comment"'):
+                try:
+                    entry = json.loads(line)
+                    if (entry.get("module") == "marriage_protection" and 
+                        entry.get("action") in ["daemon_started", "daemon_stopped"] and
+                        entry.get("task_ref") is None):
+                        work_sessions.append(f"work session {entry.get('timestamp', '')[:10]} - {entry.get('seconds_today', 0)/3600:.1f}h")
+                except json.JSONDecodeError:
+                    continue
+    
+    return work_sessions
 
 def main():
-    if len(sys.argv) < 4:
-        print("Usage: triage.py intake.md triage.md log.jsonl [--from-logs]")
-        return
+    # Check for --from-logs flag
+    from_logs = False
+    args = sys.argv[1:]
+    if "--from-logs" in args:
+        from_logs = True
+        args.remove("--from-logs")
     
-    intake, triage, log = map(pathlib.Path, sys.argv[1:4])
-    from_logs = "--from-logs" in sys.argv
+    if len(args) != 3:
+        print("Usage: triage.py [--from-logs] intake.md triage.md log.jsonl")
+        sys.exit(1)
     
-    if from_logs:
-        process_from_logs(log, triage)
-        return
-    
+    intake, triage, log = map(pathlib.Path, args)
+
     # 1) load current max ID
     maxid = 0
     if triage.exists():
@@ -65,152 +74,61 @@ def main():
 
     # 2) read unchecked bullets from intake
     if not intake.exists():
-        print(f"No intake file found: {intake}")
+        print("triaged: 0 (no intake file)")
         return
     
     raw = intake.read_text().splitlines()
     new_items = [l.strip("- [ ]").strip() for l in raw if l.startswith("- [ ]")]
 
+    # Add work sessions from logs if requested
+    if from_logs:
+        work_sessions = process_from_logs(str(log))
+        new_items.extend(work_sessions)
+
+    if not new_items:
+        print("triaged: 0 (no unchecked items)")
+        return
+
     # 3) append to triage table if missing
     rows = []
     if triage.exists():
         rows = [l for l in triage.read_text().splitlines() if l.strip()]
-    
     header = "| id | title | status | due | tag |\n|---|---|---|---|---|"
     if not rows or not rows[0].startswith("| id |"):
         rows = [header]
 
     added = []
-    prev_hash = load_last_hash(log)
-    
     for note in new_items[:10]:  # cap per run
         maxid += 1
         tid = f"T-{maxid:04d}"
         row = f"| {tid} | {note} | open |  | general |"
         rows.append(row)
-        
-        # Create entry with hash chain
-        ts = datetime.datetime.utcnow().isoformat(timespec="seconds") + "Z"
-        entry = {
-            "id": tid,
-            "note": note,
-            "status": "open",
-            "src": "intake", 
-            "ts": ts,
-            "type": "triage",
-            "prev_hash": prev_hash,
-        }
-        
-        # Calculate and add hash
-        entry["hash"] = digest(entry)
-        added.append(entry)
-        prev_hash = entry["hash"]
+        added.append({"id": tid, "note": note})
 
     triage.write_text("\n".join(rows) + "\n")
 
-    # 4) log events with hash chain
-    for entry in added:
+    # 4) log events with hash chaining
+    prev_hash = last_hash(str(log))
+    ts = datetime.datetime.utcnow().isoformat(timespec="seconds")+"Z"
+    
+    for a in added:
+        entry = {
+            "ts": ts,
+            "type": "triage",
+            "id": a["id"],
+            "status": "open",
+            "src": "intake",
+            "note": a["note"],
+            "prev_hash": prev_hash
+        }
+        entry["hash"] = digest(entry)
+        
         line_bytes = json.dumps(entry, sort_keys=True, separators=(",", ":")).encode("utf-8")
         append_atomic(str(log), line_bytes)
         
         prev_hash = entry["hash"]
     
     print(f"triaged: {len(added)}")
-
-def process_from_logs(log, triage):
-    """Process marriage protection work sessions from logs to create triage entries"""
-    if not log.exists():
-        print("No log file found")
-        return
-    
-    # Read existing triage entries to find max ID
-    maxid = 0
-    if triage.exists():
-        for line in triage.read_text().splitlines():
-            m = re.match(r"\|\s*(T-(\d{4}))\s*\|", line)
-            if m: maxid = max(maxid, int(m.group(2)))
-    
-    # Extract work sessions from marriage protection logs
-    work_sessions = []
-    session_start = None
-    
-    with open(log, "r") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith('{"_comment'):
-                continue
-                
-            try:
-                entry = json.loads(line)
-                if entry.get("module") == "marriage_protection":
-                    action = entry.get("action", "")
-                    timestamp = entry.get("timestamp", "")
-                    
-                    if action == "daemon_started":
-                        session_start = timestamp
-                    elif action == "daemon_stopped" and session_start:
-                        # Calculate session duration (simplified)
-                        duration_min = 5  # Placeholder - could calculate from timestamps
-                        work_sessions.append({
-                            "start": session_start,
-                            "end": timestamp,
-                            "duration": f"{duration_min}min",
-                            "note": f"Work session {session_start[:10]} ({duration_min}min)"
-                        })
-                        session_start = None
-                        
-            except json.JSONDecodeError:
-                continue
-    
-    # Convert unassociated work sessions to triage entries
-    if not work_sessions:
-        print("No unassociated work sessions found")
-        return
-    
-    # Read existing triage rows
-    rows = []
-    if triage.exists():
-        rows = [l for l in triage.read_text().splitlines() if l.strip()]
-    
-    header = "| id | title | status | due | tag |"
-    if not rows or not rows[0].startswith("| id |"):
-        rows = [header, "|---|---|---|---|---|"]
-    
-    added = []
-    prev_hash = load_last_hash(pathlib.Path(log))
-    
-    for session in work_sessions[:5]:  # Limit to avoid spam
-        maxid += 1
-        tid = f"T-{maxid:04d}"
-        note = f"Document work session: {session['note']}"
-        row = f"| {tid} | {note} | open |  | sessions |"
-        rows.append(row)
-        
-        # Create triage entry
-        ts = datetime.datetime.utcnow().isoformat(timespec="seconds") + "Z"
-        entry = {
-            "id": tid,
-            "note": note,
-            "status": "open", 
-            "src": "marriage_logs",
-            "ts": ts,
-            "type": "triage",
-            "prev_hash": prev_hash,
-        }
-        
-        entry["hash"] = digest(entry)
-        added.append(entry)
-        prev_hash = entry["hash"]
-    
-    # Write updated triage table
-    triage.write_text("\n".join(rows) + "\n")
-    
-    # Append to log with hash chain
-    for entry in added:
-        line_bytes = json.dumps(entry, sort_keys=True, separators=(",", ":")).encode("utf-8")
-        append_atomic(str(log), line_bytes)
-        
-    print(f"Created {len(added)} triage entries from work sessions")
 
 if __name__ == "__main__":
     main()

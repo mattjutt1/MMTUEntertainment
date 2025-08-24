@@ -86,6 +86,11 @@ start_daemon() {
     
     log_event "daemon_started" "{\"initial_seconds\":$work_seconds}"
     
+    # Start activity monitor for wife transparency
+    echo "[marriage-protection] Starting activity transparency monitoring..."
+    ./scripts/activity_monitor.sh monitor &
+    echo $! > "$OPS_DIR/activity_monitor.pid"
+    
     while true; do
         sleep "$TICK_SECONDS"
         
@@ -198,6 +203,16 @@ cmd_stop() {
         rm -f "$PID_FILE"
     else
         echo "No daemon running"
+    fi
+    
+    # Also stop activity monitor
+    if [[ -f "$OPS_DIR/activity_monitor.pid" ]]; then
+        local activity_pid=$(cat "$OPS_DIR/activity_monitor.pid")
+        if kill -0 "$activity_pid" 2>/dev/null; then
+            kill "$activity_pid"
+            echo "✅ Activity transparency monitor stopped"
+        fi
+        rm -f "$OPS_DIR/activity_monitor.pid"
     fi
 }
 

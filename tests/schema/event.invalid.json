@@ -1,0 +1,55 @@
+[
+  {
+    "name": "invalid_ulid",
+    "data": {
+      "id": "invalid-ulid-format",
+      "ts": "2025-08-24T16:42:00.000Z",
+      "source": "zammad",
+      "contact": {
+        "id": "01ARZ3NDEKTSV4RRFFQ69G5FB1",
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+      },
+      "status": "NEW",
+      "priority": "P3"
+    }
+  },
+  {
+    "name": "invalid_rfc3339",
+    "data": {
+      "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "ts": "2025-08-24 16:42:00",
+      "source": "zammad",
+      "contact": {
+        "id": "01ARZ3NDEKTSV4RRFFQ69G5FB1",
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+      },
+      "status": "NEW",
+      "priority": "P3"
+    }
+  },
+  {
+    "name": "invalid_source",
+    "data": {
+      "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "ts": "2025-08-24T16:42:00.000Z",
+      "source": "invalid-source",
+      "contact": {
+        "id": "01ARZ3NDEKTSV4RRFFQ69G5FB1",
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+      },
+      "status": "NEW",
+      "priority": "P3"
+    }
+  },
+  {
+    "name": "missing_required_fields",
+    "data": {
+      "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "ts": "2025-08-24T16:42:00.000Z",
+      "source": "zammad"
+    }
+  }
+]

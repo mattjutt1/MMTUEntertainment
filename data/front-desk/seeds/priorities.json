@@ -1,0 +1,38 @@
+[
+  {
+    "id": "P1",
+    "name": "Critical",
+    "description": "Critical issues requiring immediate attention",
+    "first_response_minutes": 15,
+    "resolution_minutes": 240,
+    "color": "#dc3545",
+    "order": 1
+  },
+  {
+    "id": "P2", 
+    "name": "High",
+    "description": "High priority issues",
+    "first_response_minutes": 60,
+    "resolution_minutes": 480,
+    "color": "#fd7e14",
+    "order": 2
+  },
+  {
+    "id": "P3",
+    "name": "Medium", 
+    "description": "Standard priority issues",
+    "first_response_minutes": 240,
+    "resolution_minutes": 1440,
+    "color": "#ffc107",
+    "order": 3
+  },
+  {
+    "id": "P4",
+    "name": "Low",
+    "description": "Low priority issues",
+    "first_response_minutes": 480,
+    "resolution_minutes": 2880,
+    "color": "#28a745",
+    "order": 4
+  }
+]

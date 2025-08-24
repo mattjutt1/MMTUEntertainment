@@ -1,0 +1,44 @@
+[
+  {
+    "id": "technical_support",
+    "name": "Technical Support",
+    "description": "Technical issues and troubleshooting",
+    "default_priority": "P3"
+  },
+  {
+    "id": "billing",
+    "name": "Billing & Payments", 
+    "description": "Payment, billing, and subscription issues",
+    "default_priority": "P2"
+  },
+  {
+    "id": "account_management",
+    "name": "Account Management",
+    "description": "Account settings, profile, and access issues",
+    "default_priority": "P3"
+  },
+  {
+    "id": "feature_request",
+    "name": "Feature Request",
+    "description": "Requests for new features or enhancements",
+    "default_priority": "P4"
+  },
+  {
+    "id": "bug_report",
+    "name": "Bug Report",
+    "description": "Software bugs and defects",
+    "default_priority": "P2"
+  },
+  {
+    "id": "security_incident",
+    "name": "Security Incident",
+    "description": "Security-related issues and incidents",
+    "default_priority": "P1"
+  },
+  {
+    "id": "general_inquiry",
+    "name": "General Inquiry",
+    "description": "General questions and information requests",
+    "default_priority": "P4"
+  }
+]
