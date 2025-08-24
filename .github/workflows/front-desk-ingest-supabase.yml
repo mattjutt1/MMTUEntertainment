@@ -1,0 +1,80 @@
+name: Front Desk Ingest - Supabase Integration
+
+on:
+  push:
+    paths:
+      - 'front-desk/ingest/**'
+      - '.github/workflows/front-desk-ingest-supabase.yml'
+    branches:
+      - main
+      - 'frontdesk/**'
+  pull_request:
+    paths:
+      - 'front-desk/ingest/**'
+      - '.github/workflows/front-desk-ingest-supabase.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test Ingest Service with Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        working-directory: front-desk/ingest
+        run: npm ci
+        
+      - name: Run tests without Supabase
+        working-directory: front-desk/ingest
+        run: npm test
+        env:
+          NODE_ENV: test
+          
+      - name: Run tests with Supabase (if configured)
+        if: ${{ vars.SUPABASE_URL != '' }}
+        working-directory: front-desk/ingest
+        run: npm test
+        env:
+          NODE_ENV: test
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          
+      - name: Check service health
+        working-directory: front-desk/ingest
+        run: |
+          echo "Testing health endpoint..."
+          npm start &
+          SERVER_PID=$!
+          sleep 2
+          curl -f http://localhost:3000/api/health || exit 1
+          kill $SERVER_PID
+        env:
+          NODE_ENV: test
+
+  deploy-check:
+    name: Verify Vercel Deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Check deployment health
+        run: |
+          echo "Checking Vercel deployment health..."
+          HEALTH_URL="${{ vars.INGEST_SERVICE_URL }}/api/health"
+          if [ -z "$HEALTH_URL" ]; then
+            HEALTH_URL="https://ingest.vercel.app/api/health"
+          fi
+          curl -f "$HEALTH_URL" || echo "Health check failed (non-critical)"

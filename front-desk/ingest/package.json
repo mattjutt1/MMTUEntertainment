@@ -1,0 +1,28 @@
+{
+  "name": "@mmtu/front-desk-ingest",
+  "version": "1.0.0",
+  "description": "Front desk event ingestion service",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:integration": "vitest run tests/integration.test.js",
+    "test:coverage": "vitest run --coverage",
+    "lint": "echo 'ESLint not configured yet'",
+    "format:check": "echo 'Prettier not configured yet'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.56.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "express": "^4.18.2",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "supertest": "^6.3.3",
+    "vitest": "^2.1.8"
+  }
+}
