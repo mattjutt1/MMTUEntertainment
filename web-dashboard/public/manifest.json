@@ -1,0 +1,55 @@
+{
+  "name": "Marriage Protection Dashboard",
+  "short_name": "Marriage Protection",
+  "description": "Real-time work monitoring and spousal oversight for healthy work-life balance",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#9333ea",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["productivity", "lifestyle", "health"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Marriage Protection Dashboard on mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Emergency Halt",
+      "short_name": "Emergency Stop",
+      "description": "Immediately stop all work activities",
+      "url": "/?action=emergency",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
